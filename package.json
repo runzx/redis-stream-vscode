@@ -19,7 +19,24 @@
         "command": "redis-stream.helloWorld",
         "title": "Hello World"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "package-explorer",
+          "title": "Package Explorer",
+          "icon": "image/redis-icon-0.png"
+        }
+      ]
+    },
+    "views": {
+      "package-explorer": [
+        {
+          "id": "targetTree1",
+          "name": "Targets1"
+        }
+      ]
+    }
   },
   "scripts": {
     "lint": "eslint .",
