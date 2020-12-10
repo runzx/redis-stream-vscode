@@ -10,7 +10,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:redis-stream.helloWorld"
+    "onCommand:redis-stream.helloWorld",
+    "onCommand:redis-stream.hide"
   ],
   "main": "./extension.js",
   "contributes": {

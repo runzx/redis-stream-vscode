@@ -1,7 +1,7 @@
 
 const vscode = require('vscode')
 const { registerCommand, registerTextEditorCommand } = vscode.commands
-const { showMsg } = require('../lib/show-message')
+const { showMsg, showModal } = require('../lib/show-message')
 const showStatusBar = require('../lib/status-view')
 const log = require('../lib/logging')('registers')
 
@@ -20,10 +20,12 @@ exports.registers = (context) => {
     let res = statusBar.text
     statusBar.showMessage('heheh.....')
 
-    showMsg.info('Hello World from redis-stream!')
+    showMsg('Hello World from redis-stream!')
   })
 
   register('redis-stream.hide', () => {
+    showModal('要隐藏状态栏显示?', 'yes', 'no', 'or')
+      .then(res => console.log('res:', res))
     statusBar.hideMessage()
   })
 
