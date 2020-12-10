@@ -1,48 +1,27 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
+/*
+ * @Author: xiang.zhai 
+ * @Date: 2020-12-10 09:57:42 
+ * @Last Modified by: zx.B450
+ * @Last Modified time: 2020-12-10 10:10:23
+ * vscode 扩展开发框架	翟享
+ * 
+ */
+
 const vscode = require('vscode')
 
-const StatusView = require('./lib/status-view')
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
-
+const { registers } = require('./command')
+const { channel } = require('./config')
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-	const statusBar = new StatusView(context)
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
+
 	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "redis-stream" is now active!')
+	console.log(`Congratulations, your extension "${channel}" is now active!`)
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with  registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('redis-stream.helloWorld', function () {
-		// The code you place here will be executed every time your command is executed
-		let res = statusBar.text
-		statusBar.showMessage('heheh.....')
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from redis-stream!')
-	})
-
-	context.subscriptions.push(disposable)
-
-	context.subscriptions.push(vscode.commands.registerCommand('redis-stream.hide', () => {
-		// The code you place here will be executed every time your command is executed
-		let res = statusBar.text
-		// statusBar.showMessage('heheh.....')
-		// Display a message box to the user
-		vscode.window.showInformationMessage('demo hide status bar msg!')
-		statusBar.hideMessage()
-	}))
+	registers(context)
 }
+
 exports.activate = activate
 
-// this method is called when your extension is deactivated
-function deactivate() { }
-
-module.exports = {
-	activate,
-	deactivate
-}
+exports.deactivate = () => { }
