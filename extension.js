@@ -20,12 +20,22 @@ function activate(context) {
 	// The commandId parameter must match the command field in package.json
 	let disposable = vscode.commands.registerCommand('redis-stream.helloWorld', function () {
 		// The code you place here will be executed every time your command is executed
+		let res = statusBar.text
 		statusBar.showMessage('heheh.....')
 		// Display a message box to the user
 		vscode.window.showInformationMessage('Hello World from redis-stream!')
 	})
 
 	context.subscriptions.push(disposable)
+
+	context.subscriptions.push(vscode.commands.registerCommand('redis-stream.hide', () => {
+		// The code you place here will be executed every time your command is executed
+		let res = statusBar.text
+		// statusBar.showMessage('heheh.....')
+		// Display a message box to the user
+		vscode.window.showInformationMessage('demo hide status bar msg!')
+		statusBar.hideMessage()
+	}))
 }
 exports.activate = activate
 

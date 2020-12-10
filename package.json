@@ -18,6 +18,10 @@
       {
         "command": "redis-stream.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "redis-stream.hide",
+        "title": "zx hide status bar"
       }
     ],
     "viewsContainers": {
