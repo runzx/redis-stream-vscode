@@ -11,8 +11,26 @@ class RedisModel {
     this.redisBase = new RedisBase()
     this.redisClient = this.redisBase.client
   }
+  async getKeysByAllCategory(dbIndex = this.config.dbIndex) {
+    if (dbIndex !== this.config.dbIndex) {
+      await this.redisClient.select(dbIndex)
+      this.dbIndex = dbIndex
+    }
+    let [cursor, keys] = await this.redisClient.scan(0,)
+    console.log('cursor:', cursor)
+    const categoryArr = {}
+    for (const key of keys) {
+      const type = await this.getType(key)
+      if (categoryArr[type]) categoryArr[type].push(key)
+      else categoryArr[type] = [key]
+    }
+    return categoryArr
+  }
+  getType(key) {
+    return this.redisClient.type(key)
+  }
   async getKey(key) {
-    const type = await this.redisClient.type(key)
+    const type = await this.getType(key)
     let content    //  = await this.redisClient.get(key)
     switch (type) {
       case RedisType.string:
@@ -37,7 +55,7 @@ class RedisModel {
         break
       case RedisType.stream:
         const stream = new RedisStream({ redisClient: this.redisClient, stream: key })
-        content = await stream.getStreamInfo(undefined, true, 1)
+        content = await stream.getStreamInfo(undefined, true, 20)
 
         break
     }

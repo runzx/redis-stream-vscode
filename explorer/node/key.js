@@ -1,15 +1,15 @@
-const { NodeType } = require("../../config")
+const { NodeType, RedisType } = require("../../config")
 const { TreeDataItem } = require("../explorer")
-const path = require('path')
 const { ThemeIcon } = require("vscode")
-const { redisModel } = require("../../command/redis")
-
+const path = require('path')
 
 class KeyTreeItem extends TreeDataItem {
   constructor(opt = {}) {
     super(opt)
     this.config = {
-
+      connection: '127.0.0.1@6379',
+      db: 'db0',
+      redisDataType: RedisType.string,
       ...opt
     }
     // this.init()
@@ -23,15 +23,8 @@ class KeyTreeItem extends TreeDataItem {
       command: 'redis-stream.key.status'
     }
   }
-  init() {
-    let res = this.label.match(/(\d+)/)
-    this.dbIndex = res ? res[1] : 0
-  }
-  async getChildren() {
-    let keys = await redisModel.getKeys('*', this.dbIndex)
-    console.log('dB item getChildren:', keys)
-    return keys
-  }
+  // init() { }
+  // async getChildren() { }
 }
 
 module.exports = { KeyTreeItem }

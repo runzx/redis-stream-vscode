@@ -12,6 +12,7 @@ class ConnectionNode extends TreeDataItem {
   constructor(opt) {
     super(opt)
     this.config = {
+      connection: opt.label || '127.0.0.1@6379',
       ...opt
     }
     this.contextValue = NodeType.CONNECTION
@@ -26,6 +27,7 @@ class ConnectionNode extends TreeDataItem {
     return Object.keys(dbs).map(label => {
       const { keys, expires, avg_ttl } = dbs[label]
       return new DbTreeItem({
+        connection: this.config.connection,
         id: 'id:' + label, description: `(${keys})`,
         label, tooltip: `expires:${expires},avg_ttl:${avg_ttl}`,
         collapsibleState: keys !== 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None

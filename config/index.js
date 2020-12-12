@@ -12,7 +12,7 @@ const getVscodeConfigurations = (vscode) => {
 
 const NodeType = {
   CONNECTION: 'connection', DB: 'db',
-  FOLDER: 'folder',
+  FOLDER: 'folder', REDISDATATYPE: 'redisdatatype',
   KEY: 'key', INFO: "info"
 }
 
