@@ -37,7 +37,7 @@ class RedisModel {
         break
       case RedisType.stream:
         const stream = new RedisStream({ redisClient: this.redisClient, stream: key })
-        content = await stream.getStreamInfo()
+        content = await stream.getStreamInfo(undefined, true, 1)
 
         break
     }
