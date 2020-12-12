@@ -7,6 +7,8 @@ const log = require('../lib/logging')('registers')
 
 // 引入 tree
 const { RedisTree } = require('../explorer')
+const { VirtualDoc } = require('../editor')
+const { channel } = require('../config')
 
 
 exports.registers = (context) => {
@@ -37,6 +39,7 @@ exports.registers = (context) => {
 
 
   new RedisTree(context)
+  const doc = VirtualDoc.init(channel, context)
+  register('redis-stream.openDoc', (uri) => doc.showDoc(uri))
 
-  
 }

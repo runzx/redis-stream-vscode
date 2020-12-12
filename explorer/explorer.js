@@ -48,20 +48,20 @@ class TreeDataProvider {
 }
 
 class TreeDataItem extends TreeItem {
-  constructor({ label, id, iconPath, command,
-    resourceUri, tooltip,
+  constructor({ label = '', id, iconPath, command,
+    resourceUri, tooltip, description,
     collapsibleState = TreeItemCollapsibleState.None } = {}) {
     super(label || resourceUri, collapsibleState)
-    // this.label = label
-    // this.resourceUri = resourceUri
-    // this.id = id
-    // this.iconPath = iconPath
-
-    // this.tooltip = tooltip  // 鼠标悬浮时显示内容
-    // this.collapsibleState = collapsibleState  // 树节点是应该展开还是折叠
-    // this.command = command  // 点击树节点时，执行此命令
+    this.label = label
+    this.resourceUri = resourceUri
+    this.id = id
+    this.iconPath = iconPath
+    this.description = description
+    this.tooltip = tooltip  // 鼠标悬浮时显示内容
+    this.collapsibleState = collapsibleState  // 树节点是应该展开还是折叠
+    this.command = command  // 点击树节点时，执行此命令
   }
-  getChildren() { }
+  // getChildren() { }
   getCollapseState(element) {
     if (element.contextValue === NodeType.KEY
       || element.contextValue === NodeType.INFO)

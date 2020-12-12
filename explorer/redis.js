@@ -4,7 +4,7 @@ const { TreeItemCollapsibleState } = require('vscode')
 const { TreeExplorer, TreeDataProvider, TreeDataItem } = require('./explorer')
 const { ConnectionNode } = require('./node/conection')
 
-class RedisTreeItem extends ConnectionNode {
+class RedisTreeItem extends TreeDataItem {
   constructor({ label, id, iconPath, command,
     resourceUri, tooltip, collapsibleState }) {
     super({ label, id, iconPath, command, resourceUri, tooltip, collapsibleState })
@@ -18,7 +18,7 @@ class RedisTreeDataProvider extends TreeDataProvider {
   constructor() {
     super()
     // Expanded 时会在其item 上 getChileren()
-    this.treeData = [new RedisTreeItem({ label: 'rootZx', collapsibleState: TreeItemCollapsibleState.Expanded })]
+    this.treeData = [new ConnectionNode({ label: 'rootZx', collapsibleState: TreeItemCollapsibleState.Expanded })]
 
   }
 
@@ -54,10 +54,18 @@ class RedisTree extends TreeExplorer {
       console.log(opt, opt1, opt2)
       // log('connection', res)
       // showMsg('显示?' + res.label)
-    }, true)
+    })
+    this.register('redis-stream.db.status', (opt, opt1, opt2) => {
+      console.log('db.status: ', opt, opt1, opt2)
+
+      // log('connection', res)
+      // showMsg('显示?' + res.label)
+    })
   }
 }
 
+
 module.exports = {
-  RedisTree
+  RedisTree,
+  RedisTreeItem,
 }

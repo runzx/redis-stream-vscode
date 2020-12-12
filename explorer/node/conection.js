@@ -3,8 +3,9 @@ const { TreeDataItem } = require("../explorer")
 const path = require('path')
 const { showMsg } = require("../../lib/show-message")
 const { log } = require("../../lib/logging")
-const { RedisBase } = require("../../lib/redis-mq")
 const { TreeItemCollapsibleState } = require("vscode")
+const { DbTreeItem } = require("./db")
+const { redisModel } = require("../../command/redis")
 
 
 class ConnectionNode extends TreeDataItem {
@@ -23,16 +24,17 @@ class ConnectionNode extends TreeDataItem {
     // }
   }
   async getChildren() {
-    console.log('connection Node:',)
-    const redis = new RedisBase()
-    const [serverInfo, dbs, InfoTxt] = await redis.serverInfo()
+    console.log('connection getChildren:',)
+
+    const dbs = await redisModel.info()
     log('dbs', dbs,)
     return Object.keys(dbs).map(label => {
       const { keys, expires, avg_ttl } = dbs[label]
-      return {
-        label, tooltip: `keys:${keys},expires:${expires},avg_ttl:${avg_ttl}`,
+      return new DbTreeItem({
+        id: 'id:' + label, description: `(${keys})`,
+        label, tooltip: `expires:${expires},avg_ttl:${avg_ttl}`,
         collapsibleState: keys !== 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
-      }
+      })
     })
   }
 

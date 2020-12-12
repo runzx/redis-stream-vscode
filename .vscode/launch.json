@@ -22,7 +22,11 @@
 				"--enable-proposed-api",
 				"--disable-extensions",
 				"--extensionDevelopmentPath=${workspaceFolder}"
-			]
+			],
+			"env": {
+				"DEBUG": "ioredis:*,pd123:*"
+			},
+			// "outputCapture": "std",
 		},
 		{
 			"name": "Extension Tests",
