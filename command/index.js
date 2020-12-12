@@ -38,7 +38,5 @@ exports.registers = (context) => {
 
   new RedisTree(context)
 
-  register('redis-stream.connection.status', () => {
-    showModal('显示?')
-  })
+  
 }

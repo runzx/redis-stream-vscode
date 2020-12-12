@@ -17,8 +17,11 @@ class RedisTreeItem extends ConnectionNode {
 class RedisTreeDataProvider extends TreeDataProvider {
   constructor() {
     super()
-    this.treeData = [new RedisTreeItem({ label: 'rootZx', collapsibleState: TreeItemCollapsibleState.Collapsed })]
+    // Expanded 时会在其item 上 getChileren()
+    this.treeData = [new RedisTreeItem({ label: 'rootZx', collapsibleState: TreeItemCollapsibleState.Expanded })]
+
   }
+
   // element->state->Collapsed 第一次点击会触发 getChileren()->getTreeItem()
   _getChileren(element) {
     if (!element) {
@@ -43,7 +46,15 @@ class RedisTreeDataProvider extends TreeDataProvider {
 class RedisTree extends TreeExplorer {
   constructor(context) {
     super(context)
+    this.init()
+  }
+  init() {
     this.initTree('targetTree1', new RedisTreeDataProvider())
+    this.register('redis-stream.connection.status', (opt, opt1, opt2) => {
+      console.log(opt, opt1, opt2)
+      // log('connection', res)
+      // showMsg('显示?' + res.label)
+    }, true)
   }
 }
 

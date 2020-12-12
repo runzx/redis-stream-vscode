@@ -4,7 +4,7 @@ const path = require('path')
 const { ThemeIcon } = require("vscode")
 
 
-class Db extends TreeDataItem {
+class DbTreeItem extends TreeDataItem {
   constructor(opt) {
     super(opt)
     this.config = {
@@ -13,11 +13,16 @@ class Db extends TreeDataItem {
     this.contextValue = NodeType.DB
     this.iconPath = new ThemeIcon('database', '#fff')
     // path.join(__dirname, '..', '..', 'image', `${this.contextValue}.png`)
-
+    this.command = {
+      title: 'Info',
+      tooltip: 'redis server info',
+      arguments: [],
+      command: 'redis-stream.db.status'
+    }
   }
   getChildren() {
 
   }
 }
 
-module.exports = { Db }
+module.exports = { DbTreeItem }

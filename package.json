@@ -27,24 +27,24 @@
       },
       {
         "command": "redis-stream.connection.status",
-        "title": "log redis server info",
-        "icon": "image/refresh.png"
+        "title": "server info",
+        "icon": "image/status.png"
       }
     ],
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "package-explorer",
-          "title": "Package Explorer",
+          "id": "redis-stream",
+          "title": "Redis Explorer",
           "icon": "image/redis-icon-0.png"
         }
       ]
     },
     "views": {
-      "package-explorer": [
+      "redis-stream": [
         {
           "id": "targetTree1",
-          "name": "Targets1"
+          "name": "Stream"
         }
       ]
     },
@@ -52,6 +52,7 @@
       "view/item/context": [
         {
           "command": "redis-stream.connection.status",
+          "when": "view == targetTree1 && viewItem == connection",
           "group": "inline@0"
         }
       ]

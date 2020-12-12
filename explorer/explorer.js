@@ -52,14 +52,14 @@ class TreeDataItem extends TreeItem {
     resourceUri, tooltip,
     collapsibleState = TreeItemCollapsibleState.None } = {}) {
     super(label || resourceUri, collapsibleState)
-    this.label = label
-    this.resourceUri = resourceUri
-    this.id = id
-    this.iconPath = iconPath
+    // this.label = label
+    // this.resourceUri = resourceUri
+    // this.id = id
+    // this.iconPath = iconPath
 
-    this.tooltip = tooltip  // 鼠标悬浮时显示内容
-    this.collapsibleState = collapsibleState  // 树节点是应该展开还是折叠
-    this.command = command  // 点击树节点时，执行此命令
+    // this.tooltip = tooltip  // 鼠标悬浮时显示内容
+    // this.collapsibleState = collapsibleState  // 树节点是应该展开还是折叠
+    // this.command = command  // 点击树节点时，执行此命令
   }
   getChildren() { }
   getCollapseState(element) {
@@ -70,6 +70,10 @@ class TreeDataItem extends TreeItem {
   }
   setCollapseState(element) {
 
+  }
+  register(command, cb) {
+    registerCommand(command, cb)
+    // cb && this.subscriptions.push(registerCommand(command, cb))
   }
 }
 
