@@ -12,7 +12,7 @@ class KeyTreeItem extends TreeDataItem {
       redisDataType: RedisType.string,
       ...opt
     }
-    // this.init()
+    this.init()
     this.contextValue = NodeType.KEY
     this.iconPath = path.join(__dirname, '..', '..', 'image', `${this.contextValue}.png`)
 
@@ -23,7 +23,10 @@ class KeyTreeItem extends TreeDataItem {
       command: 'redis-stream.key.status'
     }
   }
-  // init() { }
+  init() {
+    const { connection, db, redisDataType, label } = this.config
+    this.id = `${connection}_${db}_${redisDataType}_${label}.json`
+  }
   // async getChildren() { }
 }
 
