@@ -6,13 +6,21 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"name": "file-js",
+			"program": "${file}",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"type": "pwa-node"
+		},
+		{
 			"name": "Run Extension",
 			"type": "extensionHost",
 			"request": "launch",
 			"args": [
 				"--enable-proposed-api",
 				"--disable-extensions",
-				
 				"--extensionDevelopmentPath=${workspaceFolder}"
 			]
 		},

@@ -1,5 +1,6 @@
 {
   "name": "redis-stream",
+  "publisher": "zhaix",
   "displayName": "redis-stream",
   "description": "redis stream explorer",
   "version": "0.0.1",
@@ -23,6 +24,11 @@
       {
         "command": "redis-stream.hide",
         "title": "zx hide status bar"
+      },
+      {
+        "command": "redis-stream.connection.status",
+        "title": "log redis server info",
+        "icon": "image/refresh.png"
       }
     ],
     "viewsContainers": {
@@ -39,6 +45,14 @@
         {
           "id": "targetTree1",
           "name": "Targets1"
+        }
+      ]
+    },
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "redis-stream.connection.status",
+          "group": "inline@0"
         }
       ]
     }
@@ -58,5 +72,8 @@
     "mocha": "^8.1.3",
     "typescript": "^4.1.2",
     "vscode-test": "^1.4.1"
+  },
+  "dependencies": {
+    "ioredis": "^4.19.2"
   }
 }

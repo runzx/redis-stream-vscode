@@ -5,6 +5,8 @@ const { showMsg, showModal } = require('../lib/show-message')
 const showStatusBar = require('../lib/status-view')
 const log = require('../lib/logging')('registers')
 
+// 引入 tree
+const { RedisTree } = require('../explorer')
 
 
 exports.registers = (context) => {
@@ -34,4 +36,9 @@ exports.registers = (context) => {
   })
 
 
+  new RedisTree(context)
+
+  register('redis-stream.connection.status', () => {
+    showModal('显示?')
+  })
 }
