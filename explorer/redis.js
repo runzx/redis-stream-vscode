@@ -51,7 +51,7 @@ class RedisTree extends TreeExplorer {
     this.init()
   }
   init() {
-    this.initTree('targetTree1', new RedisTreeDataProvider())
+    this.initTree('redisTree', new RedisTreeDataProvider())
     this.register('redis-stream.connection.status', (opt, opt1, opt2) => {
       console.log(opt, opt1, opt2)
       // log('connection', res)

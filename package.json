@@ -11,6 +11,7 @@
     "Other"
   ],
   "activationEvents": [
+    "onView:redisTree",
     "onCommand:redis-stream.helloWorld",
     "onCommand:redis-stream.hide"
   ],
@@ -43,7 +44,7 @@
     "views": {
       "redis-stream": [
         {
-          "id": "targetTree1",
+          "id": "redisTree",
           "name": "Stream"
         }
       ]
@@ -52,7 +53,7 @@
       "view/item/context": [
         {
           "command": "redis-stream.connection.status",
-          "when": "view == targetTree1 && viewItem == connection",
+          "when": "view == redisTree && viewItem == connection",
           "group": "inline@0"
         }
       ]
