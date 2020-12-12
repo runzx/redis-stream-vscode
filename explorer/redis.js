@@ -1,6 +1,8 @@
 
 
 const { TreeItemCollapsibleState } = require('vscode')
+const { redisModel } = require('../command/redis')
+const { log } = require('../lib/logging')
 const { TreeExplorer, TreeDataProvider, TreeDataItem } = require('./explorer')
 const { ConnectionNode } = require('./node/conection')
 
@@ -59,6 +61,13 @@ class RedisTree extends TreeExplorer {
       console.log('db.status: ', opt, opt1, opt2)
 
       // log('connection', res)
+      // showMsg('显示?' + res.label)
+    })
+    this.register('redis-stream.key.status', async (opt, opt1, opt2) => {
+      console.log('key.status: ', opt, opt1, opt2)
+      const { label } = opt
+      let res = await redisModel.getKey(label)
+      log('KEY', label, res)
       // showMsg('显示?' + res.label)
     })
   }

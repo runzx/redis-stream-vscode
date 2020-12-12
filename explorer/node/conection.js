@@ -16,12 +16,7 @@ class ConnectionNode extends TreeDataItem {
     }
     this.contextValue = NodeType.CONNECTION
     this.iconPath = path.join(__dirname, '..', '..', 'image', `${this.contextValue}.png`)
-    // this.command = {
-    //   title: 'Info',
-    //   tooltip: 'redis server info',
-    //   arguments: [],
-    //   command: 'redis-stream.connection.status'
-    // }
+
   }
   async getChildren() {
     console.log('connection getChildren:',)

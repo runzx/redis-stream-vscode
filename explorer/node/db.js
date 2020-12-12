@@ -25,6 +25,7 @@ class DbTreeItem extends TreeDataItem {
   async getChildren() {
     let keys = await redisModel.getKeys('*', this.dbIndex)
     console.log('dB item getChildren:', keys)
+    keys = keys.slice(0, 50)
     return keys.map(label => {
       // const { keys, expires, avg_ttl } = dbs[label]
       return new KeyTreeItem({

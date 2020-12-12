@@ -16,8 +16,13 @@ const NodeType = {
   KEY: 'key', INFO: "info"
 }
 
-module.exports = {
+module.exports = exports = {
   channel: 'zx-redis-stream',
   getVscodeConfigurations,
   NodeType,
+}
+
+exports.RedisType = {
+  hash: 'hash', list: 'list', string: 'string', zset: 'zset', set: 'set',
+  stream: 'stream'
 }
