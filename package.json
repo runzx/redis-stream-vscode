@@ -1,20 +1,37 @@
 {
   "name": "redis-stream",
-  "publisher": "zhaix",
+  "publisher": "zhaixiang",
   "displayName": "redis-stream",
   "description": "redis stream explorer",
   "version": "0.0.1",
+  "homepage": "https://github.com/runzx/redis-stream-vscode/blob/master/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/runzx/redis-stream-vscode"
+  },
+  "bugs": {
+    "url": "https://github.com/runzx/redis-stream-vscode/issues",
+    "email": "843476168@qq.com"
+  },
   "engines": {
-    "vscode": "^1.51.0"
+    "vscode": "^1.0.0"
   },
   "categories": [
-    "Other"
+    "Visualization",
+    "Programming Languages"
+  ],
+  "keywords": [
+    "redis",
+    "stream",
+    "mq",
+    "queue",
+    "manager"
   ],
   "activationEvents": [
-    "onView:redisTree",
-    "onCommand:redis-stream.helloWorld",
-    "onCommand:redis-stream.hide"
+    "onView:redisTree"
   ],
+  "license": "MIT",
+  "icon": "image/connection.png",
   "main": "./extension.js",
   "contributes": {
     "commands": [
