@@ -1,8 +1,6 @@
 const { NodeType, RedisType } = require("../../config")
 const { TreeDataItem } = require("../explorer")
 const { TreeItemCollapsibleState } = require("vscode")
-const { KeyTreeItem } = require("./key")
-const path = require('path')
 const { StreamPending } = require("./pending")
 
 class StreamConsumer extends TreeDataItem {
@@ -21,9 +19,17 @@ class StreamConsumer extends TreeDataItem {
 
       ...opt
     }
-    // this.contextValue = NodeType.CONSUMER
-    this.iconPath = path.join(__dirname, '..', '..', 'image', `${this.contextValue}.png`)
-
+    this.init()
+    this.command = {
+      title: 'CONSUMER',
+      tooltip: 'stream CONSUMER info',
+      arguments: [this],
+      command: 'redis-stream.consumer.status'
+    }
+  }
+  init() {
+    const { connection, db, redisDataType, label, group, stream } = this.config
+    this.id = `${connection}_${db}_${redisDataType}_${stream}_${group}_${label}.json`
   }
   async getChildren() {
     const data = {

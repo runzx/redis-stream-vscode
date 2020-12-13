@@ -1,8 +1,6 @@
 const { NodeType, RedisType } = require("../../config")
 const { TreeDataItem } = require("../explorer")
 const { TreeItemCollapsibleState } = require("vscode")
-const { KeyTreeItem } = require("./key")
-const path = require('path')
 const { IDTreeItem } = require("./id")
 
 class StreamPending extends TreeDataItem {
@@ -22,7 +20,6 @@ class StreamPending extends TreeDataItem {
       item: null,  // [[]]
       ...opt
     }
-    this.iconPath = path.join(__dirname, '..', '..', 'image', `${this.contextValue}.png`)
   }
   async getChildren() {
     const data = {

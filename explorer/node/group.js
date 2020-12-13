@@ -1,9 +1,7 @@
 const { NodeType, RedisType } = require("../../config")
 const { TreeDataItem } = require("../explorer")
 const { TreeItemCollapsibleState } = require("vscode")
-const path = require('path')
 const { StreamConsumer } = require("./consumer")
-const { IDTreeItem } = require("./id")
 const { StreamPending } = require("./pending")
 
 class StreamGroup extends TreeDataItem {
@@ -15,16 +13,23 @@ class StreamGroup extends TreeDataItem {
     this.config = {
       connection: '127.0.0.1@6379',
       db: 'db0',
-      // items: [],
       label: '', // stream key
       redisDataType: RedisType.string,
       stream: '',
       item: null,  // {name,consumers,pending...}
       ...opt
     }
-    // this.contextValue = NodeType.GORUP
-    this.iconPath = path.join(__dirname, '..', '..', 'image', `${this.contextValue}.png`)
-
+    this.init()
+    this.command = {
+      title: 'GROUP',
+      tooltip: 'stream GROUP info',
+      arguments: [this],
+      command: 'redis-stream.group.status'
+    }
+  }
+  init() {
+    const { connection, db, redisDataType, label, stream, } = this.config
+    this.id = `${connection}_${db}_${redisDataType}_${stream}_${label}.json`
   }
   async getChildren() {
 
@@ -35,7 +40,6 @@ class StreamGroup extends TreeDataItem {
       contextValue: NodeType.CONSUMER,
       stream: this.config.stream,
       group: this.label,
-      // tooltip: `expires:${expires},avg_ttl:${avg_ttl}`,
       collapsibleState: TreeItemCollapsibleState.Collapsed
     }
 

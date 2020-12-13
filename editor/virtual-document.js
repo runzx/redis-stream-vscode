@@ -13,7 +13,6 @@ class DocProvider {
     this.txt = txt
   }
   async provideTextDocumentContent(uri) {
-    // simply invoke cowsay, use uri-path as text
     log('URI', uri)
     const { path } = uri
     let res
@@ -39,15 +38,8 @@ class VirtualDoc {
   constructor(scheme, context) {
     this.scheme = scheme
     this.subscriptions = context.subscriptions
-
     this.uri
-
-    // this._documents = new Map()
-    // this._editorDecoration = window.createTextEditorDecorationType({ textDecoration: 'underline' })
-    // this._subscriptions = workspace.onDidCloseTextDocument(doc =>
-    //   this._documents.delete(doc.uri.toString()))
   }
-
   initProvider(txt) {
     this.provider = new DocProvider(this.scheme, txt)
     this.subscriptions.push(vscode.workspace
@@ -68,12 +60,7 @@ class VirtualDoc {
     v.initProvider(txt)
     return v
   }
-  dispose() {
-    this._subscriptions.dispose()
-    this._documents.clear()
-    this._editorDecoration.dispose()
-    this._onDidChange.dispose()
-  }
+  dispose() { }
 }
 
 module.exports = { VirtualDoc }

@@ -1,5 +1,5 @@
 
-
+const path = require('path')
 const vscode = require("vscode")
 const { NodeType, RedisType } = require("../config")
 const { TreeItemCollapsibleState, EventEmitter, TreeItem, Uri } = vscode
@@ -11,21 +11,16 @@ class TreeExplorer {
     this.subscriptions = context.subscriptions
     this._onDidChangeTreeData = new EventEmitter()
     this.onDidChangeTreeData = this._onDidChangeTreeData.event
-
-    // this.openExplorerCommand = openExplorerCommand
   }
 
   initTree(viewId, treeDataProvider) {
     this.subscriptions.push(
       vscode.window.createTreeView(viewId, { treeDataProvider }))
   }
+
   register(command, cb) {
     cb && this.subscriptions.push(registerCommand(command, cb))
   }
-  showDoc(uri) {
-    vscode.window.showTextDocument(uri)
-  }
-
 }
 
 class TreeDataProvider {
@@ -63,11 +58,11 @@ class TreeDataItem extends TreeItem {
     this.contextValue = contextValue
     this.redisDataType = redisDataType
 
+    this.iconPath = path.join(__dirname, '..', 'image', `${this.contextValue}.png`)
     this.collapsibleState = collapsibleState || this.getCollapseState(this)
   }
   // getChildren() { }
   getCollapseState(element) {
-
     if (element.contextValue === NodeType.KEY
       && element.redisDataType === RedisType.stream)
       return TreeItemCollapsibleState.Collapsed
@@ -76,15 +71,9 @@ class TreeDataItem extends TreeItem {
       || element.contextValue === NodeType.ID
       || element.contextValue === NodeType.INFO)
       return TreeItemCollapsibleState.None
+  }
 
-  }
-  setCollapseState(element) {
-
-  }
-  register(command, cb) {
-    registerCommand(command, cb)
-    // cb && this.subscriptions.push(registerCommand(command, cb))
-  }
+  setCollapseState(element) { }
 }
 
 module.exports = { TreeExplorer, TreeDataProvider, TreeDataItem }

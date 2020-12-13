@@ -1,6 +1,5 @@
 const { NodeType, RedisType } = require("../../config")
 const { TreeDataItem } = require("../explorer")
-const path = require('path')
 const { ThemeIcon, ThemeColor, TreeItemCollapsibleState } = require("vscode")
 const { redisModel } = require("../../command/redis")
 const { RedisDateTypes } = require("./type")
@@ -18,9 +17,6 @@ class DbTreeItem extends TreeDataItem {
       ...opt
     }
     this.init()
-    // this.contextValue = contextValue
-    this.iconPath = path.join(__dirname, '..', '..', 'image', `${this.contextValue}.png`)
-
   }
   init() {
     let res = this.label.match(/(\d+)/)

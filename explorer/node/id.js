@@ -1,8 +1,5 @@
 const { NodeType, RedisType } = require("../../config")
 const { TreeDataItem } = require("../explorer")
-const { ThemeIcon } = require("vscode")
-const path = require('path')
-const { StreamGroup } = require("./group")
 const { redisModel } = require("../../command/redis")
 
 class IDTreeItem extends TreeDataItem {
@@ -20,7 +17,6 @@ class IDTreeItem extends TreeDataItem {
       ...opt
     }
     this.init()
-    this.iconPath = path.join(__dirname, '..', '..', 'image', `${this.contextValue}.png`)
 
     this.command = {
       title: 'ID',

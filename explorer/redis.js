@@ -16,8 +16,6 @@ class RedisTreeItem extends TreeDataItem {
     })
 
   }
-  // getChileren(element) { }
-
 }
 
 class RedisTreeDataProvider extends TreeDataProvider {
@@ -25,7 +23,6 @@ class RedisTreeDataProvider extends TreeDataProvider {
     super()
     // Expanded 时会在其item 上 getChileren()
     this.treeData = [new ConnectionNode({ label: 'rootZx', collapsibleState: TreeItemCollapsibleState.Expanded })]
-
   }
 
   // element->state->Collapsed 第一次点击会触发 getChileren()->getTreeItem()
@@ -57,34 +54,42 @@ class RedisTree extends TreeExplorer {
   init() {
     this.initTree('redisTree', new RedisTreeDataProvider())
     this.register('redis-stream.connection.status', (opt, opt1, opt2) => {
-      console.log(opt, opt1, opt2)
-      // log('connection', res)
-      // showMsg('显示?' + res.label)
+      // log('connection', opt)
+
     })
     this.register('redis-stream.db.status', (opt, opt1, opt2) => {
-      console.log('db.status: ', opt, opt1, opt2)
+      // log('db', opt)
 
-      // log('connection', res)
-      // showMsg('显示?' + res.label)
     })
-    this.register('redis-stream.key.status', async (opt, opt1, opt2) => {
-      console.log('key.status: ', opt, opt1, opt2)
+
+    this.register('redis-stream.key.status', async (opt) => {
       const { label, id } = opt
+      log('KEY', label, id)
       let doc = VirtualDoc.init('redis-stream', this.context)
       let res = doc.showDoc(id)
-      // let res = await redisModel.getKey(label)
-      log('KEY', label, id)
-      // showMsg('显示?' + res.label)
     })
+
     this.register('redis-stream.id.status', async (opt,) => {
-      console.log('ID.status: ', opt,)
       const { label, id } = opt
+      log('ID', label, id)
       let doc = VirtualDoc.init('redis-stream', this.context, opt.config.item)
       let res = doc.showDoc(id)
-      // let res = await redisModel.getKey(label)
-      log('KEY', label, id)
-      // showMsg('显示?' + res.label)
     })
+
+    this.register('redis-stream.group.status', async (opt,) => {
+      const { label, id } = opt
+      log('GROUP', label, id)
+      let doc = VirtualDoc.init('redis-stream', this.context, opt.config.item)
+      let res = doc.showDoc(id)
+    })
+
+    this.register('redis-stream.consumer.status', async (opt,) => {
+      const { label, id } = opt
+      log('CONSUMER', label, id)
+      let doc = VirtualDoc.init('redis-stream', this.context, opt.config.item)
+      let res = doc.showDoc(id)
+    })
+
   }
 }
 
