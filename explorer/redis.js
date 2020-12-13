@@ -1,7 +1,8 @@
 
 
-const { TreeItemCollapsibleState } = require('vscode')
+const { TreeItemCollapsibleState, window } = require('vscode')
 const { redisModel } = require('../command/redis')
+const { Constant, redisOpt } = require('../config')
 const { VirtualDoc } = require('../editor')
 const { log } = require('../lib/logging')
 const { TreeExplorer, TreeDataProvider, TreeDataItem } = require('./explorer')
@@ -19,22 +20,19 @@ class RedisTreeItem extends TreeDataItem {
 }
 
 class RedisTreeDataProvider extends TreeDataProvider {
-  constructor() {
-    super()
+  constructor(context) {
+    super(context)
+    // this.context = context
     // Expanded 时会在其item 上 getChileren()
-    this.treeData = [new ConnectionNode({ collapsibleState: TreeItemCollapsibleState.Expanded })]
+    // this.treeData = [new ConnectionNode({ collapsibleState: TreeItemCollapsibleState.Expanded })]
   }
 
   // element->state->Collapsed 第一次点击会触发 getChileren()->getTreeItem()
   _getChileren(element) {
-    if (!element) {
-      const config = this.getConnections()
-      return Object.keys(config).map(key => {
-        return new ConnectionNode(key, config[key])
-      })
-    } else {
-      return element.getChildren()
-    }
+    if (element) return element.getChildren()
+
+    const config = this.getConnections()
+    return ConnectionNode.init(config)
   }
   _getTreeItem(element) {
     return element
@@ -44,6 +42,9 @@ class RedisTreeDataProvider extends TreeDataProvider {
       tooltip: 'my ' + tooltip + ' item'
     }
   }
+  getConnections() {
+    return this.cacheGet(Constant.GLOBALSTATE_CONFIG_KEY, redisOpt)
+  }
 }
 
 class RedisTree extends TreeExplorer {
@@ -52,7 +53,7 @@ class RedisTree extends TreeExplorer {
     this.init()
   }
   init() {
-    this.initTree('redisTree', new RedisTreeDataProvider())
+    this.initTree('redisTree', new RedisTreeDataProvider(this.context))
     this.register('redis-stream.connection.status', async (opt, opt1, opt2) => {
       log('connection', opt)
       const [serInfo] = await redisModel.redisBase.serverInfo()
@@ -74,24 +75,52 @@ class RedisTree extends TreeExplorer {
     this.register('redis-stream.id.status', async (opt,) => {
       const { label, id } = opt
       log('ID', label, id)
-      let doc = VirtualDoc.init('redis-stream', this.context, opt.config.item)
+      let doc = VirtualDoc.init('redis-stream', this.context, opt.item)
       let res = doc.showDoc(id)
     })
 
     this.register('redis-stream.group.status', async (opt,) => {
       const { label, id } = opt
       log('GROUP', label, id)
-      let doc = VirtualDoc.init('redis-stream', this.context, opt.config.item)
+      let doc = VirtualDoc.init('redis-stream', this.context, opt.item)
       doc.showDoc(id)
     })
 
     this.register('redis-stream.consumer.status', async (opt,) => {
       const { label, id } = opt
       log('CONSUMER', label, id)
-      let doc = VirtualDoc.init('redis-stream', this.context, opt.config.item)
+      let doc = VirtualDoc.init('redis-stream', this.context, opt.item)
       doc.showDoc(id)
     })
 
+    this.register('redis-stream.connection.refresh', (opt) => {
+      log('refresh command: ', opt)
+      const value = this.cacheSet('redisOpt', "127.0.0.1:6379")
+      window.showInputBox(
+        { // 这个对象中所有参数都是可选参数
+          password: false, // 输入内容是否是密码
+          ignoreFocusOut: true, // 默认false，设置为true时鼠标点击别的地方输入框不会消失
+          placeHolder: '如要改变请输入新参数.', // 在输入框内的提示信息
+          prompt: '格式 "127.0.0.1:6379:password" Enter确认/ESC中止', // 在输入框下方的提示信息
+          value,
+          validateInput: function (text) {
+            // 对输入内容进行验证，返回 null 通过验证
+            if (!text || !text.trim()) return null
+            text = text.trim()
+            const [host, port, password] = text
+            if (/[^\w\d]/.test(host.trim())) return text
+            if (/[^\w\d]/.test(port.trim())) return text
+
+            if (host && port) return null
+            return text
+          }
+        }).then((msg = '') => {
+          log('Refresh new init', msg)
+          if (!msg) return
+
+          this.provider.refresh(msg)
+        })
+    })
   }
 }
 

@@ -19,21 +19,8 @@ exports.registers = (context) => {
   const statusBar = new showStatusBar(context, 'right')
   log.info('first register command...')
   // 下面是要注册的命令
-  register('redis-stream.helloWorld', () => {
-    log.info('active command: helloWorld', 'error')
-    let res = statusBar.text
-    statusBar.showMessage('状态栏中文测试.....')
-
-    showMsg('Hello World from redis-stream!')
-    showMsg('warning from redis-stream!', 'warning')
-    showMsg('error from redis-stream!', 'error')
-  })
-
   register('redis-stream.hide', () => {
-    showModal('要隐藏状态栏显示?', 'yes', 'no', 'or')
-      .then(res => {
-        if (res === 'yes') statusBar.hideMessage()
-      })
+    context.globalState.update('redisOpt', { host: "127.0.0.1", port: 6379 })
 
   })
 
@@ -41,5 +28,6 @@ exports.registers = (context) => {
   new RedisTree(context)
   const doc = VirtualDoc.init(channel, context)
   register('redis-stream.openDoc', (uri) => doc.showDoc(uri))
+
 
 }

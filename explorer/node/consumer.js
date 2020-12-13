@@ -4,22 +4,8 @@ const { TreeItemCollapsibleState } = require("vscode")
 const { StreamPending } = require("./pending")
 
 class StreamConsumer extends TreeDataItem {
-  constructor({
-    contextValue = NodeType.CONSUMER,
-    ...opt
-  } = {}) {
-    super({ contextValue, ...opt })
-    this.config = {
-      redisDataType: RedisType.string,
-      connection: '127.0.0.1@6379',
-      db: 'db0',
-      item: null,
-      stream: '', // stream key
-      group: '', // group key
-
-      ...opt
-    }
-    this.init()
+  constructor(opt = {}) {
+    super(opt)
     this.command = {
       title: 'CONSUMER',
       tooltip: 'stream CONSUMER info',
@@ -27,28 +13,29 @@ class StreamConsumer extends TreeDataItem {
       command: 'redis-stream.consumer.status'
     }
   }
-  init() {
-    const { connection, db, redisDataType, label, group, stream } = this.config
-    this.id = `${connection}_${db}_${redisDataType}_${stream}_${group}_${label}.json`
+  static init(opt = {}) {
+    opt.contextValue = NodeType.CONSUMER
+    const { connection, db, redisDataType, label, group, stream } = opt
+    opt.id = `${connection}_${db}_${redisDataType}_${stream}_${group}_${label}.json`
+    return new StreamConsumer(opt)
   }
   async getChildren() {
     const data = {
-      connection: this.config.connection,
-      db: this.config.db,
+      connection: this.connection,
+      db: this.db,
       redisDataType: this.redisDataType,
-      contextValue: NodeType.CONSUMER,
-      stream: this.config.stream,
-      group: this.config.group,
+      stream: this.stream,
+      group: this.group,
       consumer: this.label,
       collapsibleState: TreeItemCollapsibleState.Collapsed
     }
 
-    const { pending } = this.config.item
+    const { pending } = this.item
     data.item = pending
     data.label = 'pending'
-    data.contextValue = NodeType.PENDING
+    
     data.tooltip = 'pending length: ' + pending.length
-    return [new StreamPending(data)]
+    return [StreamPending.init(data)]
 
   }
 }

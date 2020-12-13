@@ -7,20 +7,8 @@ const { IDTreeItem } = require("./id")
 const { dateYMD } = require("../../lib/util")
 
 class KeyTreeItem extends TreeDataItem {
-  constructor({
-    contextValue = NodeType.KEY,
-    ...opt
-  } = {}) {
-    super({ contextValue, ...opt })
-    this.config = {
-      connection: '127.0.0.1@6379',
-      db: 'db0',
-      type: '',
-      redisDataType: RedisType.string,
-      ...opt
-    }
-    this.init()
-
+  constructor(opt = {}) {
+    super(opt)
     this.command = {
       title: 'Key',
       tooltip: 'key info',
@@ -28,9 +16,11 @@ class KeyTreeItem extends TreeDataItem {
       command: 'redis-stream.key.status'
     }
   }
-  init() {
-    const { connection, db, redisDataType, label } = this.config
-    this.id = `${connection}_${db}_${redisDataType}_${label}.json`
+  static init(opt = {}) {
+    opt.contextValue = NodeType.KEY
+    const { connection, db, redisDataType, label } = opt
+    opt.id = `${connection}_${db}_${redisDataType}_${label}.json`
+    return new KeyTreeItem(opt)
   }
   async getChildren() {
     if (this.redisDataType === RedisType.stream) {
@@ -40,10 +30,9 @@ class KeyTreeItem extends TreeDataItem {
   }
   async setStream() {
     const data = {
-      connection: this.config.connection,
-      db: this.config.db,
+      connection: this.connection,
+      db: this.db,
       redisDataType: this.redisDataType,
-      contextValue: NodeType.GORUP,
       stream: this.label,
     }
     const streamInfo = await redisModel.getKey(this.label)
@@ -56,17 +45,16 @@ class KeyTreeItem extends TreeDataItem {
       data.tooltip = `pel-count: ${i['pel-count']}`
       if (i.pending.length > 0 || i.consumers.length > 0) data.collapsibleState = TreeItemCollapsibleState.Collapsed
       else data.collapsibleState = TreeItemCollapsibleState.None
-      return new StreamGroup(data)
+      return StreamGroup.init(data)
     })
     data.collapsibleState = TreeItemCollapsibleState.None
     const ids = entries.map(i => {
       data.item = i.item
       data.label = i.id
-      data.contextValue = NodeType.ID
       let at = i.id.match(/(\d+)-?/)
       at = at ? at[1] : ''
       data.tooltip = new Date(+at).format('yy-MM-dd hh:mm:ss')
-      return new IDTreeItem(data)
+      return IDTreeItem.init(data)
     })
     return [...g, ...ids]
   }

@@ -5,29 +5,23 @@ const { KeyTreeItem } = require("./key")
 
 
 class RedisDateTypes extends TreeDataItem {
-  constructor({
-    contextValue = NodeType.REDISDATATYPE,
-    ...opt
-  } = {}) {
-    super({ contextValue, ...opt })
-    this.config = {
-      connection: '127.0.0.1@6379',
-      db: 'db0',
-      items: [],
-      redisDataType: RedisType.string,
-      ...opt
-    }
+  constructor(opt = {}) {
+    super(opt)
+
+  }
+  static init(opt) {
+    opt.contextValue = NodeType.REDISDATATYPE
+    return new RedisDateTypes(opt)
   }
   async getChildren() {
-    return this.config.items.map(label => {
+    return this.item.map(label => {
       const data = {
-        connection: this.config.connection,
-        db: this.config.db,
+        connection: this.connection,
+        db: this.db,
         redisDataType: this.redisDataType,
-        contextValue: NodeType.KEY,
         label,
       }
-      return new KeyTreeItem(data)
+      return KeyTreeItem.init(data)
     })
   }
 }

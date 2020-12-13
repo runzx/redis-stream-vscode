@@ -1,6 +1,6 @@
 
 const { RedisBase, RedisStream } = require('../lib/redis-mq')
-const { RedisType } = require('../config')
+const { RedisType, redisOpt } = require('../config')
 
 class RedisModel {
   constructor(opt) {
@@ -8,8 +8,7 @@ class RedisModel {
       dbIndex: 0,
       ...opt
     }
-    this.redisBase = new RedisBase()
-    this.redisClient = this.redisBase.client
+    this.start(opt)
   }
   async getKeysByAllCategory(dbIndex = this.config.dbIndex) {
     await this.select(dbIndex)
@@ -77,11 +76,18 @@ class RedisModel {
     return dbs
   }
   static init(opt) {
+    opt.db = opt.db || opt.dbIndex
     return new RedisModel(opt)
+  }
+  start(opt) {
+    opt.db = opt.db || opt.dbIndex
+    this.redisBase = new RedisBase(opt)
+    this.redisClient = this.redisBase.client
   }
 }
 
-module.exports = {
+let redis = RedisModel.init(redisOpt)
 
-  redisModel: RedisModel.init()
+module.exports = {
+  redisModel: redis
 }

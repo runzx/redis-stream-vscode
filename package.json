@@ -3,7 +3,7 @@
   "publisher": "zhaixiang",
   "displayName": "redis-stream",
   "description": "redis stream explorer",
-  "version": "0.0.1",
+  "version": "0.8.8",
   "homepage": "https://github.com/runzx/redis-stream-vscode/blob/master/README.md",
   "repository": {
     "type": "git",
@@ -36,15 +36,17 @@
   "contributes": {
     "commands": [
       {
-        "command": "redis-stream.helloWorld",
-        "title": "Hello World"
-      },
-      {
-        "command": "redis-stream.hide",
-        "title": "zx hide status bar"
+        "command": "redis-stream.connection.refresh",
+        "title": "refresh redis",
+        "icon": "image/change.png"
       },
       {
         "command": "redis-stream.connection.status",
+        "title": "server info",
+        "icon": "image/status.png"
+      },
+      {
+        "command": "redis-stream.hide",
         "title": "server info",
         "icon": "image/status.png"
       }
@@ -70,6 +72,11 @@
       "view/item/context": [
         {
           "command": "redis-stream.connection.status",
+          "when": "view == redisTree && viewItem == connection",
+          "group": "inline@1"
+        },
+        {
+          "command": "redis-stream.connection.refresh",
           "when": "view == redisTree && viewItem == connection",
           "group": "inline@0"
         }
