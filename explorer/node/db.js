@@ -7,15 +7,18 @@ const { RedisDateTypes } = require("./type")
 
 
 class DbTreeItem extends TreeDataItem {
-  constructor(opt = {}) {
-    super(opt)
+  constructor({
+    contextValue = NodeType.DB,
+    ...opt
+  } = {}) {
+    super({ contextValue, ...opt })
     this.config = {
       connection: '127.0.0.1@6379',
-
+      contextValue,
       ...opt
     }
     this.init()
-    this.contextValue = NodeType.DB
+    // this.contextValue = contextValue
     this.iconPath = path.join(__dirname, '..', '..', 'image', `${this.contextValue}.png`)
 
   }

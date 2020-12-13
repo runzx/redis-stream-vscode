@@ -9,13 +9,16 @@ const { redisModel } = require("../../command/redis")
 
 
 class ConnectionNode extends TreeDataItem {
-  constructor(opt) {
-    super(opt)
+  constructor({
+    contextValue = NodeType.CONNECTION,
+    ...opt
+  } = {}) {
+    super({ contextValue, ...opt })
     this.config = {
       connection: opt.label || '127.0.0.1@6379',
       ...opt
     }
-    this.contextValue = NodeType.CONNECTION
+    // this.contextValue = NodeType.CONNECTION
     this.iconPath = path.join(__dirname, '..', '..', 'image', `${this.contextValue}.png`)
 
   }

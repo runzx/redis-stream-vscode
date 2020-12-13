@@ -14,7 +14,7 @@
     "email": "843476168@qq.com"
   },
   "engines": {
-    "vscode": "^1.0.0"
+    "vscode": "^1.51.0"
   },
   "categories": [
     "Visualization",

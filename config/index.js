@@ -13,7 +13,9 @@ const getVscodeConfigurations = (vscode) => {
 const NodeType = {
   CONNECTION: 'connection', DB: 'db',
   FOLDER: 'folder', REDISDATATYPE: 'redisdatatype',
-  KEY: 'key', INFO: "info"
+  KEY: 'key', INFO: "info",
+  GORUP: 'group', CONSUMER: 'consumer', ID: 'id',
+  PENDING: 'pending'
 }
 
 module.exports = exports = {

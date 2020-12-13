@@ -9,8 +9,11 @@ const { ConnectionNode } = require('./node/conection')
 
 class RedisTreeItem extends TreeDataItem {
   constructor({ label, id, iconPath, command,
-    resourceUri, tooltip, collapsibleState }) {
-    super({ label, id, iconPath, command, resourceUri, tooltip, collapsibleState })
+    resourceUri, tooltip, collapsibleState, contextValue }) {
+    super({
+      label, id, iconPath, command, resourceUri,
+      tooltip, collapsibleState, contextValue
+    })
 
   }
   // getChileren(element) { }
@@ -68,6 +71,15 @@ class RedisTree extends TreeExplorer {
       console.log('key.status: ', opt, opt1, opt2)
       const { label, id } = opt
       let doc = VirtualDoc.init('redis-stream', this.context)
+      let res = doc.showDoc(id)
+      // let res = await redisModel.getKey(label)
+      log('KEY', label, id)
+      // showMsg('显示?' + res.label)
+    })
+    this.register('redis-stream.id.status', async (opt,) => {
+      console.log('ID.status: ', opt,)
+      const { label, id } = opt
+      let doc = VirtualDoc.init('redis-stream', this.context, opt.config.item)
       let res = doc.showDoc(id)
       // let res = await redisModel.getKey(label)
       log('KEY', label, id)

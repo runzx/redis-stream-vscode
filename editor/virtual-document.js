@@ -6,18 +6,25 @@ const { log } = require("../lib/logging")
 
 
 class DocProvider {
-  constructor(scheme) {
+  constructor(scheme, txt) {
     this.scheme = scheme
     this._onDidChange = new vscode.EventEmitter()
     this.onDidChange = this._onDidChange.event
+    this.txt = txt
   }
   async provideTextDocumentContent(uri) {
     // simply invoke cowsay, use uri-path as text
     log('URI', uri)
     const { path } = uri
+    let res
     let [connection, db, type, key] = path.split('_')
-    key = key.replace('.json', '')
-    let res = await redisModel.getKey(key, db)
+    if (type === 'stream' && this.txt) {
+      res = this.txt
+    } else {
+      key = key.replace('.json', '')
+      res = await redisModel.getKey(key, db)
+    }
+
     if (typeof res === 'string') {
       try {
         res = JSON.parse(res)
@@ -41,8 +48,8 @@ class VirtualDoc {
     //   this._documents.delete(doc.uri.toString()))
   }
 
-  initProvider() {
-    this.provider = new DocProvider(this.scheme)
+  initProvider(txt) {
+    this.provider = new DocProvider(this.scheme, txt)
     this.subscriptions.push(vscode.workspace
       .registerTextDocumentContentProvider(this.scheme, this.provider))
   }
@@ -56,9 +63,9 @@ class VirtualDoc {
   update() {
     this.provider.onDidChange.fire(this.uri)
   }
-  static init(scheme, context) {
+  static init(scheme, context, txt) {
     const v = new VirtualDoc(scheme, context)
-    v.initProvider()
+    v.initProvider(txt)
     return v
   }
   dispose() {

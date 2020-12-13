@@ -4,33 +4,39 @@ const { TreeItemCollapsibleState } = require("vscode")
 const { KeyTreeItem } = require("./key")
 const path = require('path')
 
+
 class RedisDateTypes extends TreeDataItem {
-  constructor(opt) {
-    super(opt)
+  constructor({
+    contextValue = NodeType.REDISDATATYPE,
+    ...opt
+  } = {}) {
+    super({ contextValue, ...opt })
     this.config = {
       connection: '127.0.0.1@6379',
       db: 'db0',
-      redisDataType: RedisType.string,
       items: [],
+      redisDataType: RedisType.string,
       ...opt
     }
-    this.contextValue = NodeType.REDISDATATYPE
+    // this.contextValue = NodeType.REDISDATATYPE
     this.iconPath = path.join(__dirname, '..', '..', 'image', `${this.contextValue}.png`)
 
   }
   async getChildren() {
 
     return this.config.items.map(label => {
-
-      return new KeyTreeItem({
+      const data = {
         connection: this.config.connection,
         db: this.config.db,
-        redisDataType: this.config.redisDataType,
+        redisDataType: this.redisDataType,
+        contextValue: NodeType.KEY,
         // id: 'id:' + label, description: `(${keys})`,
         label,
         // tooltip: `expires:${expires},avg_ttl:${avg_ttl}`,
-        collapsibleState: TreeItemCollapsibleState.None
-      })
+        // collapsibleState: TreeItemCollapsibleState.None
+      }
+
+      return new KeyTreeItem(data)
     })
   }
 }

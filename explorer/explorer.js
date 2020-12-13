@@ -1,7 +1,7 @@
 
 
 const vscode = require("vscode")
-const { NodeType } = require("../config")
+const { NodeType, RedisType } = require("../config")
 const { TreeItemCollapsibleState, EventEmitter, TreeItem, Uri } = vscode
 const { registerCommand, registerTextEditorCommand } = vscode.commands
 
@@ -50,7 +50,7 @@ class TreeDataProvider {
 class TreeDataItem extends TreeItem {
   constructor({ label = '', id, iconPath, command,
     resourceUri, tooltip, description,
-    collapsibleState = TreeItemCollapsibleState.None } = {}) {
+    collapsibleState, contextValue, redisDataType } = {}) {
     super(label || resourceUri, collapsibleState)
     this.label = label
     this.resourceUri = resourceUri
@@ -58,12 +58,22 @@ class TreeDataItem extends TreeItem {
     this.iconPath = iconPath
     this.description = description
     this.tooltip = tooltip  // 鼠标悬浮时显示内容
-    this.collapsibleState = collapsibleState  // 树节点是应该展开还是折叠
+    // this.collapsibleState = collapsibleState  // 树节点是应该展开还是折叠
     this.command = command  // 点击树节点时，执行此命令
+    this.contextValue = contextValue
+    this.redisDataType = redisDataType
+
+    this.collapsibleState = collapsibleState || this.getCollapseState(this)
   }
   // getChildren() { }
   getCollapseState(element) {
+
     if (element.contextValue === NodeType.KEY
+      && element.redisDataType === RedisType.stream)
+      return TreeItemCollapsibleState.Collapsed
+
+    if (element.contextValue === NodeType.KEY
+      || element.contextValue === NodeType.ID
       || element.contextValue === NodeType.INFO)
       return TreeItemCollapsibleState.None
 
