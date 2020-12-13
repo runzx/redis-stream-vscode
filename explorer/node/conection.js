@@ -8,12 +8,13 @@ const { redisModel } = require("../../command/redis")
 
 class ConnectionNode extends TreeDataItem {
   constructor({
+    label = '127.0.0.1:6379',
     contextValue = NodeType.CONNECTION,
     ...opt
   } = {}) {
-    super({ contextValue, ...opt })
+    super({ contextValue, label, ...opt })
     this.config = {
-      connection: opt.label || '127.0.0.1@6379',
+      connection: label,
       ...opt
     }
   }

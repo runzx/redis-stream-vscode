@@ -17,7 +17,7 @@ class DocProvider {
     const { path } = uri
     let res
     let [connection, db, type, key] = path.split('_')
-    if (type === 'stream' && this.txt) {
+    if (this.txt) {
       res = this.txt
     } else {
       key = key.replace('.json', '')

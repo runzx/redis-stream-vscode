@@ -22,7 +22,7 @@ class RedisTreeDataProvider extends TreeDataProvider {
   constructor() {
     super()
     // Expanded 时会在其item 上 getChileren()
-    this.treeData = [new ConnectionNode({ label: 'rootZx', collapsibleState: TreeItemCollapsibleState.Expanded })]
+    this.treeData = [new ConnectionNode({ collapsibleState: TreeItemCollapsibleState.Expanded })]
   }
 
   // element->state->Collapsed 第一次点击会触发 getChileren()->getTreeItem()
@@ -53,9 +53,11 @@ class RedisTree extends TreeExplorer {
   }
   init() {
     this.initTree('redisTree', new RedisTreeDataProvider())
-    this.register('redis-stream.connection.status', (opt, opt1, opt2) => {
-      // log('connection', opt)
-
+    this.register('redis-stream.connection.status', async (opt, opt1, opt2) => {
+      log('connection', opt)
+      const [serInfo] = await redisModel.redisBase.serverInfo()
+      let doc = VirtualDoc.init('redis-stream', this.context, serInfo)
+      doc.showDoc('redisServerInfo')
     })
     this.register('redis-stream.db.status', (opt, opt1, opt2) => {
       // log('db', opt)
@@ -66,7 +68,7 @@ class RedisTree extends TreeExplorer {
       const { label, id } = opt
       log('KEY', label, id)
       let doc = VirtualDoc.init('redis-stream', this.context)
-      let res = doc.showDoc(id)
+      doc.showDoc(id)
     })
 
     this.register('redis-stream.id.status', async (opt,) => {
@@ -80,14 +82,14 @@ class RedisTree extends TreeExplorer {
       const { label, id } = opt
       log('GROUP', label, id)
       let doc = VirtualDoc.init('redis-stream', this.context, opt.config.item)
-      let res = doc.showDoc(id)
+      doc.showDoc(id)
     })
 
     this.register('redis-stream.consumer.status', async (opt,) => {
       const { label, id } = opt
       log('CONSUMER', label, id)
       let doc = VirtualDoc.init('redis-stream', this.context, opt.config.item)
-      let res = doc.showDoc(id)
+      doc.showDoc(id)
     })
 
   }
