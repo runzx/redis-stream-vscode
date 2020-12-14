@@ -18,8 +18,6 @@ class KeyTreeItem extends TreeDataItem {
   }
   static init(opt = {}) {
     opt.contextValue = NodeType.KEY
-    // const { connection, db, redisDataType, label } = opt
-    // opt.id = `${connection}_${db}_${redisDataType}_${label}.json`
     return new KeyTreeItem(opt)
   }
   async getChildren() {

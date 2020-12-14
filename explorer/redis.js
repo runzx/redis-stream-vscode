@@ -76,21 +76,21 @@ class RedisTree extends TreeExplorer {
       const { label, id } = opt
       log('ID', label, id)
       let doc = VirtualDoc.init('redis-stream', this.context, opt.item)
-      let res = doc.showDoc(id)
+      doc.showDoc(id + '.json')
     })
 
     this.register('redis-stream.group.status', async (opt,) => {
       const { label, id } = opt
       log('GROUP', label, id)
       let doc = VirtualDoc.init('redis-stream', this.context, opt.item)
-      doc.showDoc(id)
+      doc.showDoc(id + '.json')
     })
 
     this.register('redis-stream.consumer.status', async (opt,) => {
       const { label, id } = opt
       log('CONSUMER', label, id)
       let doc = VirtualDoc.init('redis-stream', this.context, opt.item)
-      doc.showDoc(id)
+      doc.showDoc(id + '.json')
     })
 
     this.register('redis-stream.connection.refresh', (opt) => {

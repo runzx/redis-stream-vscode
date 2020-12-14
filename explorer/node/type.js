@@ -11,7 +11,6 @@ class RedisDateTypes extends TreeDataItem {
   }
   static init(opt) {
     opt.contextValue = NodeType.REDISDATATYPE
-    // opt.id = this.getId(opt)
     return new RedisDateTypes(opt)
   }
   async getChildren() {

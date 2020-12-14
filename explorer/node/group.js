@@ -16,8 +16,6 @@ class StreamGroup extends TreeDataItem {
   }
   static init(opt = {}) {
     opt.contextValue = NodeType.GORUP
-    // const { connection, db, redisDataType, label, stream, } = opt
-    // opt.id = `${connection}_${db}_${redisDataType}_${stream}_${label}.json`
     return new StreamGroup(opt)
   }
 

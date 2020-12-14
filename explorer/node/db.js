@@ -13,9 +13,6 @@ class DbTreeItem extends TreeDataItem {
   }
   static init(opt = {}) {
     opt.contextValue = NodeType.DB
-    // opt.id = this.getId(opt)
-    // let res = opt.label.match(/(\d+)/)
-    // opt.dbIndex = res ? res[1] : 0
     return new DbTreeItem(opt)
   }
   async getChildren() {
