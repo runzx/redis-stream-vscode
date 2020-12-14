@@ -4,6 +4,12 @@ All notable changes to the "redis-stream" extension will be documented in this f
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.0]
+
+- 可以配置/刷新 redis 参数
+- 记录历史配置信息
+
+
 ## [0.0.1]
 
 - Initial release
