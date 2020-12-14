@@ -37,7 +37,7 @@ class RedisTreeDataProvider extends TreeDataProvider {
   _getTreeItem(element) {
     return element
   }
-  
+
   getConnections() {
     let res = this.cacheGet(Constant.GLOBALSTATE_CONFIG_KEY, redisOpt)
     if (typeof res === 'string') {
@@ -59,7 +59,7 @@ class RedisTree extends TreeExplorer {
       log('connection', opt)
       const [serInfo] = await redisModel.redisBase.serverInfo()
       let doc = VirtualDoc.init('redis-stream', this.context, serInfo)
-      doc.showDoc('redisServerInfo')
+      doc.showDoc('redisServerInfo.json')
     })
     this.register('redis-stream.db.status', (opt, opt1, opt2) => {
       // log('db', opt)

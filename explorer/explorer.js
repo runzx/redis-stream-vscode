@@ -3,6 +3,7 @@ const path = require('path')
 const vscode = require("vscode")
 const { NodeType, RedisType } = require("../config")
 const { log } = require('../lib/logging')
+const { isEmpty } = require('../lib/util')
 const { TreeItemCollapsibleState, EventEmitter, TreeItem, Uri } = vscode
 const { registerCommand, registerTextEditorCommand } = vscode.commands
 
@@ -69,10 +70,6 @@ class TreeDataItem extends TreeItem {
     super(opt.label || opt.resourceUri, opt.collapsibleState)
 
     this.resourceUri = opt.resourceUri
-
-    this.id = opt.id || this.getId(opt)
-    log('ID', this.id)
-
     this.iconPath = opt.iconPath
     this.description = opt.description
     this.tooltip = opt.tooltip  // 鼠标悬浮时显示内容
@@ -91,10 +88,20 @@ class TreeDataItem extends TreeItem {
     this.group = opt.group
     this.consumer = opt.consumer
     this.pending = opt.pending
+
+    this.id = opt.id || this.getId(opt)
+    // log('ID', this.id)
+    console.log(this.id)
   }
   getId(opt = {}) {
     const res = ['connection', 'db', 'redisDataType', 'stream', 'group', 'consumer', 'pending', 'label']
-      .filter(i => opt[i] === 0 || opt[i]).map(j => opt[j])
+      .filter(i => {
+        if (isEmpty(opt[i])
+          || (i === 'label' && this.contextValue === NodeType.REDISDATATYPE))
+          return null
+        return true
+      })
+      .map(j => opt[j])
       .join('$')
     return res
   }
