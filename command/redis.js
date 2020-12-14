@@ -84,10 +84,12 @@ class RedisModel {
     opt.db = opt.db || opt.dbIndex
     this.redisBase = new RedisBase(opt)
     this.redisClient = this.redisBase.client
+    this.config.dbIndex = opt.db || opt.dbIndex || 0
   }
   async restart(opt) {
     await this.redisBase.restart(opt)
     this.redisClient = this.redisBase.client
+    this.config.dbIndex = opt.db || opt.dbIndex || 0
     return this.redisClient
   }
 }
