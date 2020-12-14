@@ -82,9 +82,12 @@ class TreeDataItem extends TreeItem {
     this.db = opt.db
     this.item = opt.item
     this.stream = opt.stream
+    this.group = opt.group
+    this.consumer = opt.consumer
+    this.pending = opt.pending
   }
   getId(opt = {}) {
-    const res = ['connection', 'db', 'redisDataType', 'group', 'consumer', 'pending', 'label']
+    const res = ['connection', 'db', 'redisDataType', 'stream', 'group', 'consumer', 'pending', 'label']
       .filter(i => opt[i] === 0 || opt[i]).map(j => opt[j])
       .join('$')
     return res
