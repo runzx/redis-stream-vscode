@@ -32,18 +32,19 @@ class RedisTreeDataProvider extends TreeDataProvider {
     if (element) return element.getChildren()
 
     const config = this.getConnections()
-    return ConnectionNode.init(config)
+    return ConnectionNode.init({ ...config })
   }
   _getTreeItem(element) {
     return element
-    const { label, tooltip } = element
-    return {
-      label,
-      tooltip: 'my ' + tooltip + ' item'
-    }
   }
+  
   getConnections() {
-    return this.cacheGet(Constant.GLOBALSTATE_CONFIG_KEY, redisOpt)
+    let res = this.cacheGet(Constant.GLOBALSTATE_CONFIG_KEY, redisOpt)
+    if (typeof res === 'string') {
+      const [host, port, password] = res.split(':')
+      return { host, port, password }
+    }
+    return res
   }
 }
 
@@ -95,7 +96,7 @@ class RedisTree extends TreeExplorer {
 
     this.register('redis-stream.connection.refresh', (opt) => {
       log('refresh command: ', opt)
-      const value = this.cacheSet('redisOpt', "127.0.0.1:6379")
+      const value = this.cacheGet('redisOpt', "127.0.0.1:6379")
       window.showInputBox(
         { // 这个对象中所有参数都是可选参数
           password: false, // 输入内容是否是密码
@@ -107,7 +108,7 @@ class RedisTree extends TreeExplorer {
             // 对输入内容进行验证，返回 null 通过验证
             if (!text || !text.trim()) return null
             text = text.trim()
-            const [host, port, password] = text
+            const [host = '', port = '', password] = text
             if (/[^\w\d]/.test(host.trim())) return text
             if (/[^\w\d]/.test(port.trim())) return text
 
@@ -117,8 +118,8 @@ class RedisTree extends TreeExplorer {
         }).then((msg = '') => {
           log('Refresh new init', msg)
           if (!msg) return
-
-          this.provider.refresh(msg)
+          this.cacheSet('redisOpt', msg)
+          this.refresh(msg, opt)
         })
     })
   }

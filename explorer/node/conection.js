@@ -3,30 +3,30 @@ const { TreeDataItem } = require("../explorer")
 const { log } = require("../../lib/logging")
 const { TreeItemCollapsibleState } = require("vscode")
 const { DbTreeItem } = require("./db")
-const { redisModel } = require("../../command/redis")
-
+const { redisModel, RedisModel } = require("../../command/redis")
+const { showMsg } = require("../../lib/show-message")
 
 class ConnectionNode extends TreeDataItem {
   constructor(opt = {}) {
     super(opt)
 
   }
-  static init(opt = {}) {
+  static async init(opt = {}) {
     const { host, port, password, db = 0 } = opt
     opt.contextValue = NodeType.CONNECTION
     opt.collapsibleState = TreeItemCollapsibleState.Expanded
     opt.label = opt.connection = opt.id = `${host}:${port}`
-    try {
-      if (host && port) {
-        redisModel.start(opt)
-        // this.cacheSet(Constant.GLOBALSTATE_CONFIG_KEY, { host, port, password, db })
 
-        return [new ConnectionNode(opt)]
-      }
-    } catch (err) {
-      console.log('err:', err)
+    if (host && port) {
+      await redisModel.restart({ host, port, password, db })
+        .catch(err => {
+          showMsg(err.message + '  -- refresh redis host:port --', 'error')
+          log('Redis status', redisModel.redisClient.status)
+          opt.collapsibleState = TreeItemCollapsibleState.None
+        })
     }
-    return []
+
+    return [new ConnectionNode(opt)]
   }
   async getChildren() {
     const dbs = await redisModel.info()

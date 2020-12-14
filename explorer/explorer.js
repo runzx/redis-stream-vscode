@@ -2,6 +2,7 @@
 const path = require('path')
 const vscode = require("vscode")
 const { NodeType, RedisType } = require("../config")
+const { log } = require('../lib/logging')
 const { TreeItemCollapsibleState, EventEmitter, TreeItem, Uri } = vscode
 const { registerCommand, registerTextEditorCommand } = vscode.commands
 
@@ -10,6 +11,11 @@ class TreeExplorer {
     this.context = context
     this.subscriptions = context.subscriptions
     this.provider = null
+  }
+
+  refresh(data, opt) {
+    this.refreshMsg = data
+    this.provider.refresh()
   }
 
   initTree(viewId, treeDataProvider) {
@@ -65,7 +71,7 @@ class TreeDataItem extends TreeItem {
     this.resourceUri = opt.resourceUri
 
     this.id = opt.id || this.getId(opt)
-    console.log('id:', this.id)
+    log('ID', this.id)
 
     this.iconPath = opt.iconPath
     this.description = opt.description
