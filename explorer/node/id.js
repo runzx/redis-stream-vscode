@@ -14,8 +14,8 @@ class IDTreeItem extends TreeDataItem {
   }
   static init(opt = {}) {
     opt.contextValue = NodeType.ID
-    const { connection, db, redisDataType, label, group, stream, consumer } = opt
-    opt.id = `${connection}_${db}_${redisDataType}_${stream}_${group}_${consumer}_${label}.json`
+    // const { connection, db, redisDataType, label, group, stream, consumer } = opt
+    // opt.id = `${connection}_${db}_${redisDataType}_${stream}_${group}_${consumer}_${label}.json`
     return new IDTreeItem(opt)
   }
   async getChildren() { }

@@ -30,7 +30,7 @@ class RedisModel {
   async select(dbIndex) {
     if (dbIndex !== this.config.dbIndex) {
       await this.redisClient.select(dbIndex)
-      this.dbIndex = dbIndex
+      this.config.dbIndex = dbIndex
     }
   }
   async getKey(key, dbIndex = this.config.dbIndex) {

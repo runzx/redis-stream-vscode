@@ -59,32 +59,35 @@ class TreeDataProvider {
 }
 
 class TreeDataItem extends TreeItem {
-  constructor({ label = '', id, iconPath, command,
-    resourceUri, tooltip, description,
-    collapsibleState, contextValue, redisDataType,
-    connection = '127.0.0.1:6379', db = 0,
-    item, stream } = {}) {
-    super(label || resourceUri, collapsibleState)
-    // this.label = label
-    // this.collapsibleState = collapsibleState  // 树节点是应该展开还是折叠
-    this.resourceUri = resourceUri
-    this.id = id
-    console.log('id:', id)
-    this.iconPath = iconPath
-    this.description = description
-    this.tooltip = tooltip  // 鼠标悬浮时显示内容
+  constructor(opt) {
+    super(opt.label || opt.resourceUri, opt.collapsibleState)
 
-    this.command = command  // 点击树节点时，执行此命令
-    this.contextValue = contextValue
-    this.redisDataType = redisDataType
+    this.resourceUri = opt.resourceUri
+
+    this.id = opt.id || this.getId(opt)
+    console.log('id:', this.id)
+
+    this.iconPath = opt.iconPath
+    this.description = opt.description
+    this.tooltip = opt.tooltip  // 鼠标悬浮时显示内容
+
+    this.command = opt.command  // 点击树节点时，执行此命令
+    this.contextValue = opt.contextValue
+    this.redisDataType = opt.redisDataType
 
     this.iconPath = path.join(__dirname, '..', 'image', `${this.contextValue}.png`)
-    this.collapsibleState = collapsibleState || this.getCollapseState(this)
+    this.collapsibleState = opt.collapsibleState || this.getCollapseState(this)
 
-    this.connection = connection
-    this.db = db
-    this.item = item
-    this.stream = stream
+    this.connection = opt.connection
+    this.db = opt.db
+    this.item = opt.item
+    this.stream = opt.stream
+  }
+  getId(opt = {}) {
+    const res = ['connection', 'db', 'redisDataType', 'group', 'consumer', 'pending', 'label']
+      .filter(i => opt[i] === 0 || opt[i]).map(j => opt[j])
+      .join('$')
+    return res
   }
   // getChildren() { }
   getCollapseState(element) {

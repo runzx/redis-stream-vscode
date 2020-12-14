@@ -16,8 +16,8 @@ class StreamGroup extends TreeDataItem {
   }
   static init(opt = {}) {
     opt.contextValue = NodeType.GORUP
-    const { connection, db, redisDataType, label, stream, } = opt
-    opt.id = `${connection}_${db}_${redisDataType}_${stream}_${label}.json`
+    // const { connection, db, redisDataType, label, stream, } = opt
+    // opt.id = `${connection}_${db}_${redisDataType}_${stream}_${label}.json`
     return new StreamGroup(opt)
   }
 
@@ -28,35 +28,26 @@ class StreamGroup extends TreeDataItem {
       redisDataType: this.redisDataType,
       stream: this.stream,
       group: this.label,
-      collapsibleState: TreeItemCollapsibleState.Collapsed
+      collapsibleState: TreeItemCollapsibleState.None
     }
 
     const { pending, consumers } = this.item
     const c = consumers.map(i => {
       return StreamConsumer.init({
+        ...data,
         item: i,
         label: i.name,
         tooltip: `pel-count: ${i['pel-count']}`,
-        connection: this.connection,
-        db: this.db,
-        redisDataType: this.redisDataType,
-        stream: this.stream,
-        group: this.label,
         collapsibleState: i.pending.length > 0 ? TreeItemCollapsibleState.Collapsed
           : TreeItemCollapsibleState.None
       })
     })
 
     return [...c, StreamPending.init({
+      ...data,
       item: pending,
       label: 'pending',
       tooltip: 'pending length: ' + pending.length,
-      connection: this.connection,
-      db: this.db,
-      redisDataType: this.redisDataType,
-      stream: this.stream,
-      group: this.label,
-      collapsibleState: TreeItemCollapsibleState.None
     })]
 
   }

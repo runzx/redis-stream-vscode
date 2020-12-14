@@ -16,7 +16,7 @@ class DocProvider {
     log('URI', uri)
     const { path } = uri
     let res
-    let [connection, db, type, key] = path.split('_')
+    let [connection, db, type, key] = path.split('$')
     if (this.txt) {
       res = this.txt
     } else {

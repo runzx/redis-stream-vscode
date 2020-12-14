@@ -18,8 +18,8 @@ class KeyTreeItem extends TreeDataItem {
   }
   static init(opt = {}) {
     opt.contextValue = NodeType.KEY
-    const { connection, db, redisDataType, label } = opt
-    opt.id = `${connection}_${db}_${redisDataType}_${label}.json`
+    // const { connection, db, redisDataType, label } = opt
+    // opt.id = `${connection}_${db}_${redisDataType}_${label}.json`
     return new KeyTreeItem(opt)
   }
   async getChildren() {
@@ -29,32 +29,36 @@ class KeyTreeItem extends TreeDataItem {
     return []
   }
   async setStream() {
+    const streamInfo = await redisModel.getKey(this.label)
+    if (!streamInfo) return []
+
     const data = {
       connection: this.connection,
       db: this.db,
       redisDataType: this.redisDataType,
       stream: this.label,
+      collapsibleState: TreeItemCollapsibleState.None
     }
-    const streamInfo = await redisModel.getKey(this.label)
-    if (!streamInfo) return []
     this.streamInfo = streamInfo
     const { groups, entries } = streamInfo
     const g = groups.map(i => {
-      data.item = i
-      data.label = i.name
-      data.tooltip = `pel-count: ${i['pel-count']}`
-      if (i.pending.length > 0 || i.consumers.length > 0) data.collapsibleState = TreeItemCollapsibleState.Collapsed
-      else data.collapsibleState = TreeItemCollapsibleState.None
-      return StreamGroup.init(data)
+      const collapsibleState = (i.pending.length > 0 || i.consumers.length > 0)
+        ? TreeItemCollapsibleState.Collapsed
+        : TreeItemCollapsibleState.None
+
+      return StreamGroup.init({
+        ...data, item: i, label: i.name,
+        tooltip: `pel-count: ${i['pel-count']}`,
+        collapsibleState
+      })
     })
-    data.collapsibleState = TreeItemCollapsibleState.None
     const ids = entries.map(i => {
-      data.item = i.item
-      data.label = i.id
       let at = i.id.match(/(\d+)-?/)
       at = at ? at[1] : ''
-      data.tooltip = new Date(+at).format('yy-MM-dd hh:mm:ss')
-      return IDTreeItem.init(data)
+      return IDTreeItem.init({
+        ...data, item: i.item, label: i.id,
+        tooltip: new Date(+at).format('yy-MM-dd hh:mm:ss')
+      })
     })
     return [...g, ...ids]
   }

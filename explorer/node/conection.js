@@ -15,7 +15,7 @@ class ConnectionNode extends TreeDataItem {
     const { host, port, password, db = 0 } = opt
     opt.contextValue = NodeType.CONNECTION
     opt.collapsibleState = TreeItemCollapsibleState.Expanded
-    opt.label = opt.connection = `${host}:${port}`
+    opt.label = opt.connection = opt.id = `${host}:${port}`
     try {
       if (host && port) {
         redisModel.start(opt)
@@ -35,7 +35,8 @@ class ConnectionNode extends TreeDataItem {
       const { keys, expires, avg_ttl } = dbs[label]
       return DbTreeItem.init({
         connection: this.connection,
-        id: 'id:' + label, description: `(${keys})`,
+        db: +label.match(/(\d+)/)[1],
+        description: `(${keys})`,
         label, tooltip: `expires:${expires},avg_ttl:${avg_ttl}`,
         collapsibleState: keys !== 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
       })

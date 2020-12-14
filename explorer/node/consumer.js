@@ -15,8 +15,8 @@ class StreamConsumer extends TreeDataItem {
   }
   static init(opt = {}) {
     opt.contextValue = NodeType.CONSUMER
-    const { connection, db, redisDataType, label, group, stream } = opt
-    opt.id = `${connection}_${db}_${redisDataType}_${stream}_${group}_${label}.json`
+    // const { connection, db, redisDataType, label, group, stream } = opt
+    // opt.id = `${connection}_${db}_${redisDataType}_${stream}_${group}_${label}.json`
     return new StreamConsumer(opt)
   }
   async getChildren() {
@@ -33,7 +33,7 @@ class StreamConsumer extends TreeDataItem {
     const { pending } = this.item
     data.item = pending
     data.label = 'pending'
-    
+
     data.tooltip = 'pending length: ' + pending.length
     return [StreamPending.init(data)]
 
