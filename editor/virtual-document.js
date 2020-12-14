@@ -47,10 +47,10 @@ class VirtualDoc {
   }
   async showDoc(id) {
     const uri = vscode.Uri.parse(`${this.scheme}:${id}`)
-    const doc = await vscode.workspace
-      .openTextDocument(uri)
+    // const doc = await vscode.workspace
+    //   .openTextDocument(uri)
     await vscode.window
-      .showTextDocument(doc, { preview: false })
+      .showTextDocument(uri, { preview: false })
   }
   update() {
     this.provider.onDidChange.fire(this.uri)
