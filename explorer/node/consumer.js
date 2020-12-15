@@ -18,12 +18,12 @@ class StreamConsumer extends TreeDataItem {
     return new StreamConsumer(opt)
   }
   async getChildren() {
+    const { db, connection, redisModel, redisDataType,
+      stream, group } = this
     const data = {
-      connection: this.connection,
-      db: this.db,
-      redisDataType: this.redisDataType,
-      stream: this.stream,
-      group: this.group,
+      db, connection, redisModel,
+      redisDataType, stream, group,
+
       consumer: this.label,
       collapsibleState: TreeItemCollapsibleState.Collapsed
     }

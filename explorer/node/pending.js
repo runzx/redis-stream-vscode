@@ -13,16 +13,13 @@ class StreamPending extends TreeDataItem {
   }
 
   async getChildren() {
+    const { db, connection, redisModel, redisDataType,
+      stream, group, consumer } = this
     const data = {
-      connection: this.connection,
-      db: this.db,
-      redisDataType: this.redisDataType,
-      stream: this.stream,
-      group: this.group,
-      consumer: this.consumer,
+      db, connection, redisModel,
+      redisDataType, stream, group, consumer,
       pending: this.label,
     }
-
     const ids = this.item.map(i => {
       data.item = i
       data.label = i[0]

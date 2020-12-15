@@ -14,14 +14,12 @@ class RedisDateTypes extends TreeDataItem {
     return new RedisDateTypes(opt)
   }
   async getChildren() {
+    const { db, connection, redisModel, redisDataType } = this
     return this.item.map(label => {
-      const data = {
-        connection: this.connection,
-        db: this.db,
-        redisDataType: this.redisDataType,
+      return KeyTreeItem.init({
         label,
-      }
-      return KeyTreeItem.init(data)
+        db, connection, redisModel, redisDataType
+      })
     })
   }
 }

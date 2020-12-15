@@ -53,15 +53,17 @@ class TreeDataProvider {
 
     return element
   }
-  refresh(data) {
-    this.refreshMsg = data
-    this._onDidChangeTreeData.fire()
+  refresh(item) {
+    this._onDidChangeTreeData.fire(item)
   }
   cacheGet(key, defaultValue) {
     return this.context.globalState.get(key, defaultValue)
   }
   cacheSet(key, value) {
     return this.context.globalState.update(key, value)
+  }
+  register(command, cb) {
+    cb && this.context.subscriptions.push(registerCommand(command, cb))
   }
 }
 
@@ -92,6 +94,7 @@ class TreeDataItem extends TreeItem {
     this.id = opt.id || this.getId(opt)
     // log('ID', this.id)
     console.log(this.id)
+    this.redisModel = opt.redisModel
   }
   getId(opt = {}) {
     const res = ['connection', 'db', 'redisDataType', 'stream', 'group', 'consumer', 'pending', 'label']

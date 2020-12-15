@@ -8,7 +8,8 @@ const log = require('../lib/logging')('registers')
 // 引入 tree
 const { RedisTree } = require('../explorer')
 const { VirtualDoc } = require('../editor')
-const { channel } = require('../config')
+const { channel, scheme } = require('../config')
+const { KeyView } = require('../editor/key-doc')
 
 
 exports.registers = (context) => {
@@ -26,8 +27,23 @@ exports.registers = (context) => {
 
 
   new RedisTree(context)
-  const doc = VirtualDoc.init(channel, context)
+  const doc = KeyView.init({ context })
   register('redis-stream.openDoc', (uri) => doc.showDoc(uri))
-
-
+  register('redis-stream.key.status', async (opt) => {
+    const { label, id } = opt
+    log.info('KEY', label, id)
+    doc.showDoc(id)
+  })
+  const virDoc = VirtualDoc.init({ context })
+  register('redis-stream.id.value.refresh', async (opt) => {
+    const { label, id, refresh } = opt
+    log.info('VALUE RELOAD', label, id)
+    doc.update(id)
+    refresh(opt)
+  })
+  register('redis-stream.msg.value.refresh', async (opt) => {
+    const { label, id } = opt
+    log.info('VALUE RELOAD', label, id)
+    virDoc.update(id)
+  })
 }

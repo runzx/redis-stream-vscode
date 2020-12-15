@@ -3,7 +3,7 @@
   "publisher": "zhaixiang",
   "displayName": "redis-stream",
   "description": "redis stream explorer",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "homepage": "https://github.com/runzx/redis-stream-vscode/blob/master/README.md",
   "repository": {
     "type": "git",
@@ -49,6 +49,16 @@
         "command": "redis-stream.hide",
         "title": "server info",
         "icon": "image/status.png"
+      },
+      {
+        "command": "redis-stream.id.value.refresh",
+        "title": "value reload",
+        "icon": "image/refresh.png"
+      },
+      {
+        "command": "redis-stream.msg.value.refresh",
+        "title": "value reload",
+        "icon": "image/refresh.png"
       }
     ],
     "viewsContainers": {
@@ -78,6 +88,16 @@
         {
           "command": "redis-stream.connection.refresh",
           "when": "view == redisTree && viewItem == connection",
+          "group": "inline@0"
+        },
+        {
+          "command": "redis-stream.id.value.refresh",
+          "when": "view == redisTree && viewItem == key || viewItem == id ",
+          "group": "inline@0"
+        },
+        {
+          "command": "redis-stream.msg.value.refresh",
+          "when": "view == redisTree && viewItem == group || viewItem == consumer",
           "group": "inline@0"
         }
       ]

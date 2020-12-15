@@ -1,8 +1,8 @@
 # Change Log
 
-All notable changes to the "redis-stream" extension will be documented in this file.
-
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [1.2.0]
+- 重写事件驱动部分，降低耦合度。
+- refresh TreeItem connection 
 
 ## [1.1.0]
 

@@ -20,11 +20,11 @@ class StreamGroup extends TreeDataItem {
   }
 
   async getChildren() {
+    const { db, connection, redisModel,
+      redisDataType, stream } = this
     const data = {
-      connection: this.connection,
-      db: this.db,
-      redisDataType: this.redisDataType,
-      stream: this.stream,
+      db, connection, redisModel, redisDataType, stream,
+
       group: this.label,
       collapsibleState: TreeItemCollapsibleState.None
     }

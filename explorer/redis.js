@@ -1,7 +1,7 @@
 
 
 const { TreeItemCollapsibleState, window } = require('vscode')
-const { redisModel } = require('../command/redis')
+const { redisModel, RedisModel } = require('../command/redis')
 const { Constant, redisOpt } = require('../config')
 const { VirtualDoc } = require('../editor')
 const { log } = require('../lib/logging')
@@ -32,7 +32,7 @@ class RedisTreeDataProvider extends TreeDataProvider {
     if (element) return element.getChildren()
 
     const config = this.getConnections()
-    return ConnectionNode.init({ ...config })
+    return ConnectionNode.init({ ...config, context: this.context })
   }
   _getTreeItem(element) {
     return element
@@ -52,46 +52,40 @@ class RedisTree extends TreeExplorer {
   constructor(context) {
     super(context)
     this.init()
+    this.docStatus = {}
+    this.doc = VirtualDoc.init({ context })
   }
   init() {
-    this.initTree('redisTree', new RedisTreeDataProvider(this.context))
+    const { context } = this
+    this.initTree('redisTree', new RedisTreeDataProvider(context))
+
     this.register('redis-stream.connection.status', async (opt, opt1, opt2) => {
       log('connection', opt)
-      const [serInfo] = await redisModel.redisBase.serverInfo()
-      let doc = VirtualDoc.init('redis-stream', this.context, serInfo)
-      doc.showDoc('redisServerInfo.json')
+      const id = 'redisServerInfo'
+      const [item] = await RedisModel.init(opt).redisBase.serverInfo()
+      this.doDoc({ id, item })
     })
     this.register('redis-stream.db.status', (opt, opt1, opt2) => {
       // log('db', opt)
 
     })
 
-    this.register('redis-stream.key.status', async (opt) => {
-      const { label, id } = opt
-      log('KEY', label, id)
-      let doc = VirtualDoc.init('redis-stream', this.context)
-      doc.showDoc(id + '.json')
-    })
-
     this.register('redis-stream.id.status', async (opt,) => {
-      const { label, id } = opt
+      const { label, id, } = opt
       log('ID', label, id)
-      let doc = VirtualDoc.init('redis-stream', this.context, opt.item)
-      doc.showDoc(id + '.json')
+      this.doDoc(opt)
     })
 
     this.register('redis-stream.group.status', async (opt,) => {
-      const { label, id } = opt
+      const { label, id, } = opt
       log('GROUP', label, id)
-      let doc = VirtualDoc.init('redis-stream', this.context, opt.item)
-      doc.showDoc(id + '.json')
+      this.doDoc(opt)
     })
 
     this.register('redis-stream.consumer.status', async (opt,) => {
-      const { label, id } = opt
+      const { label, id, } = opt
       log('CONSUMER', label, id)
-      let doc = VirtualDoc.init('redis-stream', this.context, opt.item)
-      doc.showDoc(id + '.json')
+      this.doDoc(opt)
     })
 
     this.register('redis-stream.connection.refresh', (opt) => {
@@ -102,18 +96,19 @@ class RedisTree extends TreeExplorer {
           password: false, // 输入内容是否是密码
           ignoreFocusOut: true, // 默认false，设置为true时鼠标点击别的地方输入框不会消失
           placeHolder: '如要改变请输入新参数.', // 在输入框内的提示信息
-          prompt: '格式 "127.0.0.1:6379:password" Enter确认/ESC中止', // 在输入框下方的提示信息
+          prompt: 'fmt: "127.0.0.1:6379:password"   ', // 在输入框下方的提示信息
           value,
           validateInput: function (text) {
             // 对输入内容进行验证，返回 null 通过验证
             if (!text || !text.trim()) return null
             text = text.trim()
-            const [host = '', port = '', password] = text
-            if (/[^\w\d]/.test(host.trim())) return text
-            if (/[^\w\d]/.test(port.trim())) return text
+            const [host = '', port = '', password] = text.split(':')
+            if (!host && !port && !password) return 'host/port/password cant empty only one,至少要有一个参数不为空'
+            if (host && /[^\w\d-]/.test(host.trim())) return host + ' 格式不符合，请重输'
+            if (port && /[^\d]/.test(port.trim())) return port + ' 格式不符合，请重输'
 
-            if (host && port) return null
-            return text
+            // if (host && port) return null
+            return null
           }
         }).then((msg = '') => {
           log('Refresh new init', msg)
@@ -122,6 +117,13 @@ class RedisTree extends TreeExplorer {
           this.refresh(msg, opt)
         })
     })
+  }
+  doDoc({ id, item }) {
+    VirtualDoc.setCacheDoc(id, item)
+    if (!this.docStatus[id]) {
+      this.doc.showDoc(id)
+      this.docStatus[id] = true
+    } else this.doc.update(id)
   }
 }
 

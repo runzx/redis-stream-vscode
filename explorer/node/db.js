@@ -1,7 +1,7 @@
 const { NodeType, RedisType } = require("../../config")
 const { TreeDataItem } = require("../explorer")
 const { ThemeIcon, ThemeColor, TreeItemCollapsibleState } = require("vscode")
-const { redisModel } = require("../../command/redis")
+const { RedisModel } = require("../../command/redis")
 const { RedisDateTypes } = require("./type")
 const { log } = require("../../lib/logging")
 
@@ -9,24 +9,31 @@ const { log } = require("../../lib/logging")
 class DbTreeItem extends TreeDataItem {
   constructor(opt = {}) {
     super(opt)
-
+    this.host = opt.host
+    this.port = opt.port
+    this.password = opt.password
+    this.context = opt.context
+    // this.redisModel = null
   }
   static init(opt = {}) {
     opt.contextValue = NodeType.DB
+
     return new DbTreeItem(opt)
   }
   async getChildren() {
-    let keysCategory = await redisModel.getKeysByAllCategory(this.db)
-    log('DB', keysCategory)
+    let { connection, host, port, password, db, redisModel, context } = this
+    if (!redisModel) {
+      redisModel = RedisModel.init({ host, port, password, db })
+    }
+    const keysCategory = await redisModel.getKeysByAllCategory()
+    log('DB', db, keysCategory)
     return Object.keys(keysCategory).map(label => {
       return RedisDateTypes.init({
-        connection: this.connection,
-        db: this.db,
+        db, connection, label, redisModel,
+
         redisDataType: label,
         item: keysCategory[label],
         description: `(${keysCategory[label].length})`,
-        label,
-        // tooltip: `expires:${expires},avg_ttl:${avg_ttl}`,
         collapsibleState: TreeItemCollapsibleState.Collapsed
       })
     })

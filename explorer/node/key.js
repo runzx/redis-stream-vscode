@@ -2,7 +2,6 @@ const { NodeType, RedisType } = require("../../config")
 const { TreeDataItem } = require("../explorer")
 const { ThemeIcon, TreeItemCollapsibleState } = require("vscode")
 const { StreamGroup } = require("./group")
-const { redisModel } = require("../../command/redis")
 const { IDTreeItem } = require("./id")
 const { dateYMD } = require("../../lib/util")
 
@@ -27,13 +26,12 @@ class KeyTreeItem extends TreeDataItem {
     return []
   }
   async setStream() {
+    const { db, connection, redisModel, redisDataType } = this
     const streamInfo = await redisModel.getKey(this.label)
     if (!streamInfo) return []
 
     const data = {
-      connection: this.connection,
-      db: this.db,
-      redisDataType: this.redisDataType,
+      db, connection, redisModel, redisDataType,
       stream: this.label,
       collapsibleState: TreeItemCollapsibleState.None
     }

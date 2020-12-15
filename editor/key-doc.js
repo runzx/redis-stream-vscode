@@ -4,8 +4,7 @@ const vscode = require("vscode")
 const { RedisModel } = require("../command/redis")
 const { scheme } = require("../config")
 const { log } = require("../lib/logging")
-
-const cacheDoc = {}
+const { VIEW_DB_KEY_SCHEME } = scheme
 
 class DocProvider {
   constructor() {
@@ -15,16 +14,17 @@ class DocProvider {
   async provideTextDocumentContent(uri) {
     log('URI', uri)
     const { path } = uri
-    // let [connection, db, type, strem, group, consumer, key] = path.split('$')
-    let keyR = path.match(/(.+)\.json/)
-    keyR = keyR ? keyR[1] : ''
+    let [connection, db, type, key] = path.split('$')
+    key = key.replace('.json', '')
 
-    return this.fmt(cacheDoc[keyR], keyR)
+    const redisModel = RedisModel.init({ connection, db, })
+    let res = await redisModel.getKey(key)
+    return this.fmt(res, key)
   }
   refresh(uri) {
     this._onDidChange.fire(uri)
   }
-  fmt(msg = '', key) {
+  fmt(msg, key) {
     if (typeof msg === 'string') {
       try {
         msg = JSON.parse(msg)
@@ -35,22 +35,21 @@ class DocProvider {
     return JSON.stringify(msg, null, 2)
   }
 }
-
-class VirtualDoc {
-  constructor(context) {
-    this.scheme = scheme.VIEW_DOCUMENT_SCHEME
+class KeyView {
+  constructor(context, scheme = VIEW_DB_KEY_SCHEME) {
+    this.scheme = scheme
     this.subscriptions = context.subscriptions
   }
-  initProvider() {
-    this.provider = new DocProvider()
+  initProvider(opt) {
+    if (opt.provider) this.provider = opt.provider
+    else this.provider = new DocProvider(opt)
 
     this.subscriptions.push(vscode.workspace
       .registerTextDocumentContentProvider(this.scheme, this.provider))
   }
   showDoc(id) {
-    vscode.window
+    return vscode.window
       .showTextDocument(this.getUri(id), { preview: false })
-    return this
   }
   getUri(id) {
     return vscode.Uri.parse(`${this.scheme}:${id}.json`)
@@ -60,27 +59,21 @@ class VirtualDoc {
   }
   dispose() { }
 
-  static init({ context }) {
-    const v = new VirtualDoc(context)
-    v.initProvider()
+  static getScheme(db, connection = '') {
+    // connection.replace(':', '_')
+    return VIEW_DB_KEY_SCHEME
+    // `${VIEW_DB_KEY_SCHEME}_${connection}_${db}`
+  }
+
+  static init({ context, redisModel, db,
+    connection = '', provider }) {
+    const schemeKey = this.getScheme(db, connection)
+    const v = new KeyView(context, schemeKey)
+    v.initProvider({ provider })
     return v
   }
-  static setCacheDoc(key, value) {
-    return cacheDoc[key] = value
-  }
-  static getCacheDoc(key, value) {
-    if (cacheDoc[key]) return cacheDoc[key]
-    return cacheDoc[key] = value
-  }
+
+
 }
 
-module.exports = exports = { VirtualDoc, }
-
-exports.setCacheDoc = (key, value) => {
-  return cacheDoc[key] = value
-}
-
-exports.getCacheDoc = (key, value) => {
-  if (cacheDoc[key]) return cacheDoc[key]
-  return cacheDoc[key] = value
-}
+module.exports = { KeyView }

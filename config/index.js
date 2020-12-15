@@ -35,3 +35,9 @@ exports.RedisType = {
   hash: 'hash', list: 'list', string: 'string', zset: 'zset', set: 'set',
   stream: 'stream'
 }
+
+exports.scheme = {
+  VIEW_DOCUMENT_SCHEME: 'redisStream',
+  VIEW_DB_KEY_SCHEME: 'redisStreamKey',
+  VIEW_STREM_ID_SCHEME: 'redisStreamID'
+}
