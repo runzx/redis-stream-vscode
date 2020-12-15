@@ -14,9 +14,8 @@ class TreeExplorer {
     this.provider = null
   }
 
-  refresh(data, opt) {
-    this.refreshMsg = data
-    this.provider.refresh()
+  refresh(data) {
+    this.provider.refresh(data)
   }
 
   initTree(viewId, treeDataProvider) {
@@ -75,14 +74,11 @@ class TreeDataItem extends TreeItem {
     this.iconPath = opt.iconPath
     this.description = opt.description
     this.tooltip = opt.tooltip  // 鼠标悬浮时显示内容
-
     this.command = opt.command  // 点击树节点时，执行此命令
     this.contextValue = opt.contextValue
     this.redisDataType = opt.redisDataType
-
     this.iconPath = path.join(__dirname, '..', 'image', `${this.contextValue}.png`)
     this.collapsibleState = opt.collapsibleState || this.getCollapseState(this)
-
     this.connection = opt.connection
     this.db = opt.db
     this.item = opt.item
@@ -90,12 +86,11 @@ class TreeDataItem extends TreeItem {
     this.group = opt.group
     this.consumer = opt.consumer
     this.pending = opt.pending
-
     this.id = opt.id || this.getId(opt)
-    // log('ID', this.id)
-    console.log(this.id)
+    // console.log(this.id)
     this.redisModel = opt.redisModel
   }
+
   getId(opt = {}) {
     const res = ['connection', 'db', 'redisDataType', 'stream', 'group', 'consumer', 'pending', 'label']
       .filter(i => {
@@ -108,7 +103,6 @@ class TreeDataItem extends TreeItem {
       .join('$')
     return res
   }
-  // getChildren() { }
   getCollapseState(element) {
     if (element.contextValue === NodeType.KEY
       && element.redisDataType === RedisType.stream)
@@ -119,7 +113,6 @@ class TreeDataItem extends TreeItem {
       || element.contextValue === NodeType.INFO)
       return TreeItemCollapsibleState.None
   }
-
   setCollapseState(element) { }
 }
 

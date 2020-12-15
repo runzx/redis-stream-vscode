@@ -8,25 +8,11 @@ const { log } = require('../lib/logging')
 const { TreeExplorer, TreeDataProvider, TreeDataItem } = require('./explorer')
 const { ConnectionNode } = require('./node/conection')
 
-class RedisTreeItem extends TreeDataItem {
-  constructor({ label, id, iconPath, command,
-    resourceUri, tooltip, collapsibleState, contextValue }) {
-    super({
-      label, id, iconPath, command, resourceUri,
-      tooltip, collapsibleState, contextValue
-    })
-
-  }
-}
 
 class RedisTreeDataProvider extends TreeDataProvider {
   constructor(context) {
     super(context)
-    // this.context = context
-    // Expanded 时会在其item 上 getChileren()
-    // this.treeData = [new ConnectionNode({ collapsibleState: TreeItemCollapsibleState.Expanded })]
   }
-
   // element->state->Collapsed 第一次点击会触发 getChileren()->getTreeItem()
   _getChileren(element) {
     if (element) return element.getChildren()
@@ -41,8 +27,8 @@ class RedisTreeDataProvider extends TreeDataProvider {
   getConnections() {
     let res = this.cacheGet(Constant.GLOBALSTATE_CONFIG_KEY, redisOpt)
     if (typeof res === 'string') {
-      const [host, port, password] = res.split(':')
-      return { host, port, password }
+      const [host, port, password, db] = res.split(':')
+      return { host, port, password, db }
     }
     return res
   }
@@ -51,9 +37,9 @@ class RedisTreeDataProvider extends TreeDataProvider {
 class RedisTree extends TreeExplorer {
   constructor(context) {
     super(context)
-    this.init()
     this.docStatus = {}
     this.doc = VirtualDoc.init({ context })
+    this.init()
   }
   init() {
     const { context } = this
@@ -65,6 +51,7 @@ class RedisTree extends TreeExplorer {
       const [item] = await RedisModel.init(opt).redisBase.serverInfo()
       this.doDoc({ id, item })
     })
+
     this.register('redis-stream.db.status', (opt, opt1, opt2) => {
       // log('db', opt)
 
@@ -118,6 +105,7 @@ class RedisTree extends TreeExplorer {
         })
     })
   }
+
   doDoc({ id, item }) {
     VirtualDoc.setCacheDoc(id, item)
     if (!this.docStatus[id]) {

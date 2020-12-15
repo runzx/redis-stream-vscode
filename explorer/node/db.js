@@ -13,7 +13,6 @@ class DbTreeItem extends TreeDataItem {
     this.port = opt.port
     this.password = opt.password
     this.context = opt.context
-    // this.redisModel = null
   }
   static init(opt = {}) {
     opt.contextValue = NodeType.DB

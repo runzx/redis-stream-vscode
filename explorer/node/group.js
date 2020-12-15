@@ -24,11 +24,9 @@ class StreamGroup extends TreeDataItem {
       redisDataType, stream } = this
     const data = {
       db, connection, redisModel, redisDataType, stream,
-
       group: this.label,
       collapsibleState: TreeItemCollapsibleState.None
     }
-
     const { pending, consumers } = this.item
     const c = consumers.map(i => {
       return StreamConsumer.init({
@@ -36,7 +34,8 @@ class StreamGroup extends TreeDataItem {
         item: i,
         label: i.name,
         tooltip: `pel-count: ${i['pel-count']}`,
-        collapsibleState: i.pending.length > 0 ? TreeItemCollapsibleState.Collapsed
+        collapsibleState: i.pending.length > 0
+          ? TreeItemCollapsibleState.Collapsed
           : TreeItemCollapsibleState.None
       })
     })

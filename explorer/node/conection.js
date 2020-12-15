@@ -13,8 +13,6 @@ class ConnectionNode extends TreeDataItem {
     this.port = opt.port
     this.password = opt.password
     this.dbs = opt.dbs
-    // this.context = opt.context
-    // this.redisModel = redisModel
   }
   static async init(opt = {}) {
     const { host, port, password } = opt
