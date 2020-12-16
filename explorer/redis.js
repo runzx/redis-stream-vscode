@@ -27,7 +27,9 @@ class RedisTreeDataProvider extends TreeDataProvider {
   getConnections() {
     let res = this.cacheGet(Constant.GLOBALSTATE_CONFIG_KEY, redisOpt)
     if (typeof res === 'string') {
-      const [host, port, password, db] = res.split(':')
+      let [host, port = 6379, password, db = 0] = res.split(':')
+      host = host ? host : '127.0.0.1'
+      port = port ? port : 6379
       return { host, port, password, db }
     }
     return res
@@ -101,7 +103,7 @@ class RedisTree extends TreeExplorer {
           log('Refresh new init', msg)
           if (!msg) return
           this.cacheSet('redisOpt', msg)
-          this.refresh(msg, opt)
+          this.refresh()
         })
     })
   }
@@ -118,5 +120,4 @@ class RedisTree extends TreeExplorer {
 
 module.exports = {
   RedisTree,
-  RedisTreeItem,
 }
