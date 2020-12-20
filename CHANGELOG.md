@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.4.0]
+
+- add button 'key search' search key in db.
+- add button 'db refresh' refresh db data.
+
 ## [1.3.0]
 
 - add button 'Show more ...' scan all keys in db.

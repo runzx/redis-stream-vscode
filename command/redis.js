@@ -15,9 +15,10 @@ class RedisModel {
     this.scanMore = true
     this.categoryList = {} //{stream:[],zet:[]}
     this.keysLen = 0
+    this.searchResult = []
   }
   async scanKeys(cursor = this.cursor, count = 20, scanMore = this.scanMore) {
-    if (scanMore === '0') return [this.categoryList, false]
+    if (scanMore === '0') return [this.categoryList, this.keysLen]
 
     let [cursorNext, keys] = await this.client.scan(cursor, 'count', count)
     console.log('cursor:', cursor, keys)
@@ -81,7 +82,12 @@ class RedisModel {
     const [serverInfo, dbs, InfoTxt] = await this.redisBase.serverInfo()
     return dbs
   }
-
+  async searchKey(key) {
+    // const value = await this.getKey(key)
+    const type = await this.getType(key)
+    this.searchResult.push({ key, type })
+    return { key, type }
+  }
   start(opt) {
     opt.dbIndex = opt.db = opt.db || opt.dbIndex || 0
     this.redisBase = new RedisBase(opt)

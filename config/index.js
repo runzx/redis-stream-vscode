@@ -11,7 +11,8 @@ const NodeType = {
   FOLDER: 'folder', REDISDATATYPE: 'redisdatatype',
   KEY: 'key', INFO: "info",
   GORUP: 'group', CONSUMER: 'consumer', ID: 'id',
-  PENDING: 'pending', SCANMORE: 'scan-more'
+  PENDING: 'pending', SCANMORE: 'scan-more',
+  SEARCHKEY: 'search-key',
 }
 
 module.exports = exports = {

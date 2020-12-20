@@ -65,6 +65,31 @@ class RedisTree extends TreeExplorer {
       this.refresh(opt)
     })
 
+    this.register('redis-stream.db.refresh', async (opt,) => {
+      const { host, port, db } = opt
+      RedisModel.delClient({ host, port, db })
+      opt.redisModel = null
+      log('DB REFRESH', opt)
+      this.refresh(opt)
+    })
+
+    this.register('redis-stream.db.search', async (opt,) => {
+      const { label, id, redisModel } = opt
+      window.showInputBox(
+        {
+          password: false,
+          ignoreFocusOut: true,
+          placeHolder: '请输入key ...',
+          prompt: '"Enter"确认/"ESC"取消   ',
+          // value,
+        }).then(async (msg) => {
+          log('SEARCH:', msg)
+          if (!msg) return
+          await redisModel.searchKey(msg)
+          this.refresh(opt)
+        })
+    })
+
     this.register('redis-stream.id.status', async (opt,) => {
       const { label, id, } = opt
       log('ID', label, id)

@@ -25,6 +25,7 @@ class DocProvider {
     this._onDidChange.fire(uri)
   }
   fmt(msg, key) {
+    if (!msg) return 'no key!'
     if (typeof msg === 'string') {
       try {
         msg = JSON.parse(msg)
