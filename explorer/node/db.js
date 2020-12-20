@@ -24,8 +24,8 @@ class DbTreeItem extends TreeDataItem {
     if (!redisModel) {
       redisModel = RedisModel.init({ host, port, password, db })
     }
-    const keysCategory = await redisModel.getKeysByAllCategory()
-    log('DB', db, keysCategory)
+    const [keysCategory, scanMore] = await redisModel.scanKeys()
+    log('DB', db, keysCategory, scanMore)
     return Object.keys(keysCategory).map(label => {
       return RedisDateTypes.init({
         db, connection, label, redisModel,

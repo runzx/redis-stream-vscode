@@ -59,6 +59,11 @@
         "command": "redis-stream.msg.value.refresh",
         "title": "value reload",
         "icon": "image/refresh.png"
+      },
+      {
+        "command": "redis-stream.db.scan",
+        "title": "key scan",
+        "icon": "image/next-page.png"
       }
     ],
     "viewsContainers": {
@@ -98,6 +103,11 @@
         {
           "command": "redis-stream.msg.value.refresh",
           "when": "view == redisTree && viewItem == group || viewItem == consumer",
+          "group": "inline@0"
+        },
+        {
+          "command": "redis-stream.db.scan",
+          "when": "view == redisTree && viewItem == db",
           "group": "inline@0"
         }
       ]

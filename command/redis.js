@@ -11,17 +11,24 @@ class RedisModel {
     this.db = db
     this.client = client
     this.start({ client, db, })
+    this.cursor = 0
+    this.scanMore = true
+    this.categoryList = {} //{stream:[],zet:[]}
   }
-  async getKeysByAllCategory() {
-    let [cursor, keys] = await this.client.scan(0,)
+  async scanKeys(cursor = this.cursor, count = 20, scanMore = this.scanMore) {
+    if (!scanMore) return [this.categoryList, false]
+
+    let [cursorNext, keys] = await this.client.scan(cursor, 'count', count)
     console.log('cursor:', cursor, keys)
-    const categoryArr = {}
+    const categoryList = this.categoryList
     for (const key of keys) {
       const type = await this.getType(key)
-      if (categoryArr[type]) categoryArr[type].push(key)
-      else categoryArr[type] = [key]
+      if (categoryList[type]) categoryList[type].push(key)
+      else categoryList[type] = [key]
     }
-    return categoryArr
+    this.cursor = cursorNext
+    this.scanMore = cursorNext !== 0
+    return [categoryList, this.scanMore]
   }
   async getType(key) {
     return this.client.type(key)
@@ -68,7 +75,7 @@ class RedisModel {
   async getKeys(pattern = '*') {
     return this.client.keys(pattern)
   }
-  async info() {
+  async dbInfo() {
     const [serverInfo, dbs, InfoTxt] = await this.redisBase.serverInfo()
     return dbs
   }
