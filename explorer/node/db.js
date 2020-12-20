@@ -46,11 +46,11 @@ class SearchKeysTreeItem extends TreeDataItem {
   }
   async getChildren() {
     const { db, connection, redisModel, } = this
-    const redisDataType = 'searchResult'
+    const redisDataType = RedisType.searchKey
     const item = this.redisModel.searchResult
     return this.redisModel.searchResult.map(({ key: label, type }) => {
       return KeyTreeItem.init({
-        label, redisDataType,
+        label, redisDataType, type,
         db, connection, redisModel,
         tooltip: `${type}`
       })

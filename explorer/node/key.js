@@ -20,7 +20,8 @@ class KeyTreeItem extends TreeDataItem {
     return new KeyTreeItem(opt)
   }
   async getChildren() {
-    if (this.redisDataType === RedisType.stream) {
+    if (this.redisDataType === RedisType.stream
+      || this.type === RedisType.stream) {
       return this.setStream()
     }
     return []

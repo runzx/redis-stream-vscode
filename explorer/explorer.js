@@ -78,6 +78,8 @@ class TreeDataItem extends TreeItem {
     this.contextValue = opt.contextValue
     this.redisDataType = opt.redisDataType
     this.iconPath = path.join(__dirname, '..', 'image', `${this.contextValue}.png`)
+
+    this.type = opt.type
     this.collapsibleState = opt.collapsibleState || this.getCollapseState(this)
     this.connection = opt.connection
     this.db = opt.db
@@ -106,6 +108,10 @@ class TreeDataItem extends TreeItem {
   getCollapseState(element) {
     if (element.contextValue === NodeType.KEY
       && element.redisDataType === RedisType.stream)
+      return TreeItemCollapsibleState.Collapsed
+
+    if (element.type === RedisType.stream
+      && element.redisDataType === RedisType.searchKey)
       return TreeItemCollapsibleState.Collapsed
 
     if (element.contextValue === NodeType.KEY

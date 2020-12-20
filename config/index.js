@@ -34,7 +34,7 @@ exports.redisOpt = {
 
 exports.RedisType = {
   hash: 'hash', list: 'list', string: 'string', zset: 'zset', set: 'set',
-  stream: 'stream',
+  stream: 'stream', searchKey: 'searchKey'
 }
 
 exports.scheme = {
