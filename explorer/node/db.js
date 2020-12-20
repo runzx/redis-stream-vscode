@@ -74,7 +74,7 @@ class DbTreeItem extends TreeDataItem {
   async getChildren() {
     let { connection, host, port, password, db, redisModel, context, description } = this
     if (!redisModel) {
-      redisModel = RedisModel.init({ host, port, password, db })
+      this.redisModel = redisModel = RedisModel.init({ host, port, password, db })
     }
     const [keysCategory, scanMore] = await redisModel.scanKeys()
     log('DB', db, keysCategory, scanMore)
