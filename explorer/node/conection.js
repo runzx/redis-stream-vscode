@@ -22,7 +22,7 @@ class ConnectionNode extends TreeDataItem {
 
     if (!host && !port && !password) log('refresh err', opt)
     const redisModel = RedisModel.init({ host, port, password, db: 0 })
-    const dbs = await redisModel.info()
+    const dbs = await redisModel.dbInfo()
       .catch(err => {
         showMsg(err.message + '  -- refresh redis host:port --', 'error')
         log('Redis status', redisModel.status)
