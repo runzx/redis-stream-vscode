@@ -14,21 +14,23 @@ class RedisModel {
     this.cursor = 0
     this.scanMore = true
     this.categoryList = {} //{stream:[],zet:[]}
+    this.keysLen = 0
   }
   async scanKeys(cursor = this.cursor, count = 20, scanMore = this.scanMore) {
-    if (!scanMore) return [this.categoryList, false]
+    if (scanMore === '0') return [this.categoryList, false]
 
     let [cursorNext, keys] = await this.client.scan(cursor, 'count', count)
     console.log('cursor:', cursor, keys)
     const categoryList = this.categoryList
+    this.keysLen += keys.length
     for (const key of keys) {
       const type = await this.getType(key)
       if (categoryList[type]) categoryList[type].push(key)
       else categoryList[type] = [key]
     }
     this.cursor = cursorNext
-    this.scanMore = cursorNext !== 0
-    return [categoryList, this.scanMore]
+    this.scanMore = cursorNext
+    return [categoryList, this.keysLen]
   }
   async getType(key) {
     return this.client.type(key)
@@ -94,6 +96,11 @@ class RedisModel {
     return this
   }
 
+  static reloadRedis(opt) {
+    this.delClient(opt)
+    opt.client = this.getClient(opt)
+    return new RedisModel(opt)
+  }
   static init(opt) {
     opt.db = opt.db || opt.dbIndex
     if (!opt.client) opt.client = this.getClient(opt)
@@ -113,6 +120,7 @@ class RedisModel {
   static delClient({ host, port, password, db = 0 }) {
     const key = `${host}-${port}-${db}`
     if (this.activeClient[key]) {
+      this.activeClient[key].disconnect()
       this.activeClient[key] = null
       return true
     }

@@ -11,7 +11,7 @@ const NodeType = {
   FOLDER: 'folder', REDISDATATYPE: 'redisdatatype',
   KEY: 'key', INFO: "info",
   GORUP: 'group', CONSUMER: 'consumer', ID: 'id',
-  PENDING: 'pending'
+  PENDING: 'pending', SCANMORE: 'scan-more'
 }
 
 module.exports = exports = {
@@ -33,7 +33,7 @@ exports.redisOpt = {
 
 exports.RedisType = {
   hash: 'hash', list: 'list', string: 'string', zset: 'zset', set: 'set',
-  stream: 'stream'
+  stream: 'stream',
 }
 
 exports.scheme = {

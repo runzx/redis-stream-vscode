@@ -110,6 +110,7 @@ class TreeDataItem extends TreeItem {
 
     if (element.contextValue === NodeType.KEY
       || element.contextValue === NodeType.ID
+      || element.contextValue === NodeType.SCANMORE
       || element.contextValue === NodeType.INFO)
       return TreeItemCollapsibleState.None
   }

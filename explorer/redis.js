@@ -59,6 +59,12 @@ class RedisTree extends TreeExplorer {
 
     })
 
+    this.register('redis-stream.db.scan', async (opt,) => {
+      const { label, id, } = opt
+      log('SCAN', opt)
+      this.refresh(opt)
+    })
+
     this.register('redis-stream.id.status', async (opt,) => {
       const { label, id, } = opt
       log('ID', label, id)
@@ -110,10 +116,12 @@ class RedisTree extends TreeExplorer {
 
   doDoc({ id, item }) {
     VirtualDoc.setCacheDoc(id, item)
-    if (!this.docStatus[id]) {
-      this.doc.showDoc(id)
-      this.docStatus[id] = true
-    } else this.doc.update(id)
+    this.doc.showDoc(id)
+
+    if (this.docStatus[id]) {
+      this.doc.update(id)
+    }
+    this.docStatus[id] = true
   }
 }
 

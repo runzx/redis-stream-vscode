@@ -6,6 +6,26 @@ const { RedisDateTypes } = require("./type")
 const { log } = require("../../lib/logging")
 
 
+class ShowMoreKeysTreeItem extends TreeDataItem {
+  constructor(opt = {}) {
+    super(opt)
+    this.isShowMoreItem = true
+
+    this.command = {
+      title: 'More',
+      tooltip: 'scan more',
+      arguments: [opt.refreshParent],
+      command: 'redis-stream.db.scan'
+    }
+  }
+
+  static init(opt = {}) {
+    opt.contextValue = NodeType.SCANMORE
+    opt.label = 'Show more ...'
+    opt.tooltip = `SCAN more...`
+    return new ShowMoreKeysTreeItem(opt)
+  }
+}
 class DbTreeItem extends TreeDataItem {
   constructor(opt = {}) {
     super(opt)
@@ -20,13 +40,15 @@ class DbTreeItem extends TreeDataItem {
     return new DbTreeItem(opt)
   }
   async getChildren() {
-    let { connection, host, port, password, db, redisModel, context } = this
+    let { connection, host, port, password, db, redisModel, context, description } = this
     if (!redisModel) {
       redisModel = RedisModel.init({ host, port, password, db })
     }
     const [keysCategory, scanMore] = await redisModel.scanKeys()
     log('DB', db, keysCategory, scanMore)
-    return Object.keys(keysCategory).map(label => {
+    const [keysLen] = description.match(/\d+/)
+    const categroys = Object.keys(keysCategory).map(label => {
+
       return RedisDateTypes.init({
         db, connection, label, redisModel,
 
@@ -36,6 +58,15 @@ class DbTreeItem extends TreeDataItem {
         collapsibleState: TreeItemCollapsibleState.Collapsed
       })
     })
+    let scanMoreItem = null
+    if (scanMore !== +keysLen) {
+      scanMoreItem = ShowMoreKeysTreeItem.init({
+        db, connection, redisModel,
+        description: `(${+keysLen - scanMore})`,
+        refreshParent: this
+      })
+    }
+    return [...categroys, scanMoreItem]
   }
 }
 

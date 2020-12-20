@@ -21,7 +21,7 @@ class ConnectionNode extends TreeDataItem {
     opt.label = opt.connection = opt.id = `${host}:${port}`
 
     if (!host && !port && !password) log('refresh err', opt)
-    const redisModel = RedisModel.init({ host, port, password, db: 0 })
+    const redisModel = RedisModel.reloadRedis({ host, port, password, db: 0 })
     const dbs = await redisModel.dbInfo()
       .catch(err => {
         showMsg(err.message + '  -- refresh redis host:port --', 'error')

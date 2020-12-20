@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.3.0]
+
+- add button 'Show more ...' scan all keys in db.
+- 增加'Show more ...'功能遍历整个 db 的 keys.
+
 ## [1.2.2]
 
 - setting desdescription.
