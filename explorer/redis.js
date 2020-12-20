@@ -74,7 +74,11 @@ class RedisTree extends TreeExplorer {
     })
 
     this.register('redis-stream.db.search', async (opt,) => {
-      const { label, id, redisModel } = opt
+      let { redisModel } = opt
+      if (!redisModel) {
+        const { host, port, db, password } = opt
+        opt.redisModel = redisModel = RedisModel.init({ host, port, db, password })
+      }
       window.showInputBox(
         {
           password: false,
