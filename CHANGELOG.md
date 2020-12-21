@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.5.0]
+
+- 增加'Show more ...'功能遍历整个 db 的 stream id keys.
+- suppport redis V5+.(兼容)
+
 ## [1.4.0]
 
 - add button 'key search' search key in db.

@@ -49,6 +49,7 @@ exports.registers = (context) => {
     log.info('VALUE RELOAD', label, id)
     doc.update(id)
     refresh(opt)
+    
   })
   register('redis-stream.msg.value.refresh', async (opt) => {
     const { label, id } = opt
