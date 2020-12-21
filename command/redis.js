@@ -42,7 +42,7 @@ class RedisModel {
     }
 
   }
-  async getKey(key) {
+  async getKey(key, count = 10) {
     const type = await this.getType(key)
     let content    //  = await this.client.get(key)
     switch (type) {
@@ -68,11 +68,20 @@ class RedisModel {
         break
       case RedisType.stream:
         const stream = new RedisStream({ client: this.client, stream: key })
-        content = await stream.getStreamInfo(undefined, true, 20)
-
+        content = await stream.getStreamInfo(key, true, count) // full
         break
     }
     return content
+  }
+  async getStreamInfo(stream) {
+    const redisStream = new RedisStream({ client: this.client, stream })
+    const res = await redisStream.getStreamInfo(stream, true, 10) // full
+    if (!res.entries) {
+      res.entries = await redisStream.xrevrange(stream, '+', '-', 1)
+      if (res.groups === 0) res.groups = []
+      else res.groups = await redisStream.getGroupsInfo()
+    }
+    return res
   }
   async getKeys(pattern = '*') {
     return this.client.keys(pattern)
