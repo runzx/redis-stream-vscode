@@ -102,7 +102,7 @@
         },
         {
           "command": "redis-stream.id.value.refresh",
-          "when": "view == redisTree && viewItem == key || viewItem == id ",
+          "when": "view == redisTree && viewItem == key",
           "group": "inline@0"
         },
         {

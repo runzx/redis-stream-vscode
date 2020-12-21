@@ -32,7 +32,7 @@ class StreamConsumer extends TreeDataItem {
     data.item = pending
     data.label = 'pending'
 
-    data.tooltip = 'pending length: ' + pending.length
+    data.tooltip = 'length: ' + pending.length
     return [StreamPending.init(data)]
 
   }

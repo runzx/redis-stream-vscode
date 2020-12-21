@@ -12,7 +12,7 @@ const NodeType = {
   KEY: 'key', INFO: "info",
   GORUP: 'group', CONSUMER: 'consumer', ID: 'id',
   PENDING: 'pending', SCANMORE: 'scan-more',
-  SEARCHKEY: 'search-key',
+  SEARCHKEY: 'search-key', IDMORE: 'id-more'
 }
 
 module.exports = exports = {
@@ -42,3 +42,4 @@ exports.scheme = {
   VIEW_DB_KEY_SCHEME: 'redisStreamKey',
   VIEW_STREM_ID_SCHEME: 'redisStreamID'
 }
+exports.SHOW_MORE_COUNT = 5
