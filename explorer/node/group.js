@@ -44,7 +44,10 @@ class StreamGroup extends TreeDataItem {
       ...data,
       item: pending,
       label: 'pending',
-      tooltip: 'pending length: ' + pending.length,
+      tooltip: 'length: ' + this.item['pel-count'],
+      collapsibleState: pending.length > 0
+        ? TreeItemCollapsibleState.Collapsed
+        : TreeItemCollapsibleState.None
     })]
 
   }

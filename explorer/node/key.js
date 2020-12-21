@@ -50,11 +50,9 @@ class KeyTreeItem extends TreeDataItem {
       })
     })
     const ids = entries.map(i => {
-      let at = i.id.match(/(\d+)-?/)
-      at = at ? at[1] : ''
       return IDTreeItem.init({
         ...data, item: i.item, label: i.id,
-        tooltip: new Date(+at).format('yy-MM-dd hh:mm:ss')
+        tooltip: this.id2date(i.id)
       })
     })
     return [...g, ...ids]

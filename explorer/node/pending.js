@@ -23,9 +23,11 @@ class StreamPending extends TreeDataItem {
     const ids = this.item.map(i => {
       data.item = i
       data.label = i[0]
-      let at = i[0].match(/(\d+)-?/)
-      at = at ? at[1] : ''
-      data.tooltip = new Date(+at).format('yy-MM-dd hh:mm:ss')
+      data.tooltip = this.id2date(data.label)
+      if (i.length === 3) {
+        data.tooltip += ` | ${this.id2date(i[1])} | ${i[2]}`
+      } else
+        data.tooltip += ` | ${i[1]} | ${this.id2date(i[2])} | ${i[3]}`
       return IDTreeItem.init(data)
     })
     return ids

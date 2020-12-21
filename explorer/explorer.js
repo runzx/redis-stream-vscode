@@ -3,7 +3,7 @@ const path = require('path')
 const vscode = require("vscode")
 const { NodeType, RedisType } = require("../config")
 const { log } = require('../lib/logging')
-const { isEmpty } = require('../lib/util')
+const { isEmpty, dateYMD } = require('../lib/util')
 const { TreeItemCollapsibleState, EventEmitter, TreeItem, Uri } = vscode
 const { registerCommand, registerTextEditorCommand } = vscode.commands
 
@@ -121,6 +121,14 @@ class TreeDataItem extends TreeItem {
       return TreeItemCollapsibleState.None
   }
   setCollapseState(element) { }
+  dateFmt(at = new Date(), fmt = 'yy-MM-dd hh:mm:ss') {
+    return new Date(+at).format(fmt)
+  }
+  id2date(id = '', fmt) {
+    if (typeof id === 'number') return this.dateFmt(id, fmt)
+    const [, at = ''] = id.match(/(\d+)-?/) || []
+    return this.dateFmt(at, fmt)
+  }
 }
 
 module.exports = { TreeExplorer, TreeDataProvider, TreeDataItem }
