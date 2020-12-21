@@ -111,7 +111,14 @@ class RedisModel {
         }))
         // if ()
       }
+    } else {
+      res.entries = await stream.xrevrange(streamKey, '+', '-', 5)
     }
+    return res
+  }
+  async getInfoById(id, stream) {
+    const redis = new RedisStream({ client: this.client, stream })
+    const [res] = await redis.xrange(stream, id, '+', 1)
     return res
   }
   async getKeys(pattern = '*') {

@@ -10,6 +10,7 @@ const { RedisTree } = require('../explorer')
 const { VirtualDoc } = require('../editor')
 const { channel, scheme } = require('../config')
 const { KeyView } = require('../editor/key-doc')
+const { StreamIdView } = require('../editor/stream-id-doc')
 
 
 exports.registers = (context) => {
@@ -34,6 +35,14 @@ exports.registers = (context) => {
     log.info('KEY', label, id)
     doc.showDoc(id)
   })
+
+  const docId = StreamIdView.init({ context })
+  register('redis-stream.id.status', async (opt) => {
+    const { label, id } = opt
+    log.info('DocID', label, id)
+    docId.showDoc(id)
+  })
+
   const virDoc = VirtualDoc.init({ context })
   register('redis-stream.id.value.refresh', async (opt) => {
     const { label, id, refresh } = opt
