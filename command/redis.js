@@ -73,13 +73,44 @@ class RedisModel {
     }
     return content
   }
-  async getStreamInfo(stream) {
-    const redisStream = new RedisStream({ client: this.client, stream })
-    const res = await redisStream.getStreamInfo(stream, true, 10) // full
+  async getStreamInfo(streamKey) {
+    const stream = new RedisStream({ client: this.client, stream: streamKey })
+    const res = await stream.getStreamInfo(streamKey, true, 10) // full
     if (!res.entries) {
-      res.entries = await redisStream.xrevrange(stream, '+', '-', 1)
+      res.entries = await stream.xrevrange(streamKey, '+', '-', 1)
       if (res.groups === 0) res.groups = []
-      else res.groups = await redisStream.getGroupsInfo()
+      else {
+        res.groups = await stream.getGroupsInfo(streamKey)
+        res.groups = await Promise.all(res.groups.map(async (i) => {
+          if (i.consumers === 0) i.consumers = []
+          else {
+            let res = await stream.getConsumersInfo(i.name)
+            res = await Promise.all(res.map(async j => {
+              j['pel-count'] = j.pending
+              if (j.pending !== 0) {
+                j.pending = await stream.readPending({
+                  group: i.name, consumer: j.name,
+                  start: '-', end: '+', count: 10,
+                })
+              } else j.pending = []
+              return j
+            }))
+            i.consumers = res
+          }
+          i['pel-count'] = i.pending
+          if (i.pending === 0) i.pending = []
+          else {
+            let res = await stream.readPending({
+              group: i.name,
+              start: '-', end: '+', count: 10,
+            })
+            i.pending = res
+          }
+
+          return i
+        }))
+        // if ()
+      }
     }
     return res
   }

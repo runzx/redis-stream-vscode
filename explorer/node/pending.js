@@ -21,13 +21,19 @@ class StreamPending extends TreeDataItem {
       pending: this.label,
     }
     const ids = this.item.map(i => {
-      data.item = i
-      data.label = i[0]
-      data.tooltip = this.id2date(data.label)
-      if (i.length === 3) {
-        data.tooltip += ` | ${this.id2date(i[1])} | ${i[2]}`
-      } else
-        data.tooltip += ` | ${i[1]} | ${this.id2date(i[2])} | ${i[3]}`
+      if (Array.isArray(i)) {
+        data.item = i
+        data.label = i[0]
+        data.tooltip = this.id2date(data.label)
+        if (i.length === 3) {
+          data.tooltip += ` | ${this.id2date(i[1])} | ${i[2]}`
+        } else
+          data.tooltip += ` | ${i[1]} | ${this.id2date(i[2])} | ${i[3]}`
+      } else {
+        data.label = i.id
+        data.tooltip = `${this.id2date(data.label)} | ${i.consumer} | ${i.deliveredTime} | ${i.deliveredNum}`
+      }
+
       return IDTreeItem.init(data)
     })
     return ids
