@@ -1,6 +1,6 @@
 
 const { RedisBase, RedisStream } = require('../lib/redis-mq')
-const { RedisType, redisOpt } = require('../config')
+const { RedisType, redisOpt, SHOW_MORE_COUNT } = require('../config')
 const IORedis = require('ioredis')
 
 
@@ -16,6 +16,7 @@ class RedisModel {
     this.categoryList = {} //{stream:[],zet:[]}
     this.keysLen = 0
     this.searchResult = []
+    this.streamIDs = {} // show more start
   }
   async scanKeys(cursor = this.cursor, count = 20, scanMore = this.scanMore) {
     if (scanMore === '0') return [this.categoryList, this.keysLen]
@@ -76,8 +77,9 @@ class RedisModel {
   async getStreamInfo(streamKey) {
     const stream = new RedisStream({ client: this.client, stream: streamKey })
     const res = await stream.getStreamInfo(streamKey, true, 10) // full
+    if (!this.streamIDs[streamKey]) this.streamIDs[streamKey] = SHOW_MORE_COUNT
     if (!res.entries) {
-      res.entries = await stream.xrevrange(streamKey, '+', '-', 1)
+      res.entries = await stream.xrevrange(streamKey, '+', '-', this.streamIDs[streamKey])
       if (res.groups === 0) res.groups = []
       else {
         res.groups = await stream.getGroupsInfo(streamKey)
@@ -112,8 +114,9 @@ class RedisModel {
         // if ()
       }
     } else {
-      res.entries = await stream.xrevrange(streamKey, '+', '-', 5)
+      res.entries = await stream.xrevrange(streamKey, '+', '-', this.streamIDs[streamKey])
     }
+    this.streamIDs[streamKey] += SHOW_MORE_COUNT
     return res
   }
   async getInfoById(id, stream) {

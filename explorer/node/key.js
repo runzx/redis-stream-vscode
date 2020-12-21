@@ -6,6 +6,7 @@ const { IDTreeItem } = require("./id")
 const { dateYMD } = require("../../lib/util")
 
 class KeyTreeItem extends TreeDataItem {
+  streamIdCount = {}
   constructor(opt = {}) {
     super(opt)
     this.command = {
@@ -26,19 +27,20 @@ class KeyTreeItem extends TreeDataItem {
     }
     return []
   }
+
   async setStream() {
     const { db, connection, redisModel, redisDataType } = this
-    const streamInfo = await redisModel.getKey(this.label)
+    const streamInfo = await redisModel.getStreamInfo(this.label)
     if (!streamInfo) return []
-
+    this.tooltip = `id(${streamInfo.length})`
     const data = {
       db, connection, redisModel, redisDataType,
       stream: this.label,
       collapsibleState: TreeItemCollapsibleState.None
     }
     this.streamInfo = streamInfo
-    const { groups, entries } = streamInfo
-    const g = groups.map(i => {
+    const { groups, entries = [] } = streamInfo
+    let g = groups.map(i => {
       const collapsibleState = (i.pending.length > 0 || i.consumers.length > 0)
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None
@@ -55,7 +57,35 @@ class KeyTreeItem extends TreeDataItem {
         tooltip: this.id2date(i.id)
       })
     })
-    return [...g, ...ids]
+    let moreItem = null
+    const sLen = streamInfo.length - ids.length
+    if (sLen !== 0) moreItem = ShowMoreItem.init({
+      ...data,
+      refreshParent: this,
+      description: `(${sLen})`,
+    })
+    return [...g, ...ids, moreItem]
+  }
+}
+
+class ShowMoreItem extends TreeDataItem {
+  constructor(opt = {}) {
+    super(opt)
+    this.isShowMoreItem = true
+
+    this.command = {
+      title: 'More',
+      tooltip: 'ID more',
+      arguments: [opt.refreshParent],
+      command: 'redis-stream.stream.showMore'
+    }
+  }
+
+  static init(opt = {}) {
+    opt.contextValue = NodeType.SCANMORE
+    opt.label = 'Show more ...'
+    opt.tooltip = `ID more...`
+    return new ShowMoreItem(opt)
   }
 }
 
