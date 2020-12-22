@@ -19,7 +19,7 @@ exports.registers = (context) => {
     subscriptions.push(registerCommand(commandName, cb))
   }
   const statusBar = new showStatusBar(context, 'right')
-  log.info('first register command...')
+  // log.info('first register command...')
   // 下面是要注册的命令
   register('redis-stream.hide', () => {
     context.globalState.update('redisOpt', { host: "127.0.0.1", port: 6379 })
@@ -29,7 +29,7 @@ exports.registers = (context) => {
 
   new RedisTree(context)
   const doc = KeyView.init({ context })
-  register('redis-stream.openDoc', (uri) => doc.showDoc(uri))
+  // register('redis-stream.openDoc', (uri) => doc.showDoc(uri))
   register('redis-stream.key.status', async (opt) => {
     const { label, id } = opt
     log.info('KEY', label, id)

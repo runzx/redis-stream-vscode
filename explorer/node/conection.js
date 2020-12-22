@@ -14,12 +14,17 @@ class ConnectionNode extends TreeDataItem {
     this.password = opt.password
     this.dbs = opt.dbs
   }
-  static async init(opt = {}) {
+  static init(opt = {}) {
     const { host, port, password } = opt
     opt.contextValue = NodeType.CONNECTION
     opt.collapsibleState = TreeItemCollapsibleState.Expanded
     opt.label = opt.connection = opt.id = `${host}:${port}`
 
+    return new ConnectionNode(opt)
+  }
+
+  async getTreeItem(provider) {
+    let { host, port, password, } = this
     if (!host && !port && !password) log('refresh err', opt)
     const redisModel = RedisModel.reloadRedis({ host, port, password, db: 0 })
     const dbs = await redisModel.dbInfo()
@@ -29,10 +34,13 @@ class ConnectionNode extends TreeDataItem {
         opt.collapsibleState = TreeItemCollapsibleState.None
       })
     log('dbs', dbs,)
-    opt.redisModel = redisModel
-    opt.dbs = dbs
-    return [new ConnectionNode(opt)]
+    this.redisModel = redisModel
+    this.dbs = dbs
+    // 只刷新此Item时要改变
+    this.label = this.connection = this.id = `${host}:${port}`
+    return this
   }
+
   async getChildren() {
 
     return Object.keys(this.dbs).map(label => {

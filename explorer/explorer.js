@@ -46,12 +46,14 @@ class TreeDataProvider {
 
     return this._getChileren(element)
   }
+  // refresh getTreeItem -> getChildren 
   async getTreeItem(element) {
     element.refresh = (e) => { this.refresh(e) }
     if (this._getTreeItem) return this._getTreeItem(element)
 
     return element
   }
+
   refresh(item) {
     this._onDidChangeTreeData.fire(item)
   }

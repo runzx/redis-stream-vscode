@@ -14,13 +14,15 @@ class RedisTreeDataProvider extends TreeDataProvider {
     super(context)
   }
   // element->state->Collapsed 第一次点击会触发 getChileren()->getTreeItem()
+  // root 时 element 为空
   _getChileren(element) {
     if (element) return element.getChildren()
 
     const config = this.getConnections()
-    return ConnectionNode.init({ ...config, context: this.context })
+    return [ConnectionNode.init({ ...config, context: this.context })]
   }
   _getTreeItem(element) {
+    if (element.getTreeItem) return element.getTreeItem(this)
     return element
   }
 

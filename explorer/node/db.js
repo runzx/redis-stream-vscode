@@ -71,14 +71,22 @@ class DbTreeItem extends TreeDataItem {
 
     return new DbTreeItem(opt)
   }
-  async getChildren() {
-    let { connection, host, port, password, db, redisModel, context, description } = this
-    if (!redisModel) {
-      this.redisModel = redisModel = RedisModel.init({ host, port, password, db })
+  async getTreeItem(parent) {
+    let { host, port, password, db, redisModel, label, } = this
+    if (!this.redisModel) {
+      this.redisModel = RedisModel.init({ host, port, password, db })
     }
+    let dbsInfo = await this.redisModel.dbInfo()
+    const { keys, } = dbsInfo[label]
+    this.description = `(${keys})`
+    return this
+  }
+  async getChildren() {
+    let { connection, db, redisModel, description, } = this
     const [keysCategory, scanMore] = await redisModel.scanKeys()
     log('DB', db, keysCategory, scanMore)
     const [keysLen] = description.match(/\d+/)
+    
     const categroys = Object.keys(keysCategory).map(label => {
 
       return RedisDateTypes.init({
@@ -90,12 +98,14 @@ class DbTreeItem extends TreeDataItem {
         collapsibleState: TreeItemCollapsibleState.Collapsed
       })
     })
+
     let searchItem = null
     if (this.redisModel && !isEmpty(this.redisModel.searchResult)) {
       searchItem = SearchKeysTreeItem.init({
         db, connection, redisModel
       })
     }
+
     let scanMoreItem = null
     if (scanMore !== +keysLen) {
       scanMoreItem = ShowMoreKeysTreeItem.init({

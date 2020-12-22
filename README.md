@@ -18,4 +18,5 @@ Welcome to the redis-stream extension for vscode!
    [![ioredis](https://www.bosstg.cn/assets/img/redis-stream-3.JPG)](https://github.com/runzx/redis-stream-vscode)
 
 3. redis need V5+
+
    **Enjoy!**
