@@ -5,7 +5,7 @@ const { showMsg, showModal } = require('../lib/show-message')
 const showStatusBar = require('../lib/status-view')
 const log = require('../lib/logging')('registers')
 
-// 引入 tree
+
 const { RedisTree } = require('../explorer')
 const { VirtualDoc } = require('../editor')
 const { channel, scheme } = require('../config')
@@ -19,8 +19,7 @@ exports.registers = (context) => {
     subscriptions.push(registerCommand(commandName, cb))
   }
   const statusBar = new showStatusBar(context, 'right')
-  // log.info('first register command...')
-  // 下面是要注册的命令
+
   register('redis-stream.hide', () => {
     context.globalState.update('redisOpt', { host: "127.0.0.1", port: 6379 })
 
@@ -49,7 +48,7 @@ exports.registers = (context) => {
     log.info('VALUE RELOAD', label, id)
     doc.update(id)
     refresh(opt)
-    
+
   })
   register('redis-stream.msg.value.refresh', async (opt) => {
     const { label, id } = opt

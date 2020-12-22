@@ -102,12 +102,6 @@ class RedisTree extends TreeExplorer {
       this.refresh(opt)
     })
 
-    // this.register('redis-stream.id.status', async (opt,) => {
-    //   const { label, id, } = opt
-    //   log('ID', label, id)
-    //   this.doDoc(opt)
-    // })
-
     this.register('redis-stream.group.status', async (opt,) => {
       const { label, id, } = opt
       log('GROUP', label, id)

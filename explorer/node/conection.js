@@ -36,7 +36,7 @@ class ConnectionNode extends TreeDataItem {
     log('dbs', dbs,)
     this.redisModel = redisModel
     this.dbs = dbs
-    // 只刷新此Item时要改变
+    // 只刷新此Item时在这改变属性
     this.label = this.connection = this.id = `${host}:${port}`
     return this
   }
