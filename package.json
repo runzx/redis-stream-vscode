@@ -51,13 +51,13 @@
         "icon": "image/status.png"
       },
       {
-        "command": "redis-stream.id.value.refresh",
-        "title": "value reload",
+        "command": "redis-stream.key.value.refresh",
+        "title": "key reload",
         "icon": "image/refresh.png"
       },
       {
         "command": "redis-stream.msg.value.refresh",
-        "title": "value reload",
+        "title": "msg reload",
         "icon": "image/refresh.png"
       },
       {
@@ -101,7 +101,7 @@
           "group": "inline@0"
         },
         {
-          "command": "redis-stream.id.value.refresh",
+          "command": "redis-stream.key.value.refresh",
           "when": "view == redisTree && viewItem == key",
           "group": "inline@0"
         },

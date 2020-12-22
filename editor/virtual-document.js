@@ -70,7 +70,7 @@ class VirtualDoc {
   }
   static getCacheDoc(key, value) {
     if (cacheDoc[key]) return cacheDoc[key]
-    return cacheDoc[key] = value
+    return value
   }
 }
 

@@ -20,19 +20,19 @@ exports.registers = (context) => {
   }
   const statusBar = new showStatusBar(context, 'right')
 
-  register('redis-stream.hide', () => {
-    context.globalState.update('redisOpt', { host: "127.0.0.1", port: 6379 })
-
-  })
-
-
   new RedisTree(context)
+
   const doc = KeyView.init({ context })
-  // register('redis-stream.openDoc', (uri) => doc.showDoc(uri))
   register('redis-stream.key.status', async (opt) => {
     const { label, id } = opt
     log.info('KEY', label, id)
     doc.showDoc(id)
+  })
+  register('redis-stream.key.value.refresh', async (opt) => {
+    const { label, id, refresh } = opt
+    log.info('VALUE RELOAD', label, id)
+    doc.update(id)
+    refresh(opt)
   })
 
   const docId = StreamIdView.init({ context })
@@ -43,13 +43,6 @@ exports.registers = (context) => {
   })
 
   const virDoc = VirtualDoc.init({ context })
-  register('redis-stream.id.value.refresh', async (opt) => {
-    const { label, id, refresh } = opt
-    log.info('VALUE RELOAD', label, id)
-    doc.update(id)
-    refresh(opt)
-
-  })
   register('redis-stream.msg.value.refresh', async (opt) => {
     const { label, id } = opt
     log.info('VALUE RELOAD', label, id)
