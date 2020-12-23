@@ -69,7 +69,7 @@ class TreeDataProvider {
 }
 
 class TreeDataItem extends TreeItem {
-  constructor(opt) {
+  constructor(opt = {}) {
     super(opt.label || opt.resourceUri, opt.collapsibleState)
 
     this.resourceUri = opt.resourceUri

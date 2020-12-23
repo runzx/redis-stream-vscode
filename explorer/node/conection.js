@@ -24,18 +24,15 @@ class ConnectionNode extends TreeDataItem {
   }
 
   async getTreeItem(provider) {
-    let { host, port, password, } = this
+    let { host, port, password, db } = this
     if (!host && !port && !password) log('refresh err', opt)
-    const redisModel = RedisModel.reloadRedis({ host, port, password, db: 0 })
-    const dbs = await redisModel.dbInfo()
+    this.redisModel = RedisModel.reloadRedis({ host, port, password, db })
+    this.dbs = await this.redisModel.dbInfo()
       .catch(err => {
-        showMsg(err.message + '  -- refresh redis host:port --', 'error')
-        log('Redis status', redisModel.status)
-        opt.collapsibleState = TreeItemCollapsibleState.None
+        showMsg(`REDIS: ${err},  Pls checked host/port/password`, 'error')
+        this.collapsibleState = TreeItemCollapsibleState.None
+        RedisModel.delClient({ host, port, password, db })
       })
-    log('dbs', dbs,)
-    this.redisModel = redisModel
-    this.dbs = dbs
     // 只刷新此Item时在这改变属性
     this.label = this.connection = this.id = `${host}:${port}`
     return this

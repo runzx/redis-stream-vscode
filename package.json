@@ -46,11 +46,6 @@
         "icon": "image/status.png"
       },
       {
-        "command": "redis-stream.hide",
-        "title": "server info",
-        "icon": "image/status.png"
-      },
-      {
         "command": "redis-stream.key.value.refresh",
         "title": "key reload",
         "icon": "image/refresh.png"

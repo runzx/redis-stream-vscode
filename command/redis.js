@@ -127,9 +127,16 @@ class RedisModel {
   async getKeys(pattern = '*') {
     return this.client.keys(pattern)
   }
-  async dbInfo() {
-    const [serverInfo, dbs, InfoTxt] = await this.redisBase.serverInfo()
-    return dbs
+  dbInfo() {
+    return new Promise(async (resolve, reject) => {
+      this.client.on('error', err => {
+        console.log('redis connection err:', err)
+        reject(err.message)
+      })
+      const [serverInfo, dbs, InfoTxt] = await this.redisBase.serverInfo()
+      return resolve(dbs)
+    })
+
   }
   async searchKey(key) {
     if (this.searchResult.find(i => i.key === key)) return

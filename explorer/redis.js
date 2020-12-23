@@ -50,14 +50,14 @@ class RedisTree extends TreeExplorer {
     this.initTree('redisTree', new RedisTreeDataProvider(context))
 
     this.register('redis-stream.connection.refresh', (opt) => {
-      log('refresh command: ', opt)
+      // log('refresh command: ', opt)
       const value = this.cacheGet('redisOpt', "127.0.0.1:6379")
       window.showInputBox(
         { // 这个对象中所有参数都是可选参数
-          password: false, // 输入内容是否是密码
+          password: false,
           ignoreFocusOut: true, // 默认false，设置为true时鼠标点击别的地方输入框不会消失
-          placeHolder: '如要改变请输入新参数.', // 在输入框内的提示信息
-          prompt: 'fmt: "127.0.0.1:6379:password"   ', // 在输入框下方的提示信息
+          placeHolder: '如要改变请输入新参数.',
+          prompt: 'fmt: "127.0.0.1:6379:password"   ',
           value,
           validateInput: function (text) {
             // 对输入内容进行验证，返回 null 通过验证
@@ -67,33 +67,30 @@ class RedisTree extends TreeExplorer {
             if (!host && !port && !password) return 'host/port/password cant empty only one,至少要有一个参数不为空'
             if (host && /[^\w\d-]/.test(host.trim())) return host + ' 格式不符合，请重输'
             if (port && /[^\d]/.test(port.trim())) return port + ' 格式不符合，请重输'
-
-            // if (host && port) return null
             return null
           }
         }).then((msg = '') => {
-          log('Refresh new init', msg)
           if (!msg) return
           this.cacheSet('redisOpt', msg)
           this.refresh()
         })
     })
 
-    this.register('redis-stream.connection.status', async (opt, opt1, opt2) => {
-      log('connection', opt)
+    this.register('redis-stream.connection.status', async (opt,) => {
+      // log('connection', opt)
       const id = 'redisServerInfo'
       const [item] = await RedisModel.init(opt).redisBase.serverInfo()
       this.doDoc({ id, item })
     })
 
-    this.register('redis-stream.db.status', (opt, opt1, opt2) => {
+    this.register('redis-stream.db.status', (opt,) => {
       // log('db', opt)
 
     })
 
     this.register('redis-stream.db.scan', async (opt,) => {
       const { label, id, } = opt
-      log('SCAN', opt)
+      // log('SCAN', opt)
       this.refresh(opt)
     })
 
@@ -101,7 +98,7 @@ class RedisTree extends TreeExplorer {
       const { host, port, db } = opt
       RedisModel.delClient({ host, port, db })
       opt.redisModel = null
-      log('DB REFRESH', opt)
+      // log('DB REFRESH', opt)
       this.refresh(opt)
     })
 
@@ -119,7 +116,7 @@ class RedisTree extends TreeExplorer {
           prompt: '"Enter"确认/"ESC"取消   ',
           // value,
         }).then(async (msg) => {
-          log('SEARCH:', msg)
+          // log('SEARCH:', msg)
           if (!msg) return
           await redisModel.searchKey(msg)
           this.refresh(opt)
@@ -128,7 +125,7 @@ class RedisTree extends TreeExplorer {
 
     this.register('redis-stream.stream.showMore', async (opt,) => {
       const { label, id, } = opt
-      log('ID MORE', opt)
+      // log('ID MORE', opt)
       this.refresh(opt)
     })
 
