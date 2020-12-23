@@ -84,7 +84,7 @@ class DbTreeItem extends TreeDataItem {
   async getChildren() {
     let { connection, db, redisModel, description, } = this
     const [keysCategory, scanMore] = await redisModel.scanKeys()
-    log('DB', db, keysCategory, scanMore)
+    // log('DB', db, keysCategory, scanMore)
     const [keysLen] = description.match(/\d+/)
     
     const categroys = Object.keys(keysCategory).map(label => {

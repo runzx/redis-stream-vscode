@@ -13,8 +13,8 @@ class DocProvider {
     this.onDidChange = this._onDidChange.event
   }
   async provideTextDocumentContent(uri) {
-    log('URI', uri)
-    const { path } = uri
+    const { path, scheme } = uri
+    log('URI', scheme, path)
     // let [connection, db, type, strem, group, consumer, key] = path.split('$')
     let keyR = path.match(/(.+)\.json/)
     keyR = keyR ? keyR[1] : ''
