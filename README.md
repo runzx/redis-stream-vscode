@@ -6,6 +6,7 @@ Welcome to the redis-stream extension for vscode!
 
 - easy use GUI to access Redis stream data.
 - test data for MQ on redis stream
+- key use SCAN, stream use XREVRARNGE.
 
 ## Extension Settings
 
