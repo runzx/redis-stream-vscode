@@ -2,6 +2,7 @@ const { NodeType, RedisType } = require("../../config")
 const { TreeDataItem } = require("../explorer")
 const { TreeItemCollapsibleState } = require("vscode")
 const { IDTreeItem } = require("./id")
+const { timeFmt } = require("../../lib/util")
 
 class StreamPending extends TreeDataItem {
   constructor(opt = {}) {
@@ -31,7 +32,7 @@ class StreamPending extends TreeDataItem {
           data.tooltip += ` | ${i[1]} | ${this.id2date(i[2])} | ${i[3]}`
       } else {
         data.label = i.id
-        data.tooltip = `${this.id2date(data.label)} | ${i.consumer} | ${i.deliveredTime} | ${i.deliveredNum}`
+        data.tooltip = `${this.id2date(data.label)} | ${i.consumer} | ${timeFmt(i.deliveredTime)} | ${i.deliveredNum}`
       }
 
       return IDTreeItem.init(data)
