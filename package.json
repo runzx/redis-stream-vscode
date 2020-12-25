@@ -3,7 +3,7 @@
   "publisher": "zhaixiang",
   "displayName": "redis-stream",
   "description": "redis stream explorer",
-  "version": "1.5.7",
+  "version": "1.6.0",
   "homepage": "https://github.com/runzx/redis-stream-vscode/blob/master/README.md",
   "repository": {
     "type": "git",
@@ -14,7 +14,7 @@
     "email": "843476168@qq.com"
   },
   "engines": {
-    "vscode": "^1.51.0"
+    "vscode": "^1.40.0"
   },
   "categories": [
     "Visualization",
@@ -52,7 +52,7 @@
       },
       {
         "command": "redis-stream.msg.value.refresh",
-        "title": "msg reload",
+        "title": "info reload",
         "icon": "image/refresh.png"
       },
       {
@@ -135,6 +135,8 @@
     "vscode-test": "^1.4.1"
   },
   "dependencies": {
-    "ioredis": "^4.19.2"
+    "global": "^4.4.0",
+    "ioredis": "^4.19.2",
+    "vsce": "^1.83.0"
   }
 }

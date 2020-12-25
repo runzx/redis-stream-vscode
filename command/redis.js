@@ -82,42 +82,48 @@ class RedisModel {
       res.entries = await stream.xrevrange(streamKey, '+', '-', this.streamIDs[streamKey])
       if (res.groups === 0) res.groups = []
       else {
-        res.groups = await stream.getGroupsInfo(streamKey)
-        res.groups = await Promise.all(res.groups.map(async (i) => {
-          if (i.consumers === 0) i.consumers = []
-          else {
-            let res = await stream.getConsumersInfo(i.name)
-            res = await Promise.all(res.map(async j => {
-              j['pel-count'] = j.pending
-              if (j.pending !== 0) {
-                j.pending = await stream.readPending({
-                  group: i.name, consumer: j.name,
-                  start: '-', end: '+', count: 10,
-                })
-              } else j.pending = []
-              return j
-            }))
-            i.consumers = res
-          }
-          i['pel-count'] = i.pending
-          if (i.pending === 0) i.pending = []
-          else {
-            let res = await stream.readPending({
-              group: i.name,
-              start: '-', end: '+', count: 10,
-            })
-            i.pending = res
-          }
-
-          return i
-        }))
-        // if ()
+        res.groups = await this.getGroupInfo(streamKey, stream)
       }
     } else {
       res.entries = await stream.xrevrange(streamKey, '+', '-', this.streamIDs[streamKey])
     }
     this.streamIDs[streamKey] += SHOW_MORE_COUNT
     return res
+  }
+  async getGroupInfo(streamKey, redisStream) {
+    if (!redisStream) redisStream = new RedisStream({ client: this.client, stream: streamKey })
+    const res = await redisStream.getGroupsInfo(streamKey)
+    return Promise.all(res.map(async (i) => {
+      if (i.consumers === 0) i.consumers = []
+      else {
+        i.consumers = await this.getConsumersInfo(i.name, streamKey, redisStream)
+      }
+      i['pel-count'] = i.pending
+      if (i.pending === 0) i.pending = []
+      else {
+        let res = await redisStream.readPending({
+          group: i.name,
+          start: '-', end: '+', count: 10,
+        })
+        i.pending = res
+      }
+
+      return i
+    }))
+  }
+  async getConsumersInfo(group, streamKey, redisStream) {
+    if (!redisStream) redisStream = new RedisStream({ client: this.client, stream: streamKey })
+    const res = await redisStream.getConsumersInfo(group, streamKey)
+    return Promise.all(res.map(async j => {
+      j['pel-count'] = j.pending
+      if (j.pending !== 0) {
+        j.pending = await redisStream.readPending({
+          group, consumer: j.name,
+          start: '-', end: '+', count: 10,
+        })
+      } else j.pending = []
+      return j
+    }))
   }
   async getInfoById(id, stream) {
     const redis = new RedisStream({ client: this.client, stream })

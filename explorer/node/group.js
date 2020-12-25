@@ -51,6 +51,17 @@ class StreamGroup extends TreeDataItem {
     })]
 
   }
+
+  async getTreeItem(parent) {
+    let { host, port, password, db, refreshCallBack, stream } = this
+    if (!this.redisModel) {
+      this.redisModel = RedisModel.init({ host, port, password, db })
+    }
+    const [item] = (await this.redisModel.getGroupInfo(stream)).filter(i => i.name === this.label)
+    this.item = item
+    refreshCallBack && refreshCallBack(item)
+    return this
+  }
 }
 
 module.exports = { StreamGroup }

@@ -36,6 +36,17 @@ class StreamConsumer extends TreeDataItem {
     return [StreamPending.init(data)]
 
   }
+
+  async getTreeItem(parent) {
+    let { host, port, password, db, refreshCallBack, stream, group } = this
+    if (!this.redisModel) {
+      this.redisModel = RedisModel.init({ host, port, password, db })
+    }
+    const [item] = (await this.redisModel.getConsumersInfo(group, stream)).filter(i => i.name === this.label)
+    this.item = item
+    refreshCallBack && refreshCallBack(item)
+    return this
+  }
 }
 
 module.exports = { StreamConsumer }

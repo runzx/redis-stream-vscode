@@ -48,7 +48,10 @@ class TreeDataProvider {
   }
   // refresh getTreeItem -> getChildren 
   async getTreeItem(element) {
-    element.refresh = (e) => { this.refresh(e) }
+    element.refresh = (e, cb) => {
+      cb && (e.refreshCallBack = cb)
+      this.refresh(e)
+    }
     if (this._getTreeItem) return this._getTreeItem(element)
 
     return element

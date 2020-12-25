@@ -44,8 +44,13 @@ exports.registers = (context) => {
 
   const virDoc = VirtualDoc.init({ context })
   register('redis-stream.msg.value.refresh', async (opt) => {
-    const { label, id } = opt
+    const { label, id, refresh } = opt
     // log.info('VALUE RELOAD', label, id)
-    virDoc.update(id)
+    await refresh(opt, (item) => {
+      VirtualDoc.setCacheDoc(id, item)
+      virDoc.showDoc(id)
+      virDoc.update(id)
+    })
+
   })
 }

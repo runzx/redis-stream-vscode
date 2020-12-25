@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.6.0]
+
+- refresh group and consumer.
+
 ## [1.5.0]
 
 - 增加'Show more ...'功能遍历整个 db 的 stream id keys.
