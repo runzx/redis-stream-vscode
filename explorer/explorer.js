@@ -126,7 +126,7 @@ class TreeDataItem extends TreeItem {
       return TreeItemCollapsibleState.None
   }
   setCollapseState(element) { }
-  dateFmt(at = new Date(), fmt = 'yy-MM-dd hh:mm:ss') {
+  dateFmt(at = new Date(), fmt = 'MM-dd hh:mm:ss') {
     return new Date(+at).format(fmt)
   }
   id2date(id = '', fmt) {

@@ -32,7 +32,8 @@ class StreamPending extends TreeDataItem {
           data.tooltip += ` | ${i[1]} | ${this.id2date(i[2])} | ${i[3]}`
       } else {
         data.label = i.id
-        data.tooltip = `${this.id2date(data.label)} | ${i.consumer} | ${timeFmt(i.deliveredTime)} | ${i.deliveredNum}`
+        data.tooltip = `${this.id2date(data.label)} | ${timeFmt(i.deliveredTime)} | ${i.deliveredNum}`
+        !consumer && (data.tooltip += ` | ${i.consumer}`)
       }
 
       return IDTreeItem.init(data)
