@@ -86,7 +86,7 @@ class DbTreeItem extends TreeDataItem {
     const [keysCategory, scanMore] = await redisModel.scanKeys()
     // log('DB', db, keysCategory, scanMore)
     const [keysLen] = description.match(/\d+/)
-    
+
     const categroys = Object.keys(keysCategory).map(label => {
 
       return RedisDateTypes.init({
@@ -107,7 +107,7 @@ class DbTreeItem extends TreeDataItem {
     }
 
     let scanMoreItem = null
-    if (scanMore !== +keysLen) {
+    if (scanMore < +keysLen) {
       scanMoreItem = ShowMoreKeysTreeItem.init({
         db, connection, redisModel,
         description: `(${+keysLen - scanMore})`,

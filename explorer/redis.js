@@ -65,7 +65,7 @@ class RedisTree extends TreeExplorer {
             text = text.trim()
             const [host = '', port = '', password] = text.split(':')
             if (!host && !port && !password) return 'host/port/password cant empty only one,至少要有一个参数不为空'
-            if (host && /[^\w\d-]/.test(host.trim())) return host + ' 格式不符合，请重输'
+            if (host && /[^\w\d-.]/.test(host.trim())) return host + ' 格式不符合，请重输'
             if (port && /[^\d]/.test(port.trim())) return port + ' 格式不符合，请重输'
             return null
           }

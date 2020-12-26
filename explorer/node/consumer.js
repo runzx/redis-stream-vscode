@@ -44,7 +44,8 @@ class StreamConsumer extends TreeDataItem {
     }
     const [item] = (await this.redisModel.getConsumersInfo(group, stream)).filter(i => i.name === this.label)
     this.item = item
-    refreshCallBack && refreshCallBack(item)
+    this.tooltip = `pel-count: ${item['pel-count']}`,
+      refreshCallBack && refreshCallBack(item)
     return this
   }
 }
