@@ -2,21 +2,28 @@
 const { RedisBase, RedisStream } = require('../lib/redis-mq')
 const { RedisType, redisOpt, SHOW_MORE_COUNT } = require('../config')
 const IORedis = require('ioredis')
+const { log } = require('../lib/logging')
 
 
 class RedisModel {
   static activeClient = {}
-
-  constructor({ client, db, } = {}) {
+  redisBase
+  constructor({ client, db = 0, ...opt } = {}) {
     this.db = db
     this.client = client
-    this.start({ client, db, })
+    this.redisBase = new RedisBase({ client, db })
     this.cursor = 0
     this.scanMore = true
     this.categoryList = {} //{stream:[],zet:[]}
     this.keysLen = 0
     this.searchResult = []
     this.streamIDs = {} // show more start
+    this.watch(opt)
+  }
+  watch(opt) {
+    this.client.on('error', err => {
+      log('Connect err:', err, opt)
+    })
   }
   async scanKeys(cursor = this.cursor, count = 20, scanMore = this.scanMore) {
     if (scanMore === '0') return [this.categoryList, this.keysLen]
@@ -150,10 +157,7 @@ class RedisModel {
     this.searchResult.push({ key, type })
     return { key, type }
   }
-  start(opt) {
-    opt.dbIndex = opt.db = opt.db || opt.dbIndex || 0
-    this.redisBase = new RedisBase(opt)
-  }
+
   restart(opt) {
     this.client.disconnect(opt)
     RedisModel.delClient(opt)
@@ -162,7 +166,7 @@ class RedisModel {
   }
 
   static reloadRedis(opt) {
-    this.delClient(opt)
+    // this.delClient(opt)
     opt.client = this.getClient(opt)
     return new RedisModel(opt)
   }
@@ -171,25 +175,24 @@ class RedisModel {
     if (!opt.client) opt.client = this.getClient(opt)
     return new RedisModel(opt)
   }
-  static getClient({ host = '127.0.0.1', port = 6379, password, db = 0, connection }) {
-    if (connection) {
-      let [h, p, d] = connection.split(':')
-      h && (host = h)
-      p && (port = p)
-    }
-    const key = `${host}-${port}-${db}`
+  static getClient({ host = '127.0.0.1', port = 6379, password, db = 0 }) {
+    const key = this.getKey({ host, port, db })
     if (this.activeClient[key]) return this.activeClient[key]
     this.activeClient[key] = new IORedis({ host, port, password, db })
     return this.activeClient[key]
   }
-  static delClient({ host, port, password, db = 0 }) {
-    const key = `${host}-${port}-${db}`
+  static delClient({ host, port, db = 0 }) {
+    const key = this.getKey({ host, port, db })
     if (this.activeClient[key]) {
       this.activeClient[key].disconnect()
+      // .then(res => log('DELclient', key, res))
       this.activeClient[key] = null
       return true
     }
     return null
+  }
+  static getKey({ host = '127.0.0.1', port = 6379, db = 0, }) {
+    return `${host}-${port}-${db}`
   }
 }
 

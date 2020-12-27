@@ -29,9 +29,7 @@ class RedisTreeDataProvider extends TreeDataProvider {
   getConnections() {
     let res = this.cacheGet(Constant.GLOBALSTATE_CONFIG_KEY, redisOpt)
     if (typeof res === 'string') {
-      let [host, port = 6379, password, db = 0] = res.split(':')
-      host = host ? host : '127.0.0.1'
-      port = port ? port : 6379
+      let [host = '127.0.0.1', port = 6379, password, db = 0] = res.split(':')
       return { host, port, password, db }
     }
     return res
@@ -79,7 +77,7 @@ class RedisTree extends TreeExplorer {
     this.register('redis-stream.connection.status', async (opt,) => {
       // log('connection', opt)
       const id = 'redisServerInfo'
-      const [item] = await RedisModel.init(opt).redisBase.serverInfo()
+      const [item] = await opt.redisModel.redisBase.serverInfo()
       this.doDoc({ id, item })
     })
 
