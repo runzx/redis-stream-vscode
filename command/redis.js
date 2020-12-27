@@ -141,13 +141,16 @@ class RedisModel {
     return this.client.keys(pattern)
   }
   dbInfo() {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       this.client.on('error', err => {
         console.log('redis connection err:', err)
         reject(err.message)
       })
-      const [serverInfo, dbs, InfoTxt] = await this.redisBase.serverInfo()
-      return resolve(dbs)
+
+      this.redisBase.serverInfo().then(res => {
+        const [serverInfo, dbs, InfoTxt] = res
+        resolve(dbs)
+      })
     })
 
   }
@@ -156,13 +159,6 @@ class RedisModel {
     const type = await this.getType(key)
     this.searchResult.push({ key, type })
     return { key, type }
-  }
-
-  restart(opt) {
-    this.client.disconnect(opt)
-    RedisModel.delClient(opt)
-    this.client = RedisModel.getClient(opt)
-    return this
   }
 
   static reloadRedis(opt) {
