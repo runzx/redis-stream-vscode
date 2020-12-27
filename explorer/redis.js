@@ -29,7 +29,9 @@ class RedisTreeDataProvider extends TreeDataProvider {
   getConnections() {
     let res = this.cacheGet(Constant.GLOBALSTATE_CONFIG_KEY, redisOpt)
     if (typeof res === 'string') {
-      let [host = '127.0.0.1', port = 6379, password, db = 0] = res.split(':')
+      let [host, port, password, db = 0] = res.split(':')
+      host || (host = '127.0.0.1')
+      port || (port = 6379)
       return { host, port, password, db }
     }
     return res

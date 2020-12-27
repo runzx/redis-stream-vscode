@@ -31,7 +31,7 @@ class ConnectionNode extends TreeDataItem {
   }
 
   async getChildren() {
-    let { host, port, password, db } = this
+    let { host, port, password, db = 0 } = this
     if (!host && !port && !password) log('refresh err', opt)
     this.redisModel = RedisModel.reloadRedis({ host, port, password, db })
     this.dbs = await this.redisModel.dbInfo()
@@ -42,7 +42,7 @@ class ConnectionNode extends TreeDataItem {
         RedisModel.delClient({ host, port, password, db })
       })
     if (!this.dbs) return null
-    
+
     return Object.keys(this.dbs).map(label => {
       const { keys, expires, avg_ttl } = this.dbs[label]
       const db = +label.match(/(\d+)/)[1]
