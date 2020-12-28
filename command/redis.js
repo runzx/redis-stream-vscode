@@ -162,7 +162,7 @@ class RedisModel {
   }
 
   static reloadRedis(opt) {
-    // this.delClient(opt)
+    this.delClient(opt)
     opt.client = this.getClient(opt)
     return new RedisModel(opt)
   }
@@ -175,6 +175,32 @@ class RedisModel {
     const key = this.getKey({ host, port, db })
     if (this.activeClient[key]) return this.activeClient[key]
     this.activeClient[key] = new IORedis({ host, port, password, db })
+    this.activeClient[key].client('id').then(id => {
+      log('Connect ID:', id, key)
+    })
+    this.activeClient[key].client('list').then(msg => {
+      let res = msg.split('\n')
+        .filter(i => i)
+        .map(i => i.split(' ')
+          .reduce((acc, j) => {
+            let [key, value] = j.split('=')
+            acc[key] = value
+            return acc
+          }, {}))
+        .sort((a, b) => (a.id - b.id))
+        .map(k => {
+          const { age, cmd, db, id, idle, psub, sub } = k
+          const arr = ['id', 'age', 'idle', 'psub', 'sub', 'cmd']
+          return arr.reduce((acc, i) => {
+            acc += [i, k[i]].join(':') + ' '
+            return acc
+          }, '')
+          // return { id, age, idle, psub, sub, cmd }
+        })
+
+
+      log('Connect LIST:', key, res)
+    })
     return this.activeClient[key]
   }
   static delClient({ host, port, db = 0 }) {
