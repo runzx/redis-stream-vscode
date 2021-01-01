@@ -188,16 +188,8 @@ class RedisModel {
             return acc
           }, {}))
         .sort((a, b) => (a.id - b.id))
-        .map(k => {
-          const { age, cmd, db, id, idle, psub, sub } = k
-          const arr = ['id', 'age', 'idle', 'psub', 'sub', 'cmd']
-          return arr.reduce((acc, i) => {
-            acc += [i, k[i]].join(':') + ' '
-            return acc
-          }, '')
-          // return { id, age, idle, psub, sub, cmd }
-        })
-
+        .map(k => ['id', 'age', 'idle', 'psub', 'sub', 'cmd']
+          .reduce((acc, i) => (acc += [i, k[i]].join(':') + ' ', acc), ''))
 
       log('Connect LIST:', key, res)
     })
