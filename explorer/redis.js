@@ -99,7 +99,7 @@ class RedisTree extends TreeExplorer {
       const { host, port, db } = opt
       RedisModel.delClient({ host, port, db })
       opt.redisModel = null
-      // log('DB REFRESH', opt)
+      log.info('db refresh', opt)
       this.refresh(opt)
     })
 
