@@ -1,11 +1,12 @@
 const { NodeType, Constant } = require("../../config")
 const { TreeDataItem } = require("../explorer")
-const { log } = require("../../lib/logging")
 const { TreeItemCollapsibleState } = require("vscode")
 const { DbTreeItem } = require("./db")
 const { RedisModel } = require("../../command/redis")
 const { showMsg } = require("../../lib/show-message")
+const { createLogger } = require('../../lib/logging')
 
+const log = createLogger('connection')
 class ConnectionNode extends TreeDataItem {
   constructor(opt = {}) {
     super(opt)
@@ -32,12 +33,12 @@ class ConnectionNode extends TreeDataItem {
 
   async getChildren() {
     let { host, port, password, db = 0 } = this
-    if (!host && !port && !password) log('refresh err', opt)
+    if (!host && !port && !password) log.error('refresh err', opt)
     this.redisModel = RedisModel.reloadRedis({ host, port, password, db })
     this.dbs = await this.redisModel.dbInfo()
       .catch(err => {
         showMsg(`REDIS: ${err},  Pls checked host/port/password`, 'error')
-        log('CONNECT ERR', err)
+        log.error('CONNECT ERR', err)
         this.collapsibleState = TreeItemCollapsibleState.None
         RedisModel.delClient({ host, port, password, db })
       })

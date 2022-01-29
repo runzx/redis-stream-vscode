@@ -3,15 +3,14 @@ const vscode = require('vscode')
 const { registerCommand, registerTextEditorCommand } = vscode.commands
 const { showMsg, showModal } = require('../lib/show-message')
 const showStatusBar = require('../lib/status-view')
-const log = require('../lib/logging')('registers')
-
-
 const { RedisTree } = require('../explorer')
 const { VirtualDoc } = require('../editor')
 const { channel, scheme } = require('../config')
 const { KeyView } = require('../editor/key-doc')
 const { StreamIdView } = require('../editor/stream-id-doc')
+const { createLogger } = require('../lib/logging')
 
+const log = createLogger('register redis')
 
 exports.registers = (context) => {
   const { subscriptions } = context

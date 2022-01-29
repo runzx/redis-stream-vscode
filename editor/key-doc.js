@@ -3,8 +3,10 @@
 const vscode = require("vscode")
 const { RedisModel } = require("../command/redis")
 const { scheme } = require("../config")
-const { log } = require("../lib/logging")
 const { VIEW_DB_KEY_SCHEME } = scheme
+const { createLogger } = require('../lib/logging')
+
+const log = createLogger('doc:key')
 
 class DocProvider {
   constructor() {
@@ -13,7 +15,7 @@ class DocProvider {
   }
   async provideTextDocumentContent(uri) {
     const { path, scheme } = uri
-    log('URI', scheme, path)
+    log.info('uri', scheme, path)
     let [connection, db, type, key] = path.split('$')
     key = key.replace('.json', '')
 

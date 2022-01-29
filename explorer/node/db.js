@@ -3,10 +3,11 @@ const { TreeDataItem } = require("../explorer")
 const { ThemeIcon, ThemeColor, TreeItemCollapsibleState } = require("vscode")
 const { RedisModel } = require("../../command/redis")
 const { RedisDateTypes } = require("./type")
-const { log } = require("../../lib/logging")
 const { KeyTreeItem } = require("./key")
 const { isEmpty } = require("../../lib/util")
+const { createLogger } = require('../../lib/logging')
 
+const log = createLogger('db')
 
 class ShowMoreKeysTreeItem extends TreeDataItem {
   constructor(opt = {}) {

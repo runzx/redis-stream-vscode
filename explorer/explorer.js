@@ -2,8 +2,10 @@
 const path = require('path')
 const vscode = require("vscode")
 const { NodeType, RedisType } = require("../config")
-const { log } = require('../lib/logging')
 const { isEmpty, dateYMD } = require('../lib/util')
+const { createLogger } = require('../lib/logging')
+
+const log = createLogger('explorer')
 const { TreeItemCollapsibleState, EventEmitter, TreeItem, Uri } = vscode
 const { registerCommand, registerTextEditorCommand } = vscode.commands
 

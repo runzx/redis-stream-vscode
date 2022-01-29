@@ -4,10 +4,11 @@ const { TreeItemCollapsibleState, window } = require('vscode')
 const { redisModel, RedisModel } = require('../command/redis')
 const { Constant, redisOpt } = require('../config')
 const { VirtualDoc } = require('../editor')
-const { log } = require('../lib/logging')
 const { TreeExplorer, TreeDataProvider, TreeDataItem } = require('./explorer')
 const { ConnectionNode } = require('./node/conection')
+const { createLogger } = require('../lib/logging')
 
+const log = createLogger('register redis')
 
 class RedisTreeDataProvider extends TreeDataProvider {
   constructor(context) {

@@ -3,7 +3,9 @@
 const vscode = require("vscode")
 const { RedisModel } = require("../command/redis")
 const { scheme } = require("../config")
-const { log } = require("../lib/logging")
+const { createLogger } = require('../lib/logging')
+
+const log = createLogger('doc:id-key')
 const { VIEW_STREM_ID_SCHEME } = scheme
 
 class DocProvider {
@@ -13,7 +15,7 @@ class DocProvider {
   }
   async provideTextDocumentContent(uri) {
     const { path, scheme } = uri
-    log('URI', scheme, path)
+    log.info('URI', scheme, path)
     let [connection, db, type, key,] = path.split('$')
     let [, id] = path.match(/\$(\d+-?\d*)\.json/) || []
 

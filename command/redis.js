@@ -2,8 +2,9 @@
 const { RedisBase, RedisStream } = require('../lib/redis-mq')
 const { RedisType, redisOpt, SHOW_MORE_COUNT } = require('../config')
 const IORedis = require('ioredis')
-const { log } = require('../lib/logging')
+const { createLogger } = require('../lib/logging')
 
+const log = createLogger('redis init')
 
 class RedisModel {
   static activeClient = {}
@@ -22,7 +23,7 @@ class RedisModel {
   }
   watch(opt) {
     this.client.on('error', err => {
-      log('Connect err:', err, opt)
+      log.error('Connect err:', err, opt)
     })
   }
   async scanKeys(cursor = this.cursor, count = 20, scanMore = this.scanMore) {
@@ -143,7 +144,7 @@ class RedisModel {
   dbInfo() {
     return new Promise((resolve, reject) => {
       this.client.on('error', err => {
-        console.log('redis connection err:', err)
+        log.error('redis connection err:', err)
         reject(err.message)
       })
 
@@ -176,7 +177,7 @@ class RedisModel {
     if (this.activeClient[key]) return this.activeClient[key]
     this.activeClient[key] = new IORedis({ host, port, password, db })
     this.activeClient[key].client('id').then(id => {
-      log('Connect ID:', id, key)
+      log.info('connect id, key', id, key)
     })
     this.activeClient[key].client('list').then(msg => {
       let res = msg.split('\n')
@@ -191,7 +192,7 @@ class RedisModel {
         .map(k => ['id', 'age', 'idle', 'psub', 'sub', 'cmd']
           .reduce((acc, i) => (acc += [i, k[i]].join(':') + ' ', acc), ''))
 
-      log('Connect LIST:', key, res)
+      log.info('db, connect list', key, res)
     })
     return this.activeClient[key]
   }
