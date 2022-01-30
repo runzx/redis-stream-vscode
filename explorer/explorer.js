@@ -17,6 +17,8 @@ class TreeExplorer {
   }
 
   refresh(data) {
+    log.info('TreeExplorer refresh',)
+
     this.provider.refresh(data)
   }
 
@@ -44,13 +46,17 @@ class TreeDataProvider {
     this.onDidChangeTreeData = this._onDidChangeTreeData.event
   }
   async getChildren(element) {
+    log.info('getChildren', element ? element.label : '')
     if (element) return element.getChildren()
 
     return this._getChileren(element)
   }
   // refresh getTreeItem -> getChildren 
   async getTreeItem(element) {
+    log.info('getTreeItem', element.label)
+
     element.refresh = (e, cb) => {
+
       cb && (e.refreshCallBack = cb)
       this.refresh(e)
     }
@@ -60,6 +66,7 @@ class TreeDataProvider {
   }
 
   refresh(item) {
+    log.info('TreeDataProvider refresh',)
     this._onDidChangeTreeData.fire(item)
   }
   cacheGet(key, defaultValue) {
@@ -87,6 +94,7 @@ class TreeDataItem extends TreeItem {
     this.iconPath = path.join(__dirname, '..', 'image', `${this.contextValue}.png`)
 
     this.type = opt.type
+    // 可折叠状态
     this.collapsibleState = opt.collapsibleState || this.getCollapseState(this)
     this.connection = opt.connection
     this.db = opt.db

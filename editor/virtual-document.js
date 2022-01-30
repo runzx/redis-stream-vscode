@@ -15,7 +15,7 @@ class DocProvider {
   }
   async provideTextDocumentContent(uri) {
     const { path, scheme } = uri
-    log.inof('URI', scheme, path)
+    log.inof('uri', scheme, path)
     // let [connection, db, type, strem, group, consumer, key] = path.split('$')
     let keyR = path.match(/(.+)\.json/)
     keyR = keyR ? keyR[1] : ''

@@ -192,7 +192,8 @@ class RedisModel {
         .map(k => ['id', 'age', 'idle', 'psub', 'sub', 'cmd']
           .reduce((acc, i) => (acc += [i, k[i]].join(':') + ' ', acc), ''))
 
-      log.info('db, connect list', key, res)
+      log.info('db, connect list', key,)
+      // log.info('db, connect list', key, res)
     })
     return this.activeClient[key]
   }

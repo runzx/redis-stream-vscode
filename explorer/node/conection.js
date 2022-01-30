@@ -38,7 +38,7 @@ class ConnectionNode extends TreeDataItem {
     this.dbs = await this.redisModel.dbInfo()
       .catch(err => {
         showMsg(`REDIS: ${err},  Pls checked host/port/password`, 'error')
-        log.error('CONNECT ERR', err)
+        log.error('connect err', err)
         this.collapsibleState = TreeItemCollapsibleState.None
         RedisModel.delClient({ host, port, password, db })
       })
