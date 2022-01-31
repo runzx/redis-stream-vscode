@@ -18,9 +18,11 @@ class Pty {
     this.fn = fn
     this.client = new Client(redisItem) // host, port,password,db
   }
+
   w(str = this.tag) {
     this.writeEmitter.fire(str)
   }
+
   open() {
     // this.writeEmitter.fire('✨ 🌏❤️❤️ \r\n')
     // this.writeEmitter.fire('💻 >')
@@ -92,8 +94,10 @@ class Pty {
     this.w(this.input.join(''))
 
     this.w('\x1b[G')
+    // 移动光标到指定位置
     this.w(`\x1b[${this.tag.length + this.cursor}C`)
   }
+
   async finishInput() {
     const input = this.input.join('')
     // 保存历史记录
@@ -133,6 +137,7 @@ class Pty {
 
     this.input = this.histories[this.historyIndex].split('')
   }
+
   searchDown() {
     if (++this.historyIndex > this.histories.length) {
       this.historyIndex = this.histories.length
@@ -145,6 +150,7 @@ class Pty {
 
     this.input = this.histories[this.historyIndex].split('')
   }
+
   appendToHistory(params) {
     if (this.histories.includes(params)) return
     this.histories.push(params)
