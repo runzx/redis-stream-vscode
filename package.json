@@ -64,6 +64,11 @@
         "command": "redis-stream.db.refresh",
         "title": "db refresh",
         "icon": "image/refresh.png"
+      },
+      {
+        "command": "redis-stream.connection.terminal",
+        "title": "terminal",
+        "icon": "image/terminal.png"
       }
     ],
     "viewsContainers": {
@@ -88,10 +93,15 @@
         {
           "command": "redis-stream.connection.status",
           "when": "view == redisTree && viewItem == connection",
-          "group": "inline@1"
+          "group": "inline@2"
         },
         {
           "command": "redis-stream.connection.refresh",
+          "when": "view == redisTree && viewItem == connection",
+          "group": "inline@1"
+        },
+        {
+          "command": "redis-stream.connection.terminal",
           "when": "view == redisTree && viewItem == connection",
           "group": "inline@0"
         },
@@ -135,6 +145,7 @@
     "vscode-test": "^1.4.1"
   },
   "dependencies": {
+    "@camaro/redis": "^2.4.1",
     "global": "^4.4.0",
     "ioredis": "^4.19.2",
     "vsce": "^1.83.0"

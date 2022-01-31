@@ -7,8 +7,11 @@ const { VirtualDoc } = require('../editor')
 const { TreeExplorer, TreeDataProvider, TreeDataItem } = require('./explorer')
 const { ConnectionNode } = require('./node/conection')
 const { createLogger } = require('../lib/logging')
+const Terminal = require('../terminal')
 
 const log = createLogger('register redis')
+const terminal = new Terminal()
+
 
 class RedisTreeDataProvider extends TreeDataProvider {
   constructor(context) {
@@ -82,6 +85,11 @@ class RedisTree extends TreeExplorer {
       const id = 'redisServerInfo'
       const [item] = await opt.redisModel.redisBase.serverInfo()
       this.doDoc({ id, item })
+    })
+
+    this.register('redis-stream.connection.terminal', async (opt,) => {
+      log.info('terminal', opt)
+      terminal.start(opt)
     })
 
     this.register('redis-stream.db.status', (opt,) => {
