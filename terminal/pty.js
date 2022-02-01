@@ -2,6 +2,9 @@ const { EventEmitter } = require("vscode")
 const { lexer } = require("./lexer")
 const { ClientV2: Client } = require('@camaro/redis')
 
+const KEY = 'terminalHistorys'
+const HISTORY_LEN = 16
+
 
 class Pty {
   writeEmitter = new EventEmitter()
@@ -10,12 +13,15 @@ class Pty {
   cursor = 0
   input = []
   historyIndex = 0
-  histories = []
+  histories
   tag = '💻 >'
 
-  constructor(redisItem, fn) {
+  constructor(redisItem, fn, context) {
     this.redisItem = redisItem
     this.fn = fn
+    this.context = context
+    this.histories = this.cacheGet([])
+    this.historyIndex = this.histories.length
     this.client = new Client(redisItem) // host, port,password,db
   }
 
@@ -152,9 +158,24 @@ class Pty {
   }
 
   appendToHistory(params) {
-    if (this.histories.includes(params)) return
+    if (this.histories.includes(params)) {
+      let start = this.histories.indexOf(params)
+      if (start === this.histories.length - 1) {
+        this.historyIndex = this.histories.length
+        return
+      }
+      this.histories.splice(start, 1)
+    }
     this.histories.push(params)
+    if (this.histories.length > HISTORY_LEN) this.histories.shift()
     this.historyIndex = this.histories.length
+    this.cacheSet(this.histories)
+  }
+  cacheGet(defaultValue) {
+    return this.context.globalState.get(KEY, defaultValue)
+  }
+  cacheSet(value) {
+    return this.context.globalState.update(KEY, value)
   }
 }
 

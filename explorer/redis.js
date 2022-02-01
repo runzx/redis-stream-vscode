@@ -10,7 +10,7 @@ const { createLogger } = require('../lib/logging')
 const Terminal = require('../terminal')
 
 const log = createLogger('register redis')
-const terminal = new Terminal()
+
 
 
 class RedisTreeDataProvider extends TreeDataProvider {
@@ -93,6 +93,7 @@ class RedisTree extends TreeExplorer {
       this.doDoc({ id, item })
     })
 
+    const terminal = new Terminal(context)
     this.register('redis-stream.connection.terminal', async (opt,) => {
       log.info('terminal', opt)
       terminal.start(opt)
