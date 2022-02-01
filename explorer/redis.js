@@ -55,7 +55,9 @@ class RedisTree extends TreeExplorer {
 
     this.register('redis-stream.connection.refresh', (opt) => {
       // log('refresh command: ', opt)
-      const value = this.cacheGet('redisOpt', "127.0.0.1:6379")
+      let value = this.cacheGet('redisOpt', "127.0.0.1:6379")
+      let [host = '', port = '', password = ''] = value.split(':')
+      value = host + ':' + port + ':' + '***'
       window.showInputBox(
         { // 这个对象中所有参数都是可选参数
           password: false,
@@ -67,14 +69,18 @@ class RedisTree extends TreeExplorer {
             // 对输入内容进行验证，返回 null 通过验证
             if (!text || !text.trim()) return null
             text = text.trim()
-            const [host = '', port = '', password] = text.split(':')
-            if (!host && !port && !password) return 'host/port/password cant empty only one,至少要有一个参数不为空'
-            if (host && /[^\w\d-.]/.test(host.trim())) return host + ' 格式不符合，请重输'
-            if (port && /[^\d]/.test(port.trim())) return port + ' 格式不符合，请重输'
+            let [host1 = '', port1 = '', password1 = ''] = text.split(':')
+            if (!host1 && !port1 && !password1) return 'host/port/password cant empty only one,至少要有一个参数不为空'
+            if (host1 && /[^\w\d-.]/.test(host1.trim())) return host1 + ' 格式不符合，请重输'
+            if (port1 && /[^\d]/.test(port1.trim())) return port + ' 格式不符合，请重输'
             return null
           }
         }).then((msg = '') => {
           if (!msg) return
+          let [host1 = '', port1 = '', password1 = ''] = msg.split(':')
+          if (password1 === '***') {
+            msg = host1 + ':' + port1 + ':' + password
+          }
           this.cacheSet('redisOpt', msg)
           this.refresh()
         })
