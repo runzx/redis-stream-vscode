@@ -105,11 +105,7 @@ class Pty {
   }
 
   async finishInput() {
-    const input = this.input.join('')
-    // 保存历史记录
-    if (input) {
-      this.appendToHistory(input)
-    }
+    const input = this.input.join('').trim()
     switch (input) {
       case '':
         this.w('\r\n')
@@ -122,7 +118,9 @@ class Pty {
 
     const inputToken = lexer.analyze(this.input)
     const [command, args] = inputToken
-    console.log('command: %s, args: %s', command, args)
+    // 保存历史记录
+    this.appendToHistory(command + ' ' + args.join(' '))
+    // console.log('command: %s, args: %s', command, args)
     let result = await this.client[command.toLowerCase()]?.(...args)
     if (command === 'select') {
       this.dbIndex = args[0]
