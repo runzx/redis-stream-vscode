@@ -52,4 +52,8 @@ exports.registers = (context) => {
     })
 
   })
+
+  log.info('globalState:', ...context.globalState.keys())
+  log.info('workspaceState:', ...context.workspaceState.keys())
+
 }
