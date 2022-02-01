@@ -1,10 +1,10 @@
 
 
-const { TreeItemCollapsibleState, window } = require('vscode')
-const { redisModel, RedisModel } = require('../command/redis')
+const { window } = require('vscode')
+const { RedisModel } = require('../command/redis')
 const { Constant, redisOpt } = require('../config')
 const { VirtualDoc } = require('../editor')
-const { TreeExplorer, TreeDataProvider, TreeDataItem } = require('./explorer')
+const { TreeExplorer, TreeDataProvider, } = require('./explorer')
 const { ConnectionNode } = require('./node/conection')
 const { createLogger } = require('../lib/logging')
 const Terminal = require('../terminal')
@@ -53,7 +53,7 @@ class RedisTree extends TreeExplorer {
     const { context } = this
     this.initTree('redisTree', new RedisTreeDataProvider(context))
 
-    this.register('redis-stream.connection.refresh', (opt) => {
+    this.register('redis-stream.connection.refresh', () => {
       // log('refresh command: ', opt)
       let value = this.cacheGet('redisOpt', "127.0.0.1:6379")
       let [host = '', port = '', password = ''] = value.split(':')
@@ -98,13 +98,13 @@ class RedisTree extends TreeExplorer {
       terminal.start(opt)
     })
 
-    this.register('redis-stream.db.status', (opt,) => {
+    this.register('redis-stream.db.status', () => {
       // log('db', opt)
 
     })
 
     this.register('redis-stream.db.scan', async (opt,) => {
-      const { label, id, } = opt
+      // const { label, id, } = opt
       // log('SCAN', opt)
       this.refresh(opt)
     })
@@ -139,19 +139,19 @@ class RedisTree extends TreeExplorer {
     })
 
     this.register('redis-stream.stream.showMore', async (opt,) => {
-      const { label, id, } = opt
+      // const { label, id, } = opt
       // log('ID MORE', opt)
       this.refresh(opt)
     })
 
     this.register('redis-stream.group.status', async (opt,) => {
-      const { label, id, } = opt
+      // const { label, id, } = opt
       // log('GROUP', label, id)
       this.doDoc(opt)
     })
 
     this.register('redis-stream.consumer.status', async (opt,) => {
-      const { label, id, } = opt
+      // const { label, id, } = opt
       // log('CONSUMER', label, id)
       this.doDoc(opt)
     })

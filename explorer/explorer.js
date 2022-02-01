@@ -2,15 +2,15 @@
 const path = require('path')
 const vscode = require("vscode")
 const { NodeType, RedisType } = require("../config")
-const { isEmpty, dateYMD } = require('../lib/util')
+const { isEmpty, } = require('../lib/util')
 const { createLogger } = require('../lib/logging')
 
 const log = createLogger('explorer')
-const { TreeItemCollapsibleState, EventEmitter, TreeItem, Uri } = vscode
-const { registerCommand, registerTextEditorCommand } = vscode.commands
+const { TreeItemCollapsibleState, EventEmitter, TreeItem, } = vscode
+const { registerCommand, } = vscode.commands
 
 class TreeExplorer {
-  constructor(context, openExplorerCommand) {
+  constructor(context,) {
     this.context = context
     this.subscriptions = context.subscriptions
     this.provider = null
@@ -135,7 +135,7 @@ class TreeDataItem extends TreeItem {
       || element.contextValue === NodeType.INFO)
       return TreeItemCollapsibleState.None
   }
-  setCollapseState(element) { }
+  setCollapseState() { }
   dateFmt(at = new Date(), fmt = 'MM-dd hh:mm:ss') {
     return new Date(+at).format(fmt)
   }
