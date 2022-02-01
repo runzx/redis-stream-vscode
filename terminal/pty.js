@@ -18,13 +18,17 @@ class Pty {
 
   constructor(redisItem, fn, context) {
     this.redisItem = redisItem
+    this.dbIndex = redisItem.db || 0
+    this.sysTag()
     this.fn = fn
     this.context = context
     this.histories = this.cacheGet([])
     this.historyIndex = this.histories.length
     this.client = new Client(redisItem) // host, port,password,db
   }
-
+  sysTag(db = this.dbIndex) {
+    this.tag = `💻 ${this.dbIndex}>`
+  }
   w(str = this.tag) {
     this.writeEmitter.fire(str)
   }
@@ -124,6 +128,7 @@ class Pty {
     let result = await this.client[command.toLowerCase()]?.(...args)
     if (command === 'select') {
       this.dbIndex = args[0]
+      this.sysTag()
     }
     this.w('\r\n')
     if (Array.isArray(result)) result = result.join('\n\r')
