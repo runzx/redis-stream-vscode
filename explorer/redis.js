@@ -14,6 +14,8 @@ const log = createLogger('register redis')
 
 
 class RedisTreeDataProvider extends TreeDataProvider {
+  redisList = new Map()
+
   constructor(context) {
     super(context)
   }
@@ -22,23 +24,24 @@ class RedisTreeDataProvider extends TreeDataProvider {
   _getChileren(element) {
     if (element) return element.getChildren()
 
-    const config = this.getConnections()
-    return [ConnectionNode.init({ ...config, context: this.context })]
+    return this.getConnections()
   }
   _getTreeItem(element) {
-    if (element.getTreeItem) return element.getTreeItem(this)
+    // if (element.getTreeItem) return element.getTreeItem(this)
     return element
   }
 
   getConnections() {
-    let res = this.cacheGet(Constant.GLOBALSTATE_CONFIG_KEY, redisOpt)
-    if (typeof res === 'string') {
-      let [host, port, password, db = 0] = res.split(':')
-      host || (host = '127.0.0.1')
-      port || (port = 6379)
-      return { host, port, password, db }
-    }
-    return res
+    let list = this.cacheGet(Constant.GLOBALSTATE_CONFIG_KEY, [])
+
+    return list.map(i => {
+      let res = this.redisList.get(i.name)
+      if (res) Object.assign(res, i)
+      else res = { ...i }
+      // res.refresh = this.refresh.bind(this)
+      this.redisList.set(i.name, res)
+      return res
+    }).map(i => ConnectionNode.init(i, this.context))
   }
 }
 
@@ -53,8 +56,49 @@ class RedisTree extends TreeExplorer {
     const { context } = this
     this.initTree('redisTree', new RedisTreeDataProvider(context))
 
-    this.register('redis-stream.connection.refresh', () => {
+    this.register('redis-stream.addNewConnect', () => {
+      let value = 'local:127.0.0.1:6379:'
+      // let value = this.cacheGet('redisOpt', "127.0.0.1:6379")
+      window.showInputBox(
+        { // 这个对象中所有参数都是可选参数
+          password: false,
+          ignoreFocusOut: true, // 默认false，设置为true时鼠标点击别的地方输入框不会消失
+          placeHolder: '请输入新连接参数.',
+          prompt: 'fmt: "name:host:port:password"   ',
+          value,
+          validateInput: function (text) {
+            // 对输入内容进行验证，返回 null 通过验证
+            text = text.trim()
+            if (!text) return null
+            let [name, host1, port1, password1] = text.split(':')
+            host1 = host1.trim()
+            port1 = port1.trim()
+            // if (!host1 && !port1 && !password1) return 'host/port/password cant empty only one,至少要有一个参数不为空'
+            if (host1 && /[^\w\d-.]/.test(host1)) return host1 + ' 格式不符合，请重输'
+            if (port1 && /[^\d]/.test(port1)) return port1 + ' 格式不符合，请重输'
+            return null
+          }
+        }).then((msg = '') => {
+          let [name = '', host = '127.0.0.1', port = '6379', password] = msg.split(':')
+          name = name.trim()
+          host = host.trim()
+          port = + port.trim()
+          password && (password = password.trim())
+          name || (name = host)
+          let conf = this.cacheGet(Constant.GLOBALSTATE_CONFIG_KEY)
+          if (conf?.length > 0) {
+            let item = conf.find(i => i.name === name)
+            if (item) Object.assign(item, { host, port, password })
+            else conf.push({ host, port, password, name })
+          } else conf = [{ host, port, password, name }]
+          this.cacheSet(Constant.GLOBALSTATE_CONFIG_KEY, conf)
+          this.refresh()
+        })
+    })
+
+    this.register('redis-stream.connection.refresh', (opt) => {
       // log('refresh command: ', opt)
+      console.log('connection.refresh', opt)
       let value = this.cacheGet('redisOpt', "127.0.0.1:6379")
       let [host = '', port = '', password = ''] = value.split(':')
       value = host + ':' + port + ':' + '***'

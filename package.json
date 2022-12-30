@@ -36,6 +36,11 @@
   "contributes": {
     "commands": [
       {
+        "command": "redis-stream.addNewConnect",
+        "icon": "$(add)",
+        "title": "add new Redis"
+      },
+      {
         "command": "redis-stream.connection.refresh",
         "title": "refresh redis",
         "icon": "image/change.png"
@@ -89,6 +94,13 @@
       ]
     },
     "menus": {
+      "view/title": [
+        {
+          "command": "redis-stream.addNewConnect",
+          "when": "view == redisTree",
+          "group": "navigation"
+        }
+      ],
       "view/item/context": [
         {
           "command": "redis-stream.connection.status",

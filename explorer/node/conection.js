@@ -10,25 +10,33 @@ const log = createLogger('connection')
 class ConnectionNode extends TreeDataItem {
   constructor(opt = {}) {
     super(opt)
+    this.opt = opt
+    this.name = opt.name
     this.host = opt.host
     this.port = opt.port
     this.password = opt.password
     // this.dbs = opt.dbs
   }
-  static init(opt = {}) {
+  static init(opt, ctx) {
+    // const [name, opt] = kv
     const { host, port, password } = opt
     opt.contextValue = NodeType.CONNECTION
-    opt.collapsibleState = TreeItemCollapsibleState.Expanded
-    opt.label = opt.connection = opt.id = `${host}:${port}`
+    opt.collapsibleState = TreeItemCollapsibleState.Collapsed
+    opt.label = opt.name
+    opt.context = ctx
+    opt.connection = opt.tooltip = `${host}:${port}`
+    opt.id = opt.name
 
     return new ConnectionNode(opt)
   }
 
-  async getTreeItem() {
-    let { host, port, } = this
+  async getTreeItem(element) {
+    console.log('getTreeItem:', element)
+    // let { host, port, } = this
     // 只刷新此Item时在这改变属性
-    this.label = this.connection = this.id = `${host}:${port}`
-    return this
+    // this.label = 
+    // this.connection = this.id = `${host}:${port}`
+    return element
   }
 
   async getChildren() {

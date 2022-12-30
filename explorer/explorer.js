@@ -49,7 +49,7 @@ class TreeDataProvider {
     log.info('getChildren', element ? element.label : '')
     if (element) return element.getChildren()
 
-    return this._getChileren(element)
+    return this._getChileren()
   }
   // refresh getTreeItem -> getChildren 
   async getTreeItem(element) {
@@ -74,6 +74,9 @@ class TreeDataProvider {
   }
   cacheSet(key, value) {
     return this.context.globalState.update(key, value)
+  }
+  cacheList() {
+    return this.context.globalState.keys().map(key => [key, this.cacheGet(key)])
   }
   register(command, cb) {
     cb && this.context.subscriptions.push(registerCommand(command, cb))
