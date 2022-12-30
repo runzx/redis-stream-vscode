@@ -18,8 +18,8 @@ class DocProvider {
     log.info('uri', scheme, path)
     let [connection, db, type, key] = path.split('$')
     key = key.replace('.json', '')
-
-    const redisModel = RedisModel.init({ connection, db, })
+    let [host, port] = connection.split(':')
+    const redisModel = RedisModel.init({ host, port, db, })
     let res = await redisModel.getKey(key)
     return this.fmt(res, key)
   }
