@@ -3,7 +3,7 @@
   "publisher": "zhaixiang",
   "displayName": "redis-stream",
   "description": "redis stream explorer",
-  "version": "1.7.4",
+  "version": "1.8.0",
   "homepage": "https://github.com/runzx/redis-stream-vscode/blob/master/README.md",
   "repository": {
     "type": "git",
@@ -146,6 +146,7 @@
   },
   "dependencies": {
     "@camaro/redis": "^2.4.1",
+    "debug": "^4.3.4",
     "global": "^4.4.0",
     "ioredis": "^4.19.2",
     "vsce": "^1.83.0"
