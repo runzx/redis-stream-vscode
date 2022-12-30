@@ -15,12 +15,14 @@ class DocProvider {
   }
   async provideTextDocumentContent(uri) {
     const { path, scheme } = uri
-    log.inof('uri', scheme, path)
+    log.info('uri', scheme, path)
     // let [connection, db, type, strem, group, consumer, key] = path.split('$')
-    let keyR = path.match(/(.+)\.json/)
-    keyR = keyR ? keyR[1] : ''
-
-    return this.fmt(cacheDoc[keyR], keyR)
+    let k = path.match(/(.+)\.(\w+)/)
+    if (k?.[2] === 'json') {
+      return this.fmt(cacheDoc[k[1]], k[1])
+    }
+    // txt, path: 'redisServerInfo.txt'
+    return cacheDoc[k?.[1] || path]
   }
   refresh(uri) {
     this._onDidChange.fire(uri)
@@ -54,6 +56,8 @@ class VirtualDoc {
     return this
   }
   getUri(id) {
+    if (id === 'redisServerInfo')
+      return vscode.Uri.parse(`${this.scheme}:${id}.txt`)
     return vscode.Uri.parse(`${this.scheme}:${id}.json`)
   }
   update(id) {
