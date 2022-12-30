@@ -137,19 +137,13 @@
   },
   "devDependencies": {
     "@types/glob": "^7.2.0",
-    "@types/mocha": "^8.2.3",
-    "@types/node": "^12.20.55",
-    "@types/vscode": "^1.74.0",
-    "@vscode/test-electron": "^2.2.1",
-    "eslint": "^7.32.0",
-    "glob": "^7.2.3",
-    "mocha": "^8.4.0",
-    "typescript": "^4.9.4"
+    "@types/node": "~16.18.10",
+    "@types/vscode": "^1.40.0",
+    "glob": "^8.0.3"
   },
   "dependencies": {
     "@camaro/redis": "^2.4.1",
     "debug": "^4.3.4",
-    "global": "^4.4.0",
-    "ioredis": "^4.28.5"
+    "ioredis": "^5.2.4"
   }
 }

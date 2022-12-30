@@ -78,7 +78,7 @@ class DbTreeItem extends TreeDataItem {
       this.redisModel = RedisModel.init({ host, port, password, db })
     }
     let dbsInfo = await this.redisModel.dbInfo()
-    const { keys, } = dbsInfo[label]
+    const keys = dbsInfo[label]
     this.description = `(${keys})`
     return this
   }
@@ -86,7 +86,7 @@ class DbTreeItem extends TreeDataItem {
     let { connection, db, redisModel, description, } = this
     const [keysCategory, scanMore] = await redisModel.scanKeys()
     // log('DB', db, keysCategory, scanMore)
-    const [keysLen] = description.match(/\d+/)
+    const [keysLen] = description.match(/\d+/) || []
 
     const categroys = Object.keys(keysCategory).map(label => {
 

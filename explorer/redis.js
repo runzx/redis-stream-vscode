@@ -89,8 +89,8 @@ class RedisTree extends TreeExplorer {
     this.register('redis-stream.connection.status', async (opt,) => {
       // log('connection', opt)
       const id = 'redisServerInfo'
-      const [item] = await opt.redisModel.redisBase.serverInfo()
-      this.doDoc({ id, item })
+      const { txt } = await opt.redisModel.redisBase.serverInfo()
+      this.doDoc({ id, txt })
     })
 
     const terminal = new Terminal(context)
@@ -159,8 +159,8 @@ class RedisTree extends TreeExplorer {
 
   }
 
-  doDoc({ id, item }) {
-    VirtualDoc.setCacheDoc(id, item)
+  doDoc({ id, txt }) {
+    VirtualDoc.setCacheDoc(id, txt)
     this.doc.showDoc(id)
 
     if (this.docStatus[id]) {

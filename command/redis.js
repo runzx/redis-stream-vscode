@@ -149,7 +149,7 @@ class RedisModel {
       })
 
       this.redisBase.serverInfo().then(res => {
-        const [serverInfo, dbs, InfoTxt] = res
+        const { dbs } = res
         resolve(dbs)
       })
     })
