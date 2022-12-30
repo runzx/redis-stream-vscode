@@ -1,4 +1,7 @@
 # Change Log
+## [1.8.0]
+
+- bug for doc.
 
 ## [1.6.0]
 
