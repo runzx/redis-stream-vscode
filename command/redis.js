@@ -167,9 +167,12 @@ class RedisModel {
     opt.client = this.getClient(opt)
     return new RedisModel(opt)
   }
-  static init(opt) {
+  static init({ client, ...opt }) {
     opt.db = opt.db || opt.dbIndex
-    if (!opt.client) opt.client = this.getClient(opt)
+    // if (!opt.client) opt.client = this.getClient(opt)
+    const cli = client.duplicate()
+    cli.select(opt.db).then()
+    opt.client = cli
     return new RedisModel(opt)
   }
   static getClient({ host = '127.0.0.1', port = 6379, password, db = 0 }) {
@@ -213,6 +216,41 @@ class RedisModel {
 }
 
 
-module.exports = {
+module.exports = exports = {
   RedisModel
+}
+
+exports.connectRedis = async function (setting) {
+  let msg = setting?.uri && setting.uri?.startsWith('redis://') ? setting.uri : null
+  try {
+    const client = new IORedis(msg ? msg : setting)
+    let info = await client.info()
+    console.log('  redis --> %s', msg || `${setting.host}:${setting.port}`)
+    let ver = info.match(/redis_version:(\d+\.\d+\.\d+)/)
+    let os = info.match(/^os:(.*)$/m)
+    console.log(`  redis V${ver[1]}, host: ${setting.host} (${os[1]})`)
+    return { client, version: ver[1], os: os[1] }
+  } catch (err) {
+    return err
+    // { message: err.message }
+  }
+
+}
+
+exports.getDbs = async function (client) {
+  let txt = await client.info('Keyspace')
+  // console.log(txt)
+  let res = txt.match(/db\d+:keys=\d+/g) || []
+  const dbs = res.reduce((acc, i) => {
+    let db = i.match(/(db\d+).+?(\d+)/)
+    acc[db[1]] = +db[2]
+    return acc
+    // return { db: +db[1], keys: +db[2] }
+  }, {})
+  return dbs
+  // let res = txt.match(/db\d+:keys=\d+/g) || []
+  // return res.map(i => {
+  //   let db = i.match(/db(\d+).+?(\d+)/)
+  //   return { db: +db[1], keys: +db[2] }
+  // })
 }

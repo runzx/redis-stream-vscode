@@ -1,7 +1,7 @@
 
 
 const vscode = require("vscode")
-const { RedisModel } = require("../command/redis")
+// const { RedisModel } = require("../command/redis")
 const { scheme } = require("../config")
 const { createLogger } = require('../lib/logging')
 

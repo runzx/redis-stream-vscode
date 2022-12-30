@@ -62,36 +62,39 @@ class SearchKeysTreeItem extends TreeDataItem {
 class DbTreeItem extends TreeDataItem {
   constructor(opt = {}) {
     super(opt)
-    this.host = opt.host
-    this.port = opt.port
-    this.password = opt.password
-    this.context = opt.context
+    // this.opt = opt
+    // this.context = opt.context
   }
-  static init(opt = {}) {
+  static init({ id, ...opt }) {
+    opt.id = `${id}.db${opt.db}`
+    opt.label = `db${opt.db}`
     opt.contextValue = NodeType.DB
-
+    opt.description = `(${opt.keys})`
+    // tooltip: `expires:${expires},avg_ttl:${avg_ttl}`,
+    opt.collapsibleState = opt.keys !== 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
     return new DbTreeItem(opt)
   }
-  async getTreeItem(parent) {
-    let { host, port, password, db, redisModel, label, } = this
-    if (!this.redisModel) {
-      this.redisModel = RedisModel.init({ host, port, password, db })
-    }
-    let dbsInfo = await this.redisModel.dbInfo()
-    const keys = dbsInfo[label]
-    this.description = `(${keys})`
-    return this
+  async getTreeItem(element) {
+    // let { host, port, password, db, redisModel, label, } = this
+    // if (!this.redisModel) {
+    //   this.redisModel = RedisModel.init({ host, port, password, db })
+    // }
+    // let dbsInfo = await this.redisModel.dbInfo()
+    // const keys = dbsInfo[label]
+    // this.description = `(${keys})`
+    return element
   }
   async getChildren() {
-    let { connection, db, redisModel, description, } = this
+    // let { connection, db, description, } = this
+    const redisModel = RedisModel.init(this.opt)
     const [keysCategory, scanMore] = await redisModel.scanKeys()
     // log('DB', db, keysCategory, scanMore)
-    const [keysLen] = description.match(/\d+/) || []
+    const [keysLen] = this.opt.description.match(/\d+/) || []
 
     const categroys = Object.keys(keysCategory).map(label => {
 
       return RedisDateTypes.init({
-        db, connection, label, redisModel,
+        ...this.opt, redisModel, label,
 
         redisDataType: label,
         item: keysCategory[label],

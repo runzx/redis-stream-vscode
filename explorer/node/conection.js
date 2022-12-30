@@ -2,7 +2,7 @@ const { NodeType, Constant } = require("../../config")
 const { TreeDataItem } = require("../explorer")
 const { TreeItemCollapsibleState } = require("vscode")
 const { DbTreeItem } = require("./db")
-const { RedisModel } = require("../../command/redis")
+const { RedisModel, connectRedis, getDbs } = require("../../command/redis")
 const { showMsg } = require("../../lib/show-message")
 const { createLogger } = require('../../lib/logging')
 
@@ -10,11 +10,11 @@ const log = createLogger('connection')
 class ConnectionNode extends TreeDataItem {
   constructor(opt = {}) {
     super(opt)
-    this.opt = opt
-    this.name = opt.name
-    this.host = opt.host
-    this.port = opt.port
-    this.password = opt.password
+    // this.opt = opt
+    // this.name = opt.name
+    // this.host = opt.host
+    // this.port = opt.port
+    // this.password = opt.password
     // this.dbs = opt.dbs
   }
   static init(opt, ctx) {
@@ -40,29 +40,39 @@ class ConnectionNode extends TreeDataItem {
   }
 
   async getChildren() {
-    let { host, port, password, db = 0 } = this
-    if (!host && !port && !password) log.error('refresh err', opt)
-    this.redisModel = RedisModel.reloadRedis({ host, port, password, db })
-    this.dbs = await this.redisModel.dbInfo()
-      .catch(err => {
-        showMsg(`REDIS: ${err},  Pls checked host/port/password`, 'error')
-        log.error('connect err', err)
-        this.collapsibleState = TreeItemCollapsibleState.None
-        RedisModel.delClient({ host, port, password, db })
-      })
-    if (!this.dbs) return null
+    if (!this.opt.client) {
+      const { message, client, version, os } = await connectRedis(this.opt)
+      if (message) return log.error('connect getChildren:', message)
+      // notify(message)
+      Object.assign(this.opt, { client, version, os })
+      // return this.setting.refresh() // 改变 icon 状态
+    }
+    let dbs = await getDbs(this.opt.client)
 
-    return Object.keys(this.dbs).map(label => {
-      const { keys, expires, avg_ttl } = this.dbs[label]
+    // let { host, port, password, db = 0 } = this
+    // if (!host && !port && !password) log.error('refresh err', opt)
+    // this.redisModel = RedisModel.reloadRedis({ host, port, password, db })
+    // this.dbs = await this.redisModel.dbInfo()
+    //   .catch(err => {
+    //     showMsg(`REDIS: ${err},  Pls checked host/port/password`, 'error')
+    //     log.error('connect err', err)
+    //     this.collapsibleState = TreeItemCollapsibleState.None
+    //     RedisModel.delClient({ host, port, password, db })
+    //   })
+    // if (!this.dbs) return null
+
+    return Object.keys(dbs).map(label => {
+      const keys = dbs[label]
       const db = +label.match(/(\d+)/)[1]
-      const { connection, host, port, password, context } = this
-      return DbTreeItem.init({
-        db, connection, label, host, port, password, context,
-        redisModel: db === 0 ? this.redisModel : null,
-        description: `(${keys})`,
-        tooltip: `expires:${expires},avg_ttl:${avg_ttl}`,
-        collapsibleState: keys !== 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
-      })
+      return DbTreeItem.init({ keys, db, ...this.opt })
+      // const { connection, host, port, password, context } = this
+      // return DbTreeItem.init({
+      //   db, connection, label, host, port, password, context,
+      //   redisModel: db === 0 ? this.redisModel : null,
+      //   description: `(${keys})`,
+      //   tooltip: `expires:${expires},avg_ttl:${avg_ttl}`,
+      //   collapsibleState: keys !== 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
+      // })
     })
   }
 

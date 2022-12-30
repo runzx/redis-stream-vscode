@@ -1,7 +1,7 @@
 
 
 const { window } = require('vscode')
-const { RedisModel } = require('../command/redis')
+// const { RedisModel } = require('../command/redis')
 const { Constant, redisOpt } = require('../config')
 const { VirtualDoc } = require('../editor')
 const { TreeExplorer, TreeDataProvider, } = require('./explorer')
@@ -155,19 +155,19 @@ class RedisTree extends TreeExplorer {
     })
 
     this.register('redis-stream.db.refresh', async (opt,) => {
-      const { host, port, db } = opt
-      RedisModel.delClient({ host, port, db })
-      opt.redisModel = null
+      // const { host, port, db } = opt
+      // RedisModel.delClient({ host, port, db })
+      // opt.redisModel = null
       log.info('db refresh', opt)
       this.refresh(opt)
     })
 
     this.register('redis-stream.db.search', async (opt,) => {
       let { redisModel } = opt
-      if (!redisModel) {
-        const { host, port, db, password } = opt
-        opt.redisModel = redisModel = RedisModel.init({ host, port, db, password })
-      }
+      // if (!redisModel) {
+      //   const { host, port, db, password } = opt
+      //   opt.redisModel = redisModel = RedisModel.init({ host, port, db, password })
+      // }
       window.showInputBox(
         {
           password: false,

@@ -9,16 +9,18 @@ class RedisDateTypes extends TreeDataItem {
     super(opt)
 
   }
-  static init(opt) {
+  static init({ id, ...opt }) {
+    opt.id = `${id}.${opt.label}`
+    // opt.label = `db${opt.db}`
     opt.contextValue = NodeType.REDISDATATYPE
     return new RedisDateTypes(opt)
   }
   async getChildren() {
-    const { db, connection, redisModel, redisDataType } = this
+    // const { db, connection, redisModel, redisDataType } = this
     return this.item.map(label => {
       return KeyTreeItem.init({
-        label,
-        db, connection, redisModel, redisDataType
+        ...this.opt, label,
+        // db, connection, redisModel, redisDataType
       })
     })
   }

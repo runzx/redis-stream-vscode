@@ -39,9 +39,9 @@ class StreamConsumer extends TreeDataItem {
 
   async getTreeItem(parent) {
     let { host, port, password, db, refreshCallBack, stream, group } = this
-    if (!this.redisModel) {
-      this.redisModel = RedisModel.init({ host, port, password, db })
-    }
+    // if (!this.redisModel) {
+    //   this.redisModel = RedisModel.init({ host, port, password, db })
+    // }
     const [item] = (await this.redisModel.getConsumersInfo(group, stream)).filter(i => i.name === this.label)
     this.item = item
     this.tooltip = `pel-count: ${item['pel-count']}`,

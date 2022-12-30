@@ -87,6 +87,8 @@ class TreeDataItem extends TreeItem {
   constructor(opt = {}) {
     super(opt.label || opt.resourceUri, opt.collapsibleState)
 
+    this.opt = opt
+    this.name = opt.name
     this.resourceUri = opt.resourceUri
     this.iconPath = opt.iconPath
     this.description = opt.description
@@ -108,6 +110,7 @@ class TreeDataItem extends TreeItem {
     this.pending = opt.pending
     this.id = opt.id || this.getId(opt)
     // console.log(this.id)
+    // this.context = opt.context
     this.redisModel = opt.redisModel
   }
 

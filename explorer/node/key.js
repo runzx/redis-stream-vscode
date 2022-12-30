@@ -16,7 +16,8 @@ class KeyTreeItem extends TreeDataItem {
       command: 'redis-stream.key.status'
     }
   }
-  static init(opt = {}) {
+  static init({ id, ...opt }) {
+    opt.id = `${id}.${opt.label}`
     opt.contextValue = NodeType.KEY
     return new KeyTreeItem(opt)
   }
