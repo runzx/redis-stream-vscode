@@ -7,6 +7,7 @@ const { VirtualDoc } = require('../editor')
 const { KeyView } = require('../editor/key-doc')
 const { StreamIdView } = require('../editor/stream-id-doc')
 const { createLogger } = require('../lib/logging')
+const { initVdoc, showVdoc } = require('../editor/v-doc')
 
 const log = createLogger('register redis')
 
@@ -19,11 +20,14 @@ exports.registers = (context) => {
 
   new RedisTree(context)
 
-  const doc = KeyView.init({ context })
+  const doc = initVdoc({ context })
+  // const doc = KeyView.init({ context })
   register('redis-stream.key.status', async (opt) => {
-    const { id } = opt
-    // log.info('KEY', label, id)
-    doc.showDoc(id)
+    // opt.vDocView.showDoc(opt.id)
+    // showVdoc(opt)
+    // const { id } = opt
+    // // log.info('KEY', label, id)
+    doc.showDoc(opt.id)
   })
   register('redis-stream.key.value.refresh', async (opt) => {
     const { id, refresh } = opt

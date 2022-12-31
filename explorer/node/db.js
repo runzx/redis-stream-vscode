@@ -6,6 +6,7 @@ const { RedisDateTypes } = require("./type")
 const { KeyTreeItem } = require("./key")
 const { isEmpty } = require("../../lib/util")
 const { createLogger } = require('../../lib/logging')
+const { initVdoc } = require("../../editor/v-doc")
 
 const log = createLogger('db')
 
@@ -22,7 +23,8 @@ class ShowMoreKeysTreeItem extends TreeDataItem {
     }
   }
 
-  static init(opt = {}) {
+  static init({ id, ...opt }) {
+    opt.id = `${id}.more`
     opt.contextValue = NodeType.SCANMORE
     opt.label = 'Show more ...'
     opt.tooltip = `SCAN more...`
@@ -38,7 +40,8 @@ class SearchKeysTreeItem extends TreeDataItem {
 
   }
 
-  static init(opt = {}) {
+  static init({ id, ...opt }) {
+    opt.id = `${id}.search`
     opt.contextValue = NodeType.SEARCHKEY
     opt.label = 'search key'
     opt.tooltip = `Search result`
@@ -51,8 +54,9 @@ class SearchKeysTreeItem extends TreeDataItem {
     const item = this.redisModel.searchResult
     return this.redisModel.searchResult.map(({ key: label, type }) => {
       return KeyTreeItem.init({
-        label, redisDataType, type,
-        db, connection, redisModel,
+        ...this.opt, redisDataType,
+        label, type,
+        // db, connection, redisModel,
         tooltip: `${type}`
       })
     })
@@ -70,6 +74,8 @@ class DbTreeItem extends TreeDataItem {
     opt.label = `db${opt.db}`
     opt.contextValue = NodeType.DB
     opt.description = `(${opt.keys})`
+    opt.redisModel = RedisModel.init(opt)
+
     // tooltip: `expires:${expires},avg_ttl:${avg_ttl}`,
     opt.collapsibleState = opt.keys !== 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
     return new DbTreeItem(opt)
@@ -85,8 +91,9 @@ class DbTreeItem extends TreeDataItem {
     return element
   }
   async getChildren() {
-    // let { connection, db, description, } = this
-    const redisModel = RedisModel.init(this.opt)
+    let { redisModel, } = this.opt
+    // const redisModel = RedisModel.init(this.opt)
+    // const vDocView = initVdoc(this.opt)
     const [keysCategory, scanMore] = await redisModel.scanKeys()
     // log('DB', db, keysCategory, scanMore)
     const [keysLen] = this.opt.description.match(/\d+/) || []
@@ -94,7 +101,7 @@ class DbTreeItem extends TreeDataItem {
     const categroys = Object.keys(keysCategory).map(label => {
 
       return RedisDateTypes.init({
-        ...this.opt, redisModel, label,
+        ...this.opt, label,
 
         redisDataType: label,
         item: keysCategory[label],
@@ -104,16 +111,16 @@ class DbTreeItem extends TreeDataItem {
     })
 
     let searchItem = null
-    if (this.redisModel && !isEmpty(this.redisModel.searchResult)) {
+    if (redisModel && !isEmpty(redisModel.searchResult)) {
       searchItem = SearchKeysTreeItem.init({
-        db, connection, redisModel
+        ...this.opt
       })
     }
 
     let scanMoreItem = null
     if (scanMore < +keysLen) {
       scanMoreItem = ShowMoreKeysTreeItem.init({
-        db, connection, redisModel,
+        ...this.opt,
         description: `(${+keysLen - scanMore})`,
         refreshParent: this
       })

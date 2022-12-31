@@ -22,6 +22,7 @@ exports.activate = (context) => {
   log.info(`'${channel}'`, 'active!')
 
   registers(context)
+  console.log('start redis-stream.')
 }
 
 exports.deactivate = () => { }

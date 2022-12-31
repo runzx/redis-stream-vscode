@@ -5,6 +5,8 @@ const IORedis = require('ioredis')
 const { createLogger } = require('../lib/logging')
 
 const log = createLogger('redis init')
+const redisList = new Map() // redisModel 
+
 
 class RedisModel {
   static activeClient = {}
@@ -168,12 +170,23 @@ class RedisModel {
     return new RedisModel(opt)
   }
   static init({ client, ...opt }) {
-    opt.db = opt.db || opt.dbIndex
+    // let key = this.getKey(opt)  // `${opt.name}:db${opt.db}`
+    let redisModel = this.getRedisModel(this.getKey(opt))
+    if (redisModel) return redisModel
+
+    opt.db = opt.dbIndex || opt.db
     // if (!opt.client) opt.client = this.getClient(opt)
+    console.log('db:', opt.db)
     const cli = client.duplicate()
     cli.select(opt.db).then()
     opt.client = cli
-    return new RedisModel(opt)
+    redisModel = new RedisModel(opt)
+    redisList.set(this.getKey(opt), redisModel)
+    return redisModel
+  }
+  static getRedisModel(key) {
+    let redisModel = redisList.get(key)
+    return redisModel
   }
   static getClient({ host = '127.0.0.1', port = 6379, password, db = 0 }) {
     const key = this.getKey({ host, port, db })
@@ -210,8 +223,8 @@ class RedisModel {
     }
     return null
   }
-  static getKey({ host = '127.0.0.1', port = 6379, db = 0, }) {
-    return `${host}-${port}-${db}`
+  static getKey({ name, db }) {
+    return `${name}:db${db}`
   }
 }
 

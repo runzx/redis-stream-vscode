@@ -3,39 +3,39 @@
 // Hover to view descriptions of existing attributes.
 // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
 {
-	"version": "0.2.0",
-	"configurations": [
-		{
-			"name": "file-js",
-			"program": "${file}",
-			"request": "launch",
-			"skipFiles": [
-				"<node_internals>/**"
-			],
-			"type": "pwa-node"
-		},
-		{
-			"name": "Run Extension",
-			"type": "extensionHost",
-			"request": "launch",
-			"args": [
-				"--enable-proposed-api",
-				"--disable-extensions",
-				"--extensionDevelopmentPath=${workspaceFolder}"
-			],
-			"env": {
-				"DEBUG": "ioredis:*,pd123:*"
-			},
-			// "outputCapture": "std",
-		},
-		{
-			"name": "Extension Tests",
-			"type": "extensionHost",
-			"request": "launch",
-			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--extensionTestsPath=${workspaceFolder}/test/suite/index"
-			]
-		}
-	]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--enable-proposed-api",
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}"
+      ],
+      "env": {
+        "DEBUG": "ioredis:*,pd123:*"
+      },
+      // "outputCapture": "std",
+    },
+    {
+      "name": "file-js",
+      "program": "${file}",
+      "request": "launch",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "type": "node"
+    },
+    {
+      "name": "Extension Tests",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/test/suite/index"
+      ]
+    }
+  ]
 }

@@ -40,7 +40,8 @@ exports.RedisType = {
 
 exports.scheme = {
   VIEW_DOCUMENT_SCHEME: 'redisStream',
-  VIEW_DB_KEY_SCHEME: 'redisStreamKey',
+  VIEW_DB_KEY_SCHEME: 'redisKey',
+  VIEW_STREM_KEY_SCHEME: 'stream-key',
   VIEW_STREM_ID_SCHEME: 'redisStreamID'
 }
 exports.SHOW_MORE_COUNT = 5

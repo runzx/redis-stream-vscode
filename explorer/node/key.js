@@ -12,13 +12,14 @@ class KeyTreeItem extends TreeDataItem {
     this.command = {
       title: 'Key',
       tooltip: 'key info',
-      arguments: [this],
+      arguments: [opt],
       command: 'redis-stream.key.status'
     }
   }
   static init({ id, ...opt }) {
     opt.id = `${id}.${opt.label}`
     opt.contextValue = NodeType.KEY
+    // opt.scheme = `${opt.redisDataType}-${opt.contextValue}`
     return new KeyTreeItem(opt)
   }
   async getChildren() {
