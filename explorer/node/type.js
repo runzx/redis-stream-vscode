@@ -16,13 +16,17 @@ class RedisDateTypes extends TreeDataItem {
     return new RedisDateTypes(opt)
   }
   async getChildren() {
-    // const { db, connection, redisModel, redisDataType } = this
-    return this.item.map(label => {
-      return KeyTreeItem.init({
-        ...this.opt, label,
-        // db, connection, redisModel, redisDataType
-      })
-    })
+    let data = []
+    for (const label of this.item) {
+      let description = '', streamInfo, tooltip = ''
+      if (this.opt.label === 'stream') {
+        streamInfo = await this.opt.redisModel.getStreamInfo(label)
+        description = `(${streamInfo.length})`
+        tooltip = `updateAt ${this.id2date(streamInfo['last-generated-id'],'yyyy-MM-dd hh:mm:ss')}`
+      }
+      data.push({ ...this.opt, label, description, streamInfo, tooltip })
+    }
+    return data.map(i => KeyTreeItem.init(i))
   }
 }
 

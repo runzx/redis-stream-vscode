@@ -9,7 +9,7 @@ class StreamPending extends TreeDataItem {
     super(opt)
   }
   static init({ id, ...opt }) {
-    opt.id = `${id.replace('.stream.', '.s-panding.')}.${opt.label}`
+    opt.id = `${id.replace('.s-group.', '.s-panding.')}.${opt.label}`
     opt.contextValue = NodeType.PENDING
     return new StreamPending(opt)
   }

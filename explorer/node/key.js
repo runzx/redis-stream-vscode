@@ -20,6 +20,8 @@ class KeyTreeItem extends TreeDataItem {
     opt.id = `${id}.${opt.label}`
     opt.contextValue = NodeType.KEY
     // opt.scheme = `${opt.redisDataType}-${opt.contextValue}`
+    opt.collapsibleState = opt.redisDataType === 'stream' ? TreeItemCollapsibleState.Collapsed
+      : TreeItemCollapsibleState.None
     return new KeyTreeItem(opt)
   }
   async getChildren() {
@@ -31,8 +33,8 @@ class KeyTreeItem extends TreeDataItem {
   }
 
   async setStream() {
-    const { db, connection, redisModel, redisDataType } = this
-    const streamInfo = await redisModel.getStreamInfo(this.label)
+    const { streamInfo } = this.opt
+    // const streamInfo = await redisModel.getStreamInfo(this.label)
     if (!streamInfo) return []
     this.tooltip = `id(${streamInfo.length})`
     // const data = {
@@ -40,7 +42,7 @@ class KeyTreeItem extends TreeDataItem {
     //   stream: this.label,
     //   collapsibleState: TreeItemCollapsibleState.None
     // }
-    this.streamInfo = streamInfo
+    // this.streamInfo = streamInfo
     const { groups, entries = [] } = streamInfo
     this.opt.stream = this.label
     let g = groups.map(i => {

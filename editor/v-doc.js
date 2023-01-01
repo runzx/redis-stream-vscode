@@ -21,7 +21,7 @@ class DocProvider {
     const { path, scheme } = uri
     log.info('uri', scheme, path)
     // 'pve.db4.s-id.siteNotice.1671810120023-0.json'
-    let [name, db, type, key, extension] = path.split('.')
+    let [name, db, type, key, extension, consumer] = path.split('.')
     let result = ''
     switch (type) {
       case 'text':
@@ -36,9 +36,13 @@ class DocProvider {
         break;
 
       case 's-group':
-      case 's-consumer':
+
       case 's-pending':
-        result = content.get([name, db, type, key].join('.')) || '没有连接上 redis 服务'
+        result = content.get([name, db, type, key, extension].join('.')) || '没有连接上 redis 服务'
+        result = this.fmt(result, 'streamK')
+        break;
+      case 's-consumer':
+        result = content.get([name, db, type, key, extension, consumer].join('.')) || '没有连接上 redis 服务'
 
         result = this.fmt(result, 'streamK')
         break;

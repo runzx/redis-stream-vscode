@@ -14,7 +14,7 @@ class StreamConsumer extends TreeDataItem {
     }
   }
   static init({ id, ...opt }) {
-    opt.id = `${id.replace('.stream.', '.s-consumer.')}.${opt.label}`
+    opt.id = `${id.replace('.s-group.', '.s-consumer.')}.${opt.label}`
     opt.contextValue = NodeType.CONSUMER
     return new StreamConsumer(opt)
   }
