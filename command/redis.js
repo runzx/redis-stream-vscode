@@ -80,7 +80,7 @@ class RedisModel {
           (key, 0, await this.client.zcard(key))
         break
       case RedisType.stream:
-        const stream = new RedisStream({ client: this.client, stream: key })
+        const stream = new RedisStream({ ...this.opt, client: this.client, stream: key })
         content = await stream.getStreamInfo(key, true, count) // full
         break
     }

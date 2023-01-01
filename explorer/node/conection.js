@@ -52,7 +52,7 @@ class ConnectionNode extends TreeDataItem {
         return log.error('connect getChildren:', message)
       }
       // notify(message)
-      Object.assign(this.opt, { client, version, os, redisInfo })
+      Object.assign(this.opt, { client, redisVersion: version, os, redisInfo })
       // return this.setting.refresh() // 改变 icon 状态
     }
     let dbs = await getDbs(this.opt.client)
