@@ -91,7 +91,8 @@ class ShowMoreItem extends TreeDataItem {
     }
   }
 
-  static init(opt = {}) {
+  static init({ id, ...opt }) {
+    opt.id = `${id}.more`
     opt.contextValue = NodeType.SCANMORE
     opt.label = 'Show more ...'
     opt.tooltip = `ID more...`
