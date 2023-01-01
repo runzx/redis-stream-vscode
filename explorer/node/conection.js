@@ -41,10 +41,18 @@ class ConnectionNode extends TreeDataItem {
 
   async getChildren() {
     if (!this.opt.client) {
-      const { message, client, version, os } = await connectRedis(this.opt)
-      if (message) return log.error('connect getChildren:', message)
+      const { code, message, client, version, os, redisInfo } = await connectRedis(this.opt).catch(err => {
+        let { code, message, } = err
+        if (code === 'EADDRNOTAVAIL') message = '密码不正确，请检查'
+        else if (code === 'ECONNREFUSED') message = `redis 拒绝，请检查 host:${this.opt.host},port:${this.opt.port}`
+        showMsg(`${code || ''} >> ${message}`, 'error')
+        return { code, message, }
+      })
+      if (message || code) {
+        return log.error('connect getChildren:', message)
+      }
       // notify(message)
-      Object.assign(this.opt, { client, version, os })
+      Object.assign(this.opt, { client, version, os, redisInfo })
       // return this.setting.refresh() // 改变 icon 状态
     }
     let dbs = await getDbs(this.opt.client)

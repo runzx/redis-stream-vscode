@@ -3,11 +3,13 @@
 const { window } = require('vscode')
 // const { RedisModel } = require('../command/redis')
 const { Constant, redisOpt } = require('../config')
-const { VirtualDoc } = require('../editor')
+// const { VirtualDoc } = require('../editor')
 const { TreeExplorer, TreeDataProvider, } = require('./explorer')
 const { ConnectionNode } = require('./node/conection')
 const { createLogger } = require('../lib/logging')
 const Terminal = require('../terminal')
+const { RedisModel } = require('../command/redis')
+const { initVdoc, cacheSetVdoc } = require('../editor/v-doc')
 
 const log = createLogger('register redis')
 
@@ -49,7 +51,8 @@ class RedisTree extends TreeExplorer {
   constructor(context) {
     super(context)
     this.docStatus = {}
-    this.doc = VirtualDoc.init({ context })
+    this.doc = initVdoc({ context })
+    // this.doc = VirtualDoc.init({ context })
     this.init()
   }
   init() {
@@ -99,42 +102,18 @@ class RedisTree extends TreeExplorer {
     this.register('redis-stream.connection.refresh', (opt) => {
       // log('refresh command: ', opt)
       console.log('connection.refresh', opt)
-      let value = this.cacheGet('redisOpt', "127.0.0.1:6379")
-      let [host = '', port = '', password = ''] = value.split(':')
-      value = host + ':' + port + ':' + '***'
-      window.showInputBox(
-        { // 这个对象中所有参数都是可选参数
-          password: false,
-          ignoreFocusOut: true, // 默认false，设置为true时鼠标点击别的地方输入框不会消失
-          placeHolder: '如要改变请输入新参数.',
-          prompt: 'fmt: "127.0.0.1:6379:password"   ',
-          value,
-          validateInput: function (text) {
-            // 对输入内容进行验证，返回 null 通过验证
-            if (!text || !text.trim()) return null
-            text = text.trim()
-            let [host1 = '', port1 = '', password1 = ''] = text.split(':')
-            if (!host1 && !port1 && !password1) return 'host/port/password cant empty only one,至少要有一个参数不为空'
-            if (host1 && /[^\w\d-.]/.test(host1.trim())) return host1 + ' 格式不符合，请重输'
-            if (port1 && /[^\d]/.test(port1.trim())) return port + ' 格式不符合，请重输'
-            return null
-          }
-        }).then((msg = '') => {
-          if (!msg) return
-          let [host1 = '', port1 = '', password1 = ''] = msg.split(':')
-          if (password1 === '***') {
-            msg = host1 + ':' + port1 + ':' + password
-          }
-          this.cacheSet('redisOpt', msg)
-          this.refresh()
-        })
+      RedisModel.closeAll(opt.name)
+      opt.opt.client.disconnect()
+      opt.opt.client = null
+      this.refresh()
     })
 
     this.register('redis-stream.connection.status', async (opt,) => {
       // log('connection', opt)
-      const id = 'redisServerInfo'
-      const { txt } = await opt.redisModel.redisBase.serverInfo()
-      this.doDoc({ id, txt })
+      this.doDoc({
+        id: `${opt.id}..text.redisServerInfo`,
+        item: opt.opt.redisInfo, extension: '.txt'
+      })
     })
 
     const terminal = new Terminal(context)
@@ -203,9 +182,9 @@ class RedisTree extends TreeExplorer {
 
   }
 
-  doDoc({ id, txt }) {
-    VirtualDoc.setCacheDoc(id, txt)
-    this.doc.showDoc(id)
+  doDoc({ id, item, extension }) {
+    cacheSetVdoc(id, item)
+    this.doc.showDoc(id, extension)
 
     if (this.docStatus[id]) {
       this.doc.update(id)

@@ -9,6 +9,8 @@ const { VIEW_DB_KEY_SCHEME, VIEW_STREM_ID_SCHEME, VIEW_STREM_KEY_SCHEME } = sche
 const { createLogger } = require('../lib/logging')
 
 const log = createLogger('doc:key')
+const content = new Map() // cache doc
+
 
 class DocProvider {
   constructor() {
@@ -21,19 +23,22 @@ class DocProvider {
     let [name, db, type, key, extension] = path.split('.')
     let result = ''
     switch (type) {
-      case 'stream':
-      case 'search':
-        result = await RedisModel.getRedisModel(`${name}:${db}`).getKey(key)
-        result = this.fmt(result, key)
+      case 'text':
+        result = content.get([name, db, type, key].join('.')) || '没有连接上 redis 服务'
         break;
-      case VIEW_STREM_ID_SCHEME:
+
+      case VIEW_STREM_ID_SCHEME:  // stream-id
         // let [connection, db, type, key,] = path.split('$')
         let [, id] = path.match(/\$(\d+-?\d*)\.json/) || []
         result = await RedisModel.getRedisModel(`${name}:${db}`).getInfoById(id, key)
         result = this.fmt(result, id)
         break;
-      default:
-        result = this.opt.text
+
+      case 'stream':
+      case 'search':
+      default:   // string, set, ...
+        result = await RedisModel.getRedisModel(`${name}:${db}`).getKey(key)
+        result = this.fmt(result, key)
         break;
     }
     return result
@@ -65,17 +70,17 @@ class DocView {
       .registerTextDocumentContentProvider(VIEW_DB_KEY_SCHEME, this.provider))
   }
 
-  showDoc(id) {
+  showDoc(id, extension) {
     return vscode.window
-      .showTextDocument(this._getUri(id), { preview: false })
+      .showTextDocument(this._getUri(id, extension), { preview: false })
   }
 
   update(id) {
     this.provider.refresh(this._getUri(id))
   }
 
-  _getUri(id) {
-    return vscode.Uri.parse(`${VIEW_DB_KEY_SCHEME}:${id}.json`)
+  _getUri(id, extension = '.json') {
+    return vscode.Uri.parse(`${VIEW_DB_KEY_SCHEME}:${id}${extension}`)
   }
 
 
@@ -83,13 +88,12 @@ class DocView {
 }
 
 exports.VirtualDocView = DocView
-
+let docView
 exports.initVdoc = (opt) => {
-
-  return new DocView(opt)
+  if (!docView) docView = new DocView(opt)
+  return docView
 }
 
-exports.showVdoc = (opt) => {
-
-  return new DocView(opt).showDoc(opt.id)
+exports.cacheSetVdoc = (key, value) => {
+  return content.set(key, value)
 }

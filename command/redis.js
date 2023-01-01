@@ -3,6 +3,7 @@ const { RedisBase, RedisStream } = require('../lib/redis-mq')
 const { RedisType, redisOpt, SHOW_MORE_COUNT } = require('../config')
 const IORedis = require('ioredis')
 const { createLogger } = require('../lib/logging')
+const { Deferred } = require('../lib/util')
 
 const log = createLogger('redis init')
 const redisList = new Map() // redisModel 
@@ -12,6 +13,7 @@ class RedisModel {
   static activeClient = {}
   redisBase
   constructor({ client, db = 0, ...opt } = {}) {
+    this.opt = opt
     this.db = db
     this.client = client
     this.redisBase = new RedisBase({ client, db })
@@ -163,7 +165,16 @@ class RedisModel {
     this.searchResult.push({ key, type })
     return { key, type }
   }
-
+  // 清除 name connect 的所有 连接和redisModel
+  static closeAll(name) {
+    redisList.forEach((value, key) => {
+      if (key.startsWith(name + ':')) {
+        value.client.disconnect()
+        redisList.delete(key)
+      }
+    })
+    // return this.client.disconnect()
+  }
   static reloadRedis(opt) {
     this.delClient(opt)
     opt.client = this.getClient(opt)
@@ -233,21 +244,29 @@ module.exports = exports = {
   RedisModel
 }
 
-exports.connectRedis = async function (setting) {
+exports.connectRedis = function (setting) {
   let msg = setting?.uri && setting.uri?.startsWith('redis://') ? setting.uri : null
-  try {
-    const client = new IORedis(msg ? msg : setting)
-    let info = await client.info()
+  const { resolve, reject, promise } = new Deferred()
+  const client = new IORedis(msg ? msg : setting)
+  client.on('error', err => {
+    console.error(`${setting.name} redis connect error: (${err.code}) ${err.message}`)
+    reject(err)
+    if (err.code === 'ECONNREFUSED' || err.code === 'EADDRNOTAVAIL') client.disconnect()
+  })
+  client.on('connect', connect => {
+    console.log('redis connect:', setting.name)
+  })
+  client.info((err, info) => {
+    if (err) return console.error(`${setting.name} redis info error: ${err.message}`)
     console.log('  redis --> %s', msg || `${setting.host}:${setting.port}`)
     let ver = info.match(/redis_version:(\d+\.\d+\.\d+)/)
     let os = info.match(/^os:(.*)$/m)
     console.log(`  redis V${ver[1]}, host: ${setting.host} (${os[1]})`)
-    return { client, version: ver[1], os: os[1] }
-  } catch (err) {
-    return err
-    // { message: err.message }
-  }
+    resolve({ client, version: ver[1], os: os[1], redisInfo: info })
+  })
 
+
+  return promise
 }
 
 exports.getDbs = async function (client) {
