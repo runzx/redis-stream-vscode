@@ -30,6 +30,10 @@ class ShowMoreKeysTreeItem extends TreeDataItem {
     opt.tooltip = `SCAN more...`
     return new ShowMoreKeysTreeItem(opt)
   }
+
+  getChildren(element) {
+    return null
+  }
 }
 
 class SearchKeysTreeItem extends TreeDataItem {
