@@ -116,8 +116,6 @@ class TreeDataItem extends TreeItem {
     this.consumer = opt.consumer
     this.pending = opt.pending
     this.id = opt.id || this.getId(opt)
-    // console.log(this.id)
-    // this.context = opt.context
     this.redisModel = opt.redisModel
   }
 

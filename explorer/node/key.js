@@ -3,7 +3,6 @@ const { TreeDataItem } = require("../explorer")
 const { ThemeIcon, TreeItemCollapsibleState } = require("vscode")
 const { StreamGroup } = require("./group")
 const { IDTreeItem } = require("./id")
-const { dateYMD } = require("../../lib/util")
 
 class KeyTreeItem extends TreeDataItem {
   streamIdCount = {}
@@ -21,7 +20,6 @@ class KeyTreeItem extends TreeDataItem {
   static init({ id, ...opt }) {
     opt.id = `${id}.${opt.label}`
     opt.contextValue = NodeType.KEY
-    // opt.scheme = `${opt.redisDataType}-${opt.contextValue}`
     opt.collapsibleState = opt.redisDataType === 'stream' ? TreeItemCollapsibleState.Collapsed
       : TreeItemCollapsibleState.None
     return new KeyTreeItem(opt)
@@ -39,15 +37,10 @@ class KeyTreeItem extends TreeDataItem {
     const { redisModel } = this.opt
     const streamInfo = await redisModel.getStreamInfo(this.label)
     if (!streamInfo) return []
-    this.tooltip = `id(${streamInfo.length})`
-    // const data = {
-    //   db, connection, redisModel, redisDataType,
-    //   stream: this.label,
-    //   collapsibleState: TreeItemCollapsibleState.None
-    // }
-    // this.streamInfo = streamInfo
+    // this.tooltip = `id(${streamInfo.length})`
     const { groups, entries = [] } = streamInfo
     this.opt.stream = this.label
+
     let g = groups.map(i => {
       const collapsibleState = (i.pending.length > 0 || i.consumers.length > 0)
         ? TreeItemCollapsibleState.Collapsed
@@ -60,6 +53,7 @@ class KeyTreeItem extends TreeDataItem {
         collapsibleState
       })
     })
+
     const ids = entries.map(i => {
       return IDTreeItem.init({
         ...this.opt,
@@ -70,6 +64,7 @@ class KeyTreeItem extends TreeDataItem {
         tooltip: this.id2date(i.id)
       })
     })
+
     let moreItem = null
     const sLen = streamInfo.length - ids.length
     if (sLen !== 0) moreItem = ShowMoreItem.init({

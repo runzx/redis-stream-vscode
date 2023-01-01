@@ -21,11 +21,7 @@ class StreamConsumer extends TreeDataItem {
   }
 
   async getChildren() {
-    // const { db, connection, redisModel, redisDataType,
-    //   stream, group } = this
     const data = {
-      // db, connection, redisModel,
-      // redisDataType, stream, group,
       ...this.opt,
       item: this.item.pending,
       consumer: this.label,
@@ -33,22 +29,15 @@ class StreamConsumer extends TreeDataItem {
       tooltip: 'length: ' + this.item.pending.length,
       collapsibleState: TreeItemCollapsibleState.Collapsed
     }
-    // const { pending } = this.item
-    // data.item = pending
-    // data.label = 'pending'
-    // data.tooltip = 'length: ' + pending.length
     return [StreamPending.init(data)]
   }
 
   async getTreeItem(parent) {
-    let { host, port, password, db, refreshCallBack, stream, group } = this
-    // if (!this.redisModel) {
-    //   this.redisModel = RedisModel.init({ host, port, password, db })
-    // }
+    let { refreshCallBack, stream, group } = this
     const [item] = (await this.redisModel.getConsumersInfo(group, stream)).filter(i => i.name === this.label)
     this.item = item
     this.tooltip = `pel-count: ${item['pel-count']}`,
-    refreshCallBack && refreshCallBack(item)
+      refreshCallBack && refreshCallBack(item)
     return this
   }
 }

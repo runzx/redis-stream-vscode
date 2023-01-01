@@ -57,7 +57,6 @@ class RedisModel {
       await this.client.select(dbIndex)
       this.config.dbIndex = dbIndex
     }
-
   }
 
   async getKey(key, count = 10) {
@@ -75,14 +74,14 @@ class RedisModel {
         break
       case RedisType.list:
         content = await this.client.lrange
-        (key, 0, await this.client.llen(key))
+          (key, 0, await this.client.llen(key))
         break
       case RedisType.set:
         content = await this.client.smembers(key)
         break
       case RedisType.zset:
         content = await this.client.zrange
-        (key, 0, await this.client.zcard(key))
+          (key, 0, await this.client.zcard(key))
         break
       case RedisType.stream:
         const stream = new RedisStream({ ...this.opt, client: this.client, stream: key })
@@ -186,7 +185,6 @@ class RedisModel {
         redisList.delete(key)
       }
     })
-    // return this.client.disconnect()
   }
 
   static reloadRedis(opt) {
@@ -263,7 +261,7 @@ module.exports = exports = {
   RedisModel
 }
 
-exports.connectRedis = function(setting) {
+exports.connectRedis = function (setting) {
   let msg = setting?.uri && setting.uri?.startsWith('redis://') ? setting.uri : null
   const { resolve, reject, promise } = new Deferred()
   const client = new IORedis(msg ? msg : setting)
@@ -288,7 +286,7 @@ exports.connectRedis = function(setting) {
   return promise
 }
 
-exports.getDbs = async function(client) {
+exports.getDbs = async function (client) {
   let txt = await client.info('Keyspace')
   // console.log(txt)
   let res = txt.match(/db\d+:keys=\d+/g) || []
@@ -299,9 +297,4 @@ exports.getDbs = async function(client) {
     // return { db: +db[1], keys: +db[2] }
   }, {})
   return dbs
-  // let res = txt.match(/db\d+:keys=\d+/g) || []
-  // return res.map(i => {
-  //   let db = i.match(/db(\d+).+?(\d+)/)
-  //   return { db: +db[1], keys: +db[2] }
-  // })
 }

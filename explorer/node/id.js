@@ -1,6 +1,5 @@
 const { NodeType, RedisType } = require("../../config")
 const { TreeDataItem } = require("../explorer")
-const { redisModel } = require("../../command/redis")
 
 class IDTreeItem extends TreeDataItem {
   constructor(opt = {}) {

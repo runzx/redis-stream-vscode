@@ -26,7 +26,6 @@ class RedisTreeDataProvider extends TreeDataProvider {
   }
 
   _getTreeItem(element) {
-    // if (element.getTreeItem) return element.getTreeItem(this)
     return element
   }
 
@@ -49,7 +48,6 @@ class RedisTree extends TreeExplorer {
     super(context)
     this.docStatus = {}
     this.doc = initVdoc({ context })
-    // this.doc = VirtualDoc.init({ context })
     this.init()
   }
 
@@ -67,7 +65,7 @@ class RedisTree extends TreeExplorer {
           placeHolder: '请输入新连接参数.',
           prompt: 'fmt: "name:host:port:password"   ',
           value,
-          validateInput: function(text) {
+          validateInput: function (text) {
             // 对输入内容进行验证，返回 null 通过验证
             text = text.trim()
             if (!text) return null
@@ -80,26 +78,25 @@ class RedisTree extends TreeExplorer {
             return null
           }
         }).then((msg = '') => {
-        let [name = '', host = '127.0.0.1', port = '6379', password] = msg.split(':')
-        name = name.trim()
-        host = host.trim()
-        port = +port.trim()
-        password && (password = password.trim())
-        name || (name = host)
-        let conf = this.cacheGet(Constant.GLOBALSTATE_CONFIG_KEY)
-        if (conf?.length > 0) {
-          let item = conf.find(i => i.name === name)
-          if (item) Object.assign(item, { host, port, password })
-          else conf.push({ host, port, password, name })
-        } else conf = [{ host, port, password, name }]
-        this.cacheSet(Constant.GLOBALSTATE_CONFIG_KEY, conf)
-        this.refresh()
-      })
+          let [name = '', host = '127.0.0.1', port = '6379', password] = msg.split(':')
+          name = name.trim()
+          host = host.trim()
+          port = +port.trim()
+          password && (password = password.trim())
+          name || (name = host)
+          let conf = this.cacheGet(Constant.GLOBALSTATE_CONFIG_KEY)
+          if (conf?.length > 0) {
+            let item = conf.find(i => i.name === name)
+            if (item) Object.assign(item, { host, port, password })
+            else conf.push({ host, port, password, name })
+          } else conf = [{ host, port, password, name }]
+          this.cacheSet(Constant.GLOBALSTATE_CONFIG_KEY, conf)
+          this.refresh()
+        })
     })
 
     this.register('redis-stream.connection.refresh', (opt) => {
-      // log('refresh command: ', opt)
-      console.log('connection.refresh', opt)
+      // console.log('connection.refresh', opt)
       RedisModel.closeAll(opt.name)
       opt.opt.client.disconnect()
       opt.opt.client = null
@@ -107,7 +104,6 @@ class RedisTree extends TreeExplorer {
     })
 
     this.register('redis-stream.connection.status', async (opt,) => {
-      // log('connection', opt)
       this.doDoc({
         id: `${opt.id}..text.redisServerInfo`,
         item: opt.opt.redisInfo, extension: '.txt'
@@ -121,30 +117,20 @@ class RedisTree extends TreeExplorer {
     })
 
     this.register('redis-stream.db.status', () => {
-      // log('db', opt)
 
     })
 
     this.register('redis-stream.db.scan', async (opt,) => {
-      // const { label, id, } = opt
-      // log('SCAN', opt)
       this.refresh(opt)
     })
 
     this.register('redis-stream.db.refresh', async (opt,) => {
-      // const { host, port, db } = opt
-      // RedisModel.delClient({ host, port, db })
-      // opt.redisModel = null
       log.info('db refresh', opt)
       this.refresh(opt)
     })
 
     this.register('redis-stream.db.search', async (opt,) => {
       let { redisModel } = opt
-      // if (!redisModel) {
-      //   const { host, port, db, password } = opt
-      //   opt.redisModel = redisModel = RedisModel.init({ host, port, db, password })
-      // }
       window.showInputBox(
         {
           password: false,
@@ -153,28 +139,21 @@ class RedisTree extends TreeExplorer {
           prompt: '"Enter"确认/"ESC"取消   ',
           // value,
         }).then(async (msg) => {
-        // log('SEARCH:', msg)
-        if (!msg) return
-        await redisModel.searchKey(msg)
-        this.refresh(opt)
-      })
+          if (!msg) return
+          await redisModel.searchKey(msg)
+          this.refresh(opt)
+        })
     })
 
     this.register('redis-stream.stream.showMore', async (opt,) => {
-      // const { label, id, } = opt
-      // log('ID MORE', opt)
       this.refresh(opt)
     })
 
     this.register('redis-stream.group.status', async (opt,) => {
-      // const { label, id, } = opt
-      // log('GROUP', label, id)
       this.doDoc(opt)
     })
 
     this.register('redis-stream.consumer.status', async (opt,) => {
-      // const { label, id, } = opt
-      // log('CONSUMER', label, id)
       this.doDoc(opt)
     })
 

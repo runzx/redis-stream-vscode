@@ -1,6 +1,5 @@
 const { NodeType, RedisType } = require("../../config")
 const { TreeDataItem } = require("../explorer")
-const { TreeItemCollapsibleState } = require("vscode")
 const { IDTreeItem } = require("./id")
 const { timeFmt } = require("../../lib/util")
 

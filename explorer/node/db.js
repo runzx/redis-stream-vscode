@@ -35,7 +35,6 @@ class ShowMoreKeysTreeItem extends TreeDataItem {
 class SearchKeysTreeItem extends TreeDataItem {
   constructor(opt = {}) {
     super(opt)
-    // this.isShowMoreItem = true
   }
 
   static init({ id, ...opt }) {
@@ -65,8 +64,6 @@ class SearchKeysTreeItem extends TreeDataItem {
 class DbTreeItem extends TreeDataItem {
   constructor(opt = {}) {
     super(opt)
-    // this.opt = opt
-    // this.context = opt.context
   }
 
   static init({ id, ...opt }) {
@@ -75,36 +72,22 @@ class DbTreeItem extends TreeDataItem {
     opt.contextValue = NodeType.DB
     opt.description = `(${opt.keys})`
     opt.redisModel = RedisModel.init(opt)
-
-    // tooltip: `expires:${expires},avg_ttl:${avg_ttl}`,
     opt.collapsibleState = opt.keys !== 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
     return new DbTreeItem(opt)
   }
 
   async getTreeItem(element) {
-    // let { host, port, password, db, redisModel, label, } = this
-    // if (!this.redisModel) {
-    //   this.redisModel = RedisModel.init({ host, port, password, db })
-    // }
-    // let dbsInfo = await this.redisModel.dbInfo()
-    // const keys = dbsInfo[label]
-    // this.description = `(${keys})`
     return element
   }
 
   async getChildren() {
     let { redisModel, } = this.opt
-    // const redisModel = RedisModel.init(this.opt)
-    // const vDocView = initVdoc(this.opt)
     const [keysCategory, scanMore] = await redisModel.scanKeys()
-    // log('DB', db, keysCategory, scanMore)
     const [keysLen] = this.opt.description.match(/\d+/) || []
 
     const categroys = Object.keys(keysCategory).map(label => {
-
       return RedisDateTypes.init({
         ...this.opt, label,
-
         redisDataType: label,
         item: keysCategory[label],
         description: `(${keysCategory[label].length})`,

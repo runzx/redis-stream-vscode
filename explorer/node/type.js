@@ -1,18 +1,15 @@
 const { NodeType, RedisType } = require("../../config")
 const { TreeDataItem } = require("../explorer")
-const { TreeItemCollapsibleState } = require("vscode")
 const { KeyTreeItem } = require("./key")
 
 
 class RedisDateTypes extends TreeDataItem {
   constructor(opt = {}) {
     super(opt)
-
   }
 
   static init({ id, ...opt }) {
     opt.id = `${id}.${opt.label}`
-    // opt.label = `db${opt.db}`
     opt.contextValue = NodeType.REDISDATATYPE
     return new RedisDateTypes(opt)
   }
