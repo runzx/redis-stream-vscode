@@ -35,34 +35,40 @@ class KeyTreeItem extends TreeDataItem {
     const streamInfo = await redisModel.getStreamInfo(this.label)
     if (!streamInfo) return []
     this.tooltip = `id(${streamInfo.length})`
-    const data = {
-      db, connection, redisModel, redisDataType,
-      stream: this.label,
-      collapsibleState: TreeItemCollapsibleState.None
-    }
+    // const data = {
+    //   db, connection, redisModel, redisDataType,
+    //   stream: this.label,
+    //   collapsibleState: TreeItemCollapsibleState.None
+    // }
     this.streamInfo = streamInfo
     const { groups, entries = [] } = streamInfo
+    this.opt.stream = this.label
     let g = groups.map(i => {
       const collapsibleState = (i.pending.length > 0 || i.consumers.length > 0)
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None
 
       return StreamGroup.init({
-        ...data, item: i, label: i.name,
+        ...this.opt,
+        item: i, label: i.name,
         tooltip: `pel-count: ${i['pel-count']}`,
         collapsibleState
       })
     })
     const ids = entries.map(i => {
       return IDTreeItem.init({
-        ...data, item: i.item, label: i.id,
+        ...this.opt,
+        item: i.item,
+        description: '',
+        label: i.id,
+        collapsibleState: TreeItemCollapsibleState.None,
         tooltip: this.id2date(i.id)
       })
     })
     let moreItem = null
     const sLen = streamInfo.length - ids.length
     if (sLen !== 0) moreItem = ShowMoreItem.init({
-      ...data,
+      ...this.opt,
       refreshParent: this,
       description: `(${sLen})`,
     })

@@ -12,7 +12,8 @@ class IDTreeItem extends TreeDataItem {
       command: 'redis-stream.id.status'
     }
   }
-  static init(opt = {}) {
+  static init({ id, ...opt }) {
+    opt.id = `${id.replace('.stream.', '.s-id.')}.${opt.label}`
     opt.contextValue = NodeType.ID
     return new IDTreeItem(opt)
   }

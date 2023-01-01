@@ -13,28 +13,29 @@ class StreamConsumer extends TreeDataItem {
       command: 'redis-stream.consumer.status'
     }
   }
-  static init(opt = {}) {
+  static init({ id, ...opt }) {
+    opt.id = `${id.replace('.stream.', '.s-consumer.')}.${opt.label}`
     opt.contextValue = NodeType.CONSUMER
     return new StreamConsumer(opt)
   }
   async getChildren() {
-    const { db, connection, redisModel, redisDataType,
-      stream, group } = this
+    // const { db, connection, redisModel, redisDataType,
+    //   stream, group } = this
     const data = {
-      db, connection, redisModel,
-      redisDataType, stream, group,
-
+      // db, connection, redisModel,
+      // redisDataType, stream, group,
+      ...this.opt,
+      item: this.item.pending,
       consumer: this.label,
+      label: 'pending',
+      tooltip: 'length: ' + this.item.pending.length,
       collapsibleState: TreeItemCollapsibleState.Collapsed
     }
-
-    const { pending } = this.item
-    data.item = pending
-    data.label = 'pending'
-
-    data.tooltip = 'length: ' + pending.length
+    // const { pending } = this.item
+    // data.item = pending
+    // data.label = 'pending'
+    // data.tooltip = 'length: ' + pending.length
     return [StreamPending.init(data)]
-
   }
 
   async getTreeItem(parent) {

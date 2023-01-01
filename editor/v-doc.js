@@ -20,6 +20,7 @@ class DocProvider {
   async provideTextDocumentContent(uri) {
     const { path, scheme } = uri
     log.info('uri', scheme, path)
+    // 'pve.db4.s-id.siteNotice.1671810120023-0.json'
     let [name, db, type, key, extension] = path.split('.')
     let result = ''
     switch (type) {
@@ -27,11 +28,19 @@ class DocProvider {
         result = content.get([name, db, type, key].join('.')) || '没有连接上 redis 服务'
         break;
 
-      case VIEW_STREM_ID_SCHEME:  // stream-id
+      case 's-id':  // stream-id
         // let [connection, db, type, key,] = path.split('$')
-        let [, id] = path.match(/\$(\d+-?\d*)\.json/) || []
-        result = await RedisModel.getRedisModel(`${name}:${db}`).getInfoById(id, key)
-        result = this.fmt(result, id)
+        // let [, id] = path.match(/\$(\d+-?\d*)\.json/) || []
+        result = await RedisModel.getRedisModel(`${name}:${db}`).getInfoById(extension, key)
+        result = this.fmt(result, extension)
+        break;
+
+      case 's-group':
+      case 's-consumer':
+      case 's-pending':
+        result = content.get([name, db, type, key].join('.')) || '没有连接上 redis 服务'
+
+        result = this.fmt(result, 'streamK')
         break;
 
       case 'stream':

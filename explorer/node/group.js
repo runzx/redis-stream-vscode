@@ -14,7 +14,8 @@ class StreamGroup extends TreeDataItem {
       command: 'redis-stream.group.status'
     }
   }
-  static init(opt = {}) {
+  static init({ id, ...opt }) {
+    opt.id = `${id.replace('.stream.', '.s-group.')}.${opt.label}`
     opt.contextValue = NodeType.GORUP
     return new StreamGroup(opt)
   }
@@ -22,15 +23,15 @@ class StreamGroup extends TreeDataItem {
   async getChildren() {
     const { db, connection, redisModel,
       redisDataType, stream } = this
-    const data = {
-      db, connection, redisModel, redisDataType, stream,
-      group: this.label,
-      collapsibleState: TreeItemCollapsibleState.None
-    }
+    // const data = {
+    //   db, connection, redisModel, redisDataType, stream,
+    //   group: this.label,
+    //   collapsibleState: TreeItemCollapsibleState.None
+    // }
     const { pending, consumers } = this.item
     const c = consumers.map(i => {
       return StreamConsumer.init({
-        ...data,
+        ...this.opt,
         item: i,
         label: i.name,
         tooltip: `pel-count: ${i['pel-count']}`,
@@ -41,7 +42,7 @@ class StreamGroup extends TreeDataItem {
     })
 
     return [...c, StreamPending.init({
-      ...data,
+      ...this.opt,
       item: pending,
       label: 'pending',
       tooltip: 'length: ' + this.item['pel-count'],
