@@ -7,6 +7,7 @@ const { dateYMD } = require("../../lib/util")
 
 class KeyTreeItem extends TreeDataItem {
   streamIdCount = {}
+
   constructor(opt = {}) {
     super(opt)
     this.command = {
@@ -16,6 +17,7 @@ class KeyTreeItem extends TreeDataItem {
       command: 'redis-stream.key.status'
     }
   }
+
   static init({ id, ...opt }) {
     opt.id = `${id}.${opt.label}`
     opt.contextValue = NodeType.KEY
@@ -24,6 +26,7 @@ class KeyTreeItem extends TreeDataItem {
       : TreeItemCollapsibleState.None
     return new KeyTreeItem(opt)
   }
+
   async getChildren() {
     if (this.redisDataType === RedisType.stream
       || this.type === RedisType.stream) {

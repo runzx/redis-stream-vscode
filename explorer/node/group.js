@@ -14,6 +14,7 @@ class StreamGroup extends TreeDataItem {
       command: 'redis-stream.group.status'
     }
   }
+
   static init({ id, ...opt }) {
     opt.id = `${id.replace('.stream.', '.s-group.')}.${opt.label}`
     opt.contextValue = NodeType.GORUP
@@ -21,8 +22,10 @@ class StreamGroup extends TreeDataItem {
   }
 
   async getChildren() {
-    const { db, connection, redisModel,
-      redisDataType, stream } = this
+    const {
+      db, connection, redisModel,
+      redisDataType, stream
+    } = this
     // const data = {
     //   db, connection, redisModel, redisDataType, stream,
     //   group: this.label,

@@ -1,4 +1,3 @@
-
 const vscode = require('vscode')
 const { registerCommand } = vscode.commands
 // const showStatusBar = require('../lib/status-view')

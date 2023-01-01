@@ -1,5 +1,5 @@
 /**
- * 显示 普通 key, stream key, text 内容 
+ * 显示 普通 key, stream key, text 内容
  * 翟享20221231
  */
 const vscode = require("vscode")
@@ -17,6 +17,7 @@ class DocProvider {
     this._onDidChange = new vscode.EventEmitter()
     this.onDidChange = this._onDidChange.event
   }
+
   async provideTextDocumentContent(uri) {
     const { path, scheme } = uri
     log.info('uri', scheme, path)
@@ -56,9 +57,11 @@ class DocProvider {
     }
     return result
   }
+
   refresh(uri) {
     this._onDidChange.fire(uri)
   }
+
   fmt(msg, key) {
     if (!msg) return 'no key!'
     if (typeof msg === 'string') {
@@ -67,7 +70,8 @@ class DocProvider {
       } catch (err) {
         msg = { [key]: msg }
       }
-    } else { }
+    } else {
+    }
     return JSON.stringify(msg, null, 2)
   }
 }
@@ -77,6 +81,7 @@ class DocView {
     this.opt = opt
     this._initProvider(opt)
   }
+
   _initProvider(opt) {
     this.provider = opt.provider ? opt.provider : new DocProvider()
     opt.context.subscriptions.push(vscode.workspace
@@ -97,7 +102,8 @@ class DocView {
   }
 
 
-  dispose() { }
+  dispose() {
+  }
 }
 
 exports.VirtualDocView = DocView

@@ -8,6 +8,7 @@ class StreamPending extends TreeDataItem {
   constructor(opt = {}) {
     super(opt)
   }
+
   static init({ id, ...opt }) {
     opt.id = `${id.replace('.s-group.', '.s-panding.')}.${opt.label}`
     opt.contextValue = NodeType.PENDING
@@ -15,8 +16,10 @@ class StreamPending extends TreeDataItem {
   }
 
   async getChildren() {
-    const { db, connection, redisModel, redisDataType,
-      stream, group, consumer } = this
+    const {
+      db, connection, redisModel, redisDataType,
+      stream, group, consumer
+    } = this
     const data = {
       db, connection, redisModel,
       redisDataType, stream, group, consumer,

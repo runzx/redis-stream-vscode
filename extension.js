@@ -25,4 +25,5 @@ exports.activate = (context) => {
   console.log('start redis-stream.')
 }
 
-exports.deactivate = () => { }
+exports.deactivate = () => {
+}

@@ -7,6 +7,7 @@ const { showMsg } = require("../../lib/show-message")
 const { createLogger } = require('../../lib/logging')
 
 const log = createLogger('connection')
+
 class ConnectionNode extends TreeDataItem {
   constructor(opt = {}) {
     super(opt)
@@ -17,6 +18,7 @@ class ConnectionNode extends TreeDataItem {
     // this.password = opt.password
     // this.dbs = opt.dbs
   }
+
   static init(opt, ctx) {
     // const [name, opt] = kv
     const { host, port, password } = opt

@@ -9,12 +9,14 @@ class RedisDateTypes extends TreeDataItem {
     super(opt)
 
   }
+
   static init({ id, ...opt }) {
     opt.id = `${id}.${opt.label}`
     // opt.label = `db${opt.db}`
     opt.contextValue = NodeType.REDISDATATYPE
     return new RedisDateTypes(opt)
   }
+
   async getChildren() {
     let data = []
     for (const label of this.item) {
@@ -22,7 +24,7 @@ class RedisDateTypes extends TreeDataItem {
       if (this.opt.label === 'stream') {
         streamInfo = await this.opt.redisModel.getStreamInfo(label)
         description = `(${streamInfo.length})`
-        tooltip = `updateAt ${this.id2date(streamInfo['last-generated-id'],'yyyy-MM-dd hh:mm:ss')}`
+        tooltip = `updateAt ${this.id2date(streamInfo['last-generated-id'], 'yyyy-MM-dd hh:mm:ss')}`
       }
       data.push({ ...this.opt, label, description, streamInfo, tooltip })
     }

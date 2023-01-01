@@ -13,11 +13,13 @@ class StreamConsumer extends TreeDataItem {
       command: 'redis-stream.consumer.status'
     }
   }
+
   static init({ id, ...opt }) {
     opt.id = `${id.replace('.s-group.', '.s-consumer.')}.${opt.label}`
     opt.contextValue = NodeType.CONSUMER
     return new StreamConsumer(opt)
   }
+
   async getChildren() {
     // const { db, connection, redisModel, redisDataType,
     //   stream, group } = this
@@ -46,7 +48,7 @@ class StreamConsumer extends TreeDataItem {
     const [item] = (await this.redisModel.getConsumersInfo(group, stream)).filter(i => i.name === this.label)
     this.item = item
     this.tooltip = `pel-count: ${item['pel-count']}`,
-      refreshCallBack && refreshCallBack(item)
+    refreshCallBack && refreshCallBack(item)
     return this
   }
 }

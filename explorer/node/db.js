@@ -46,6 +46,7 @@ class SearchKeysTreeItem extends TreeDataItem {
     opt.collapsibleState = TreeItemCollapsibleState.Expanded
     return new SearchKeysTreeItem(opt)
   }
+
   async getChildren() {
     const { db, connection, redisModel, } = this
     const redisDataType = RedisType.searchKey
@@ -67,6 +68,7 @@ class DbTreeItem extends TreeDataItem {
     // this.opt = opt
     // this.context = opt.context
   }
+
   static init({ id, ...opt }) {
     opt.id = `${id}.db${opt.db}`
     opt.label = `db${opt.db}`
@@ -78,6 +80,7 @@ class DbTreeItem extends TreeDataItem {
     opt.collapsibleState = opt.keys !== 0 ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
     return new DbTreeItem(opt)
   }
+
   async getTreeItem(element) {
     // let { host, port, password, db, redisModel, label, } = this
     // if (!this.redisModel) {
@@ -88,6 +91,7 @@ class DbTreeItem extends TreeDataItem {
     // this.description = `(${keys})`
     return element
   }
+
   async getChildren() {
     let { redisModel, } = this.opt
     // const redisModel = RedisModel.init(this.opt)

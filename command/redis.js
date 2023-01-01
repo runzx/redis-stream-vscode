@@ -1,4 +1,3 @@
-
 const { RedisBase, RedisStream } = require('../lib/redis-mq')
 const { RedisType, redisOpt, SHOW_MORE_COUNT } = require('../config')
 const IORedis = require('ioredis')
@@ -12,6 +11,7 @@ const redisList = new Map() // redisModel
 class RedisModel {
   static activeClient = {}
   redisBase
+
   constructor({ client, db = 0, ...opt } = {}) {
     this.opt = opt
     this.db = db
@@ -25,11 +25,13 @@ class RedisModel {
     this.streamIDs = {} // show more start
     this.watch(opt)
   }
+
   watch(opt) {
     this.client.on('error', err => {
       log.error('Connect err:', err, opt)
     })
   }
+
   async scanKeys(cursor = this.cursor, count = 20, scanMore = this.scanMore) {
     if (scanMore === '0') return [this.categoryList, this.keysLen]
 
@@ -45,9 +47,11 @@ class RedisModel {
     this.scanMore = cursorNext
     return [categoryList, this.keysLen]
   }
+
   async getType(key) {
     return this.client.type(key)
   }
+
   async select(dbIndex) {
     if (dbIndex !== this.config.dbIndex) {
       await this.client.select(dbIndex)
@@ -55,6 +59,7 @@ class RedisModel {
     }
 
   }
+
   async getKey(key, count = 10) {
     const type = await this.getType(key)
     let content    //  = await this.client.get(key)
@@ -70,14 +75,14 @@ class RedisModel {
         break
       case RedisType.list:
         content = await this.client.lrange
-          (key, 0, await this.client.llen(key))
+        (key, 0, await this.client.llen(key))
         break
       case RedisType.set:
         content = await this.client.smembers(key)
         break
       case RedisType.zset:
         content = await this.client.zrange
-          (key, 0, await this.client.zcard(key))
+        (key, 0, await this.client.zcard(key))
         break
       case RedisType.stream:
         const stream = new RedisStream({ ...this.opt, client: this.client, stream: key })
@@ -86,6 +91,7 @@ class RedisModel {
     }
     return content
   }
+
   async getStreamInfo(streamKey) {
     const stream = new RedisStream({ client: this.client, stream: streamKey })
     const res = await stream.getStreamInfo(streamKey, true, 10) // full
@@ -102,6 +108,7 @@ class RedisModel {
     this.streamIDs[streamKey] += SHOW_MORE_COUNT
     return res
   }
+
   async getGroupInfo(streamKey, redisStream) {
     if (!redisStream) redisStream = new RedisStream({ client: this.client, stream: streamKey })
     const res = await redisStream.getGroupsInfo(streamKey)
@@ -123,6 +130,7 @@ class RedisModel {
       return i
     }))
   }
+
   async getConsumersInfo(group, streamKey, redisStream) {
     if (!redisStream) redisStream = new RedisStream({ client: this.client, stream: streamKey })
     const res = await redisStream.getConsumersInfo(group, streamKey)
@@ -137,14 +145,17 @@ class RedisModel {
       return j
     }))
   }
+
   async getInfoById(id, stream) {
     const redis = new RedisStream({ client: this.client, stream })
     const [res] = await redis.xrange(stream, id, '+', 1)
     return res
   }
+
   async getKeys(pattern = '*') {
     return this.client.keys(pattern)
   }
+
   dbInfo() {
     return new Promise((resolve, reject) => {
       this.client.on('error', err => {
@@ -159,12 +170,14 @@ class RedisModel {
     })
 
   }
+
   async searchKey(key) {
     if (this.searchResult.find(i => i.key === key)) return
     const type = await this.getType(key)
     this.searchResult.push({ key, type })
     return { key, type }
   }
+
   // 清除 name connect 的所有 连接和redisModel
   static closeAll(name) {
     redisList.forEach((value, key) => {
@@ -175,11 +188,13 @@ class RedisModel {
     })
     // return this.client.disconnect()
   }
+
   static reloadRedis(opt) {
     this.delClient(opt)
     opt.client = this.getClient(opt)
     return new RedisModel(opt)
   }
+
   static init({ client, ...opt }) {
     // let key = this.getKey(opt)  // `${opt.name}:db${opt.db}`
     let redisModel = this.getRedisModel(this.getKey(opt))
@@ -195,10 +210,12 @@ class RedisModel {
     redisList.set(this.getKey(opt), redisModel)
     return redisModel
   }
+
   static getRedisModel(key) {
     let redisModel = redisList.get(key)
     return redisModel
   }
+
   static getClient({ host = '127.0.0.1', port = 6379, password, db = 0 }) {
     const key = this.getKey({ host, port, db })
     if (this.activeClient[key]) return this.activeClient[key]
@@ -224,6 +241,7 @@ class RedisModel {
     })
     return this.activeClient[key]
   }
+
   static delClient({ host, port, db = 0 }) {
     const key = this.getKey({ host, port, db })
     if (this.activeClient[key]) {
@@ -234,6 +252,7 @@ class RedisModel {
     }
     return null
   }
+
   static getKey({ name, db }) {
     return `${name}:db${db}`
   }
@@ -244,7 +263,7 @@ module.exports = exports = {
   RedisModel
 }
 
-exports.connectRedis = function (setting) {
+exports.connectRedis = function(setting) {
   let msg = setting?.uri && setting.uri?.startsWith('redis://') ? setting.uri : null
   const { resolve, reject, promise } = new Deferred()
   const client = new IORedis(msg ? msg : setting)
@@ -269,7 +288,7 @@ exports.connectRedis = function (setting) {
   return promise
 }
 
-exports.getDbs = async function (client) {
+exports.getDbs = async function(client) {
   let txt = await client.info('Keyspace')
   // console.log(txt)
   let res = txt.match(/db\d+:keys=\d+/g) || []

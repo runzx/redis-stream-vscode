@@ -1,4 +1,3 @@
-
 const path = require('path')
 const vscode = require("vscode")
 const { NodeType, RedisType } = require("../config")
@@ -31,9 +30,11 @@ class TreeExplorer {
   register(command, cb) {
     cb && this.subscriptions.push(registerCommand(command, cb))
   }
+
   cacheGet(key, defaultValue) {
     return this.context.globalState.get(key, defaultValue)
   }
+
   cacheSet(key, value) {
     return this.context.globalState.update(key, value)
   }
@@ -45,13 +46,15 @@ class TreeDataProvider {
     this._onDidChangeTreeData = new EventEmitter()
     this.onDidChangeTreeData = this._onDidChangeTreeData.event
   }
+
   async getChildren(element) {
     log.info('getChildren', element ? element.label : '')
     if (element) return element.getChildren()
 
     return this._getChileren()
   }
-  // refresh getTreeItem -> getChildren 
+
+  // refresh getTreeItem -> getChildren
   async getTreeItem(element) {
     log.info('getTreeItem', element.label)
 
@@ -69,15 +72,19 @@ class TreeDataProvider {
     log.info('TreeDataProvider refresh',)
     this._onDidChangeTreeData.fire(item)
   }
+
   cacheGet(key, defaultValue) {
     return this.context.globalState.get(key, defaultValue)
   }
+
   cacheSet(key, value) {
     return this.context.globalState.update(key, value)
   }
+
   cacheList() {
     return this.context.globalState.keys().map(key => [key, this.cacheGet(key)])
   }
+
   register(command, cb) {
     cb && this.context.subscriptions.push(registerCommand(command, cb))
   }
@@ -126,6 +133,7 @@ class TreeDataItem extends TreeItem {
       .join('$')
     return res
   }
+
   getCollapseState(element) {
     if (element.contextValue === NodeType.KEY
       && element.redisDataType === RedisType.stream)
@@ -141,10 +149,14 @@ class TreeDataItem extends TreeItem {
       || element.contextValue === NodeType.INFO)
       return TreeItemCollapsibleState.None
   }
-  setCollapseState() { }
+
+  setCollapseState() {
+  }
+
   dateFmt(at = new Date(), fmt = 'MM-dd hh:mm:ss') {
     return new Date(+at).format(fmt)
   }
+
   id2date(id = '', fmt) {
     if (typeof id === 'number') return this.dateFmt(id, fmt)
     const [, at = ''] = id.match(/(\d+)-?/) || []

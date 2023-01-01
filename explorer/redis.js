@@ -1,9 +1,5 @@
-
-
 const { window } = require('vscode')
-// const { RedisModel } = require('../command/redis')
 const { Constant, redisOpt } = require('../config')
-// const { VirtualDoc } = require('../editor')
 const { TreeExplorer, TreeDataProvider, } = require('./explorer')
 const { ConnectionNode } = require('./node/conection')
 const { createLogger } = require('../lib/logging')
@@ -14,13 +10,13 @@ const { initVdoc, cacheSetVdoc } = require('../editor/v-doc')
 const log = createLogger('register redis')
 
 
-
 class RedisTreeDataProvider extends TreeDataProvider {
   redisList = new Map()
 
   constructor(context) {
     super(context)
   }
+
   // element->state->Collapsed 第一次点击会触发 getChileren()->getTreeItem()
   // root 时 element 为空
   _getChileren(element) {
@@ -28,6 +24,7 @@ class RedisTreeDataProvider extends TreeDataProvider {
 
     return this.getConnections()
   }
+
   _getTreeItem(element) {
     // if (element.getTreeItem) return element.getTreeItem(this)
     return element
@@ -55,6 +52,7 @@ class RedisTree extends TreeExplorer {
     // this.doc = VirtualDoc.init({ context })
     this.init()
   }
+
   init() {
     const { context } = this
     this.initTree('redisTree', new RedisTreeDataProvider(context))
@@ -69,7 +67,7 @@ class RedisTree extends TreeExplorer {
           placeHolder: '请输入新连接参数.',
           prompt: 'fmt: "name:host:port:password"   ',
           value,
-          validateInput: function (text) {
+          validateInput: function(text) {
             // 对输入内容进行验证，返回 null 通过验证
             text = text.trim()
             if (!text) return null
@@ -82,21 +80,21 @@ class RedisTree extends TreeExplorer {
             return null
           }
         }).then((msg = '') => {
-          let [name = '', host = '127.0.0.1', port = '6379', password] = msg.split(':')
-          name = name.trim()
-          host = host.trim()
-          port = + port.trim()
-          password && (password = password.trim())
-          name || (name = host)
-          let conf = this.cacheGet(Constant.GLOBALSTATE_CONFIG_KEY)
-          if (conf?.length > 0) {
-            let item = conf.find(i => i.name === name)
-            if (item) Object.assign(item, { host, port, password })
-            else conf.push({ host, port, password, name })
-          } else conf = [{ host, port, password, name }]
-          this.cacheSet(Constant.GLOBALSTATE_CONFIG_KEY, conf)
-          this.refresh()
-        })
+        let [name = '', host = '127.0.0.1', port = '6379', password] = msg.split(':')
+        name = name.trim()
+        host = host.trim()
+        port = +port.trim()
+        password && (password = password.trim())
+        name || (name = host)
+        let conf = this.cacheGet(Constant.GLOBALSTATE_CONFIG_KEY)
+        if (conf?.length > 0) {
+          let item = conf.find(i => i.name === name)
+          if (item) Object.assign(item, { host, port, password })
+          else conf.push({ host, port, password, name })
+        } else conf = [{ host, port, password, name }]
+        this.cacheSet(Constant.GLOBALSTATE_CONFIG_KEY, conf)
+        this.refresh()
+      })
     })
 
     this.register('redis-stream.connection.refresh', (opt) => {
@@ -155,11 +153,11 @@ class RedisTree extends TreeExplorer {
           prompt: '"Enter"确认/"ESC"取消   ',
           // value,
         }).then(async (msg) => {
-          // log('SEARCH:', msg)
-          if (!msg) return
-          await redisModel.searchKey(msg)
-          this.refresh(opt)
-        })
+        // log('SEARCH:', msg)
+        if (!msg) return
+        await redisModel.searchKey(msg)
+        this.refresh(opt)
+      })
     })
 
     this.register('redis-stream.stream.showMore', async (opt,) => {
