@@ -33,8 +33,8 @@ class KeyTreeItem extends TreeDataItem {
   }
 
   async setStream() {
-    const { streamInfo } = this.opt
-    // const streamInfo = await redisModel.getStreamInfo(this.label)
+    const { redisModel } = this.opt
+    const streamInfo = await redisModel.getStreamInfo(this.label)
     if (!streamInfo) return []
     this.tooltip = `id(${streamInfo.length})`
     // const data = {
@@ -97,6 +97,10 @@ class ShowMoreItem extends TreeDataItem {
     opt.label = 'Show more ...'
     opt.tooltip = `ID more...`
     return new ShowMoreItem(opt)
+  }
+
+  getChildren(element) {
+    return null
   }
 }
 

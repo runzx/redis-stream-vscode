@@ -36,8 +36,6 @@ class SearchKeysTreeItem extends TreeDataItem {
   constructor(opt = {}) {
     super(opt)
     // this.isShowMoreItem = true
-
-
   }
 
   static init({ id, ...opt }) {
