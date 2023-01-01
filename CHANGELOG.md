@@ -1,4 +1,9 @@
 # Change Log
+
+## [1.9.0]
+
+- 支持多个 redis server.
+
 ## [1.8.0]
 
 - bug for doc.
