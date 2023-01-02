@@ -149,8 +149,8 @@
   },
   "devDependencies": {
     "@types/glob": "^7.2.0",
-    "@types/node": "~16.18.10",
-    "@types/vscode": "^1.40.0",
+    "@types/node": "~16.18.11",
+    "@types/vscode": "^1.74.0",
     "glob": "^8.0.3"
   },
   "dependencies": {

@@ -103,7 +103,7 @@ class RedisTree extends TreeExplorer {
       this.refresh()
     })
 
-    this.register('redis-stream.connection.status', async (opt,) => {
+    this.register('redis-stream.connection.status', async (opt) => {
       this.doDoc({
         id: `${opt.id}..text.redisServerInfo`,
         item: opt.opt.redisInfo, extension: '.txt'
@@ -121,17 +121,16 @@ class RedisTree extends TreeExplorer {
 
     })
 
-    this.register('redis-stream.db.scan', async (opt,) => {
+    this.register('redis-stream.db.scan', async (opt) => {
       this.refresh(opt)
     })
 
-    this.register('redis-stream.db.refresh', async (opt,) => {
+    this.register('redis-stream.db.refresh', async (opt) => {
       log.info('db refresh', opt)
       this.refresh(opt)
     })
 
-    this.register('redis-stream.db.search', async (opt,) => {
-      let { redisModel } = opt
+    this.register('redis-stream.db.search', async (opt) => {
       window.showInputBox(
         {
           password: false,
@@ -141,20 +140,21 @@ class RedisTree extends TreeExplorer {
           // value,
         }).then(async (msg) => {
           if (!msg) return
-          await redisModel.searchKey(msg)
-          this.refresh(opt)
+          await opt.redisModel.searchKey(msg)
+          // 有searchItem 时不再刷新整个 db Item
+          this.refresh(opt.opt.searchItem || opt)
         })
     })
 
-    this.register('redis-stream.stream.showMore', async (opt,) => {
+    this.register('redis-stream.stream.showMore', async (opt) => {
       this.refresh(opt)
     })
 
-    this.register('redis-stream.group.status', async (opt,) => {
+    this.register('redis-stream.group.status', async (opt) => {
       this.doDoc(opt)
     })
 
-    this.register('redis-stream.consumer.status', async (opt,) => {
+    this.register('redis-stream.consumer.status', async (opt) => {
       this.doDoc(opt)
     })
 

@@ -171,8 +171,12 @@ class RedisModel {
   }
 
   async searchKey(key) {
-    if (this.searchResult.find(i => i.key === key)) return
     const type = await this.getType(key)
+    let res = this.searchResult.find(i => i.key === key)
+    if (res) {
+      res.type = type
+      return res
+    }
     this.searchResult.push({ key, type })
     return { key, type }
   }

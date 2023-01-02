@@ -51,17 +51,16 @@ class SearchKeysTreeItem extends TreeDataItem {
   }
 
   async getChildren() {
-    const { db, connection, redisModel, } = this
-    const redisDataType = RedisType.searchKey
-    const item = this.redisModel.searchResult
-    return this.redisModel.searchResult.map(({ key: label, type }) => {
-      return KeyTreeItem.init({
-        ...this.opt, redisDataType,
-        label, type,
-        // db, connection, redisModel,
-        tooltip: `${type}`
+    return this.redisModel.searchResult.map(
+      ({ key: label, type }) => {
+        return KeyTreeItem.init({
+          ...this.opt,
+          redisDataType: RedisType.searchKey,
+          description: '',
+          tooltip: `${type}`,
+          label, type,
+        })
       })
-    })
   }
 }
 
@@ -81,10 +80,13 @@ class DbTreeItem extends TreeDataItem {
   }
 
   async getTreeItem(element) {
+    console.log('getTreeItem db')
     return element
   }
 
-  async getChildren() {
+  async getChildren(e) {
+    console.log('getChildren db', e)
+
     let { redisModel, } = this.opt
     const [keysCategory, scanMore] = await redisModel.scanKeys()
     const [keysLen] = this.opt.description.match(/\d+/) || []
@@ -100,10 +102,12 @@ class DbTreeItem extends TreeDataItem {
     })
 
     let searchItem = null
-    if (redisModel && !isEmpty(redisModel.searchResult)) {
+    if (!isEmpty(redisModel.searchResult)) {
       searchItem = SearchKeysTreeItem.init({
-        ...this.opt
+        ...this.opt,
+        description: `(${redisModel.searchResult.length})`,
       })
+      this.opt.searchItem = searchItem
     }
 
     let scanMoreItem = null
