@@ -19,15 +19,20 @@ class Pty {
   constructor(redisItem, fn, context) {
     this.redisItem = redisItem
     this.dbIndex = redisItem.db || 0
-    this.sysTag()
+    this.name = redisItem.name || ' '
+    this.sysTag(redisItem.name)
     this.fn = fn
     this.context = context
     this.histories = this.cacheGet([])
     this.historyIndex = this.histories.length
     this.client = new Client(redisItem) // host, port,password,db
+    this.client.on('error', (err) => {
+      // data: ['message','somechannel','this is the message']
+      console.error(err.message);
+    })
   }
-  sysTag(db = this.dbIndex) {
-    this.tag = `💻 ${this.dbIndex}>`
+  sysTag() {
+    this.tag = `💻${this.name}:${this.dbIndex}>`
   }
   w(str = this.tag) {
     this.writeEmitter.fire(str)

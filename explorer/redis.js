@@ -111,9 +111,10 @@ class RedisTree extends TreeExplorer {
     })
 
     const terminal = new Terminal(context)
-    this.register('redis-stream.connection.terminal', async (opt) => {
-      log.info('terminal', opt)
-      terminal.start(opt)
+    this.register('redis-stream.connection.terminal', async (opt,) => {
+      const { host, port, password, db, name, id } = opt.opt
+      log.info('terminal', opt.opt)
+      terminal.start({ host, port, password, db, name, id })
     })
 
     this.register('redis-stream.db.status', () => {
