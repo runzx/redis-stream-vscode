@@ -16,8 +16,6 @@ class TreeExplorer {
   }
 
   refresh(data) {
-    log.info('TreeExplorer refresh',)
-
     this.provider.refresh(data)
   }
 
@@ -49,17 +47,16 @@ class TreeDataProvider {
 
   async getChildren(element) {
     log.info('getChildren', element ? element.label : '')
-    if (element) return element.getChildren()
+    if (element) return element.getChildren(element)
 
     return this._getChileren()
   }
 
   // refresh getTreeItem -> getChildren
   async getTreeItem(element) {
-    log.info('getTreeItem', element.label)
+    // log.info('getTreeItem', element.label)
 
     element.refresh = (e, cb) => {
-
       cb && (e.refreshCallBack = cb)
       this.refresh(e)
     }
@@ -69,7 +66,7 @@ class TreeDataProvider {
   }
 
   refresh(item) {
-    log.info('TreeDataProvider refresh',)
+    log.info('TreeDataProvider refresh', item.id)
     this._onDidChangeTreeData.fire(item)
   }
 
