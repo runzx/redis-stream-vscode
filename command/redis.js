@@ -9,7 +9,6 @@ const redisList = new Map() // redisModel
 
 
 class RedisModel {
-  cursorSearch = '0'
   static activeClient = {}
   redisBase
 
@@ -178,22 +177,20 @@ class RedisModel {
     return await this.scanSearch(key)
   }
 
-  async scanSearch(key, count = 10, cursor = this.cursorSearch,) {
+  async scanSearch(key, count = 10, cursor = '0') {
     let result = []
     while (true) {
       let [cursorNext, items] = await this.client.scan(cursor, 'Match', key, 'COUNT', count)
       cursor = cursorNext
       if (items.length > 0) result = result.concat(items)
-      if (cursor === '0' || result.length > count) break
+      if (cursor === '0' || result.length >= count) break
     }
-    this.cursorSearch = cursor
     if (result.length === 0) return this.updateResult(key, 'none')
     for (const i of result) {
       let type = await this.getType(i)
       this.updateResult(i, type)
     }
-    // this.searchResult.push(...result)
-    return result
+    return [cursor, result]
   }
   updateResult(key, type) {
     for (let i = 0; i < this.searchResult.length; i++)
