@@ -56,8 +56,9 @@ class SearchKeysTreeItem extends TreeDataItem {
         return KeyTreeItem.init({
           ...this.opt,
           redisDataType: RedisType.searchKey,
-          description: '',
-          tooltip: `${type}`,
+          description: type === 'none' ? 'x' : '',
+          // `(${type})`,
+          tooltip: type,
           label, type,
         })
       })

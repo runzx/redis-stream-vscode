@@ -9,6 +9,7 @@ const redisList = new Map() // redisModel
 
 
 class RedisModel {
+  cursorSearch = '0'
   static activeClient = {}
   redisBase
 
@@ -171,16 +172,38 @@ class RedisModel {
   }
 
   async searchKey(key) {
-    const type = await this.getType(key)
-    let res = this.searchResult.find(i => i.key === key)
-    if (res) {
-      res.type = type
-      return res
-    }
-    this.searchResult.push({ key, type })
-    return { key, type }
+    let type = await this.getType(key)
+    if (type !== 'none') return this.updateResult(key, type)
+
+    return await this.scanSearch(key)
   }
 
+  async scanSearch(key, count = 10, cursor = this.cursorSearch,) {
+    let result = []
+    while (true) {
+      let [cursorNext, items] = await this.client.scan(cursor, 'Match', key, 'COUNT', count)
+      cursor = cursorNext
+      if (items.length > 0) result = result.concat(items)
+      if (cursor === '0' || result.length > count) break
+    }
+    this.cursorSearch = cursor
+    if (result.length === 0) return this.updateResult(key, 'none')
+    for (const i of result) {
+      let type = await this.getType(i)
+      this.updateResult(i, type)
+    }
+    // this.searchResult.push(...result)
+    return result
+  }
+  updateResult(key, type) {
+    for (let i = 0; i < this.searchResult.length; i++)
+      if (this.searchResult[i].key === key) {
+        this.searchResult.splice(i, 1)
+        break
+      }
+    this.searchResult.unshift({ key, type })
+    if (this.searchResult.length > 10) this.searchResult.pop()
+  }
   // 清除 name connect 的所有 连接和redisModel
   static closeAll(name) {
     redisList.forEach((value, key) => {
