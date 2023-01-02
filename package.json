@@ -3,7 +3,7 @@
   "publisher": "zhaixiang",
   "displayName": "redis-stream",
   "description": "redis stream explorer",
-  "version": "1.9.6",
+  "version": "1.9.9",
   "homepage": "https://github.com/runzx/redis-stream-vscode/blob/master/README.md",
   "repository": {
     "type": "git",
@@ -14,7 +14,7 @@
     "email": "843476168@qq.com"
   },
   "engines": {
-    "vscode": "^1.40.0"
+    "vscode": "^1.74.0"
   },
   "categories": [
     "Visualization",
