@@ -18,9 +18,9 @@ exports.registers = (context) => {
 
   const doc = initVdoc({ context })
 
-  register('redis-stream.key.status', async (opt) => {
-    doc.showDoc(opt.id)
-  })
+  // register('redis-stream.key.status', async (opt) => {
+  //   doc.showDoc(opt.id)
+  // })
 
   register('redis-stream.key.value.refresh', async (opt) => {
     doc.update(opt.id)

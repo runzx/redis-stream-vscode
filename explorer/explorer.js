@@ -1,18 +1,72 @@
+const { constants } = require('fs')
+const { access, mkdir, unlink } = require('node:fs/promises')
 const path = require('path')
 const vscode = require("vscode")
 const { NodeType, RedisType } = require("../config")
 const { isEmpty, } = require('../lib/util')
 const { createLogger } = require('../lib/logging')
+const { showMsg } = require('../lib/show-message')
+const { writeFile } = require('fs/promises')
 
 const log = createLogger('explorer')
 const { TreeItemCollapsibleState, EventEmitter, TreeItem, } = vscode
 const { registerCommand, } = vscode.commands
 
 class TreeExplorer {
+  rootPath = ''
   constructor(context,) {
     this.context = context
     this.subscriptions = context.subscriptions
     this.provider = null
+    this.initSaveFile()
+  }
+  async initFile(dumpFile = '.zx.json') {
+    if (!vscode.workspace.workspaceFolders) {
+      showMsg('请先打开一个工作空间', 'error')
+      return true
+    }
+    const wsFolder = vscode.workspace.workspaceFolders.find(f => f.uri.scheme === 'file')
+    if (!wsFolder) return true
+
+    this.rootPath = wsFolder.uri.fsPath
+    await access(`${this.rootPath}/.vscode`, constants.F_OK)
+      .catch(async err => {
+        console.log(`.vscode/ ${err ? 'does not exist' : 'exists'}`)
+        await mkdir(`${this.rootPath}/.vscode`)
+      })
+    await access(`${this.rootPath}/.vscode/${dumpFile}`, constants.F_OK).then(async () => {
+      await unlink(`${this.rootPath}/.vscode/${dumpFile}`).catch(err => {
+        console.error(err)
+      })
+    }).catch(err => {
+      console.log(`.vscode/${dumpFile} ${err ? 'does not exist' : 'exists'}`)
+    })
+  }
+
+  async openResource(element) {
+    let res = await this.initFile()
+    if (res) return
+    const filename = `${this.rootPath}/.vscode/${element.id}.json`
+    await writeFile(filename, 'hello,zx')
+      .then(() => {
+        vscode.workspace.openTextDocument(filename)
+          .then(doc => vscode.window.showTextDocument(doc))
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  initSaveFile() {
+    vscode.workspace.onDidSaveTextDocument(async e => {
+      console.log('onDidSaveTextDocument:', e)
+      let res = path.parse(e.uri.path)
+      // e.uri.path.replace(`${this.rootPath}/.vscode/`, '')
+      console.log(res)
+      if (path.parse(res.dir).base !== '.vscode') return
+
+      path.basename(path.parse(e.uri.path))
+    })
   }
 
   refresh(data) {

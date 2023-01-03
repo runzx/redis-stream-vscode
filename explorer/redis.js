@@ -1,4 +1,4 @@
-const { window } = require('vscode')
+const { window, } = require('vscode')
 const { Constant, redisOpt } = require('../config')
 const { TreeExplorer, TreeDataProvider, } = require('./explorer')
 const { ConnectionNode } = require('./node/conection')
@@ -158,6 +158,9 @@ class RedisTree extends TreeExplorer {
       this.doDoc(opt)
     })
 
+    this.register('redis-stream.key.status', async (opt) => {
+      this.openResource(opt)
+    })
   }
 
   doDoc({ id, item, extension }) {
@@ -169,6 +172,7 @@ class RedisTree extends TreeExplorer {
     }
     this.docStatus[id] = true
   }
+
 }
 
 
