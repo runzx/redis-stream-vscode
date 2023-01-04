@@ -1,12 +1,15 @@
 const { constants } = require('fs')
-const { access, mkdir, unlink } = require('node:fs/promises')
+const { access, mkdir, unlink, writeFile } = require('node:fs/promises')
 const path = require('path')
 const vscode = require("vscode")
 const { NodeType, RedisType } = require("../config")
 const { isEmpty, } = require('../lib/util')
 const { createLogger } = require('../lib/logging')
 const { showMsg } = require('../lib/show-message')
-const { writeFile } = require('fs/promises')
+// const { writeFile } = require('fs/promises')
+const { getValueFrUri } = require('../editor/v-doc')
+const { readFile } = require('fs/promises')
+const { setValueFrUri } = require('../command/redis')
 
 const log = createLogger('explorer')
 const { TreeItemCollapsibleState, EventEmitter, TreeItem, } = vscode
@@ -14,11 +17,13 @@ const { registerCommand, } = vscode.commands
 
 class TreeExplorer {
   rootPath = ''
+  wsDir = ''
   constructor(context,) {
     this.context = context
     this.subscriptions = context.subscriptions
     this.provider = null
-    this.initSaveFile()
+    // this.initDir()
+    this.initSaveEvent()
   }
   async initFile(dumpFile = '.zx.json') {
     if (!vscode.workspace.workspaceFolders) {
@@ -43,29 +48,79 @@ class TreeExplorer {
     })
   }
 
+  async initDir(dir = '.zx-redis') {
+    if (!vscode.workspace.workspaceFolders) {
+      showMsg('请先打开一个工作空间', 'error')
+      return true
+    }
+    const wsFolder = vscode.workspace.workspaceFolders.find(f => f.uri.scheme === 'file')
+    if (!wsFolder) return true
+
+    this.rootPath = wsFolder.uri.fsPath
+    this.wsDir = path.join(this.rootPath, '.vscode')
+    // `${this.rootPath}/.vscode`
+    await access(this.wsDir, constants.F_OK)
+      .catch(async err => {
+        // console.log(`.vscode/ ${err ? 'does not exist' : 'exists'}`)
+        await mkdir(this.wsDir)
+      })
+    this.wsDir = path.join(this.wsDir, dir)
+    // `/${dir}`
+    await access(this.wsDir, constants.F_OK)
+      .catch(async err => {
+        await mkdir(this.wsDir)
+      })
+  }
   async openResource(element) {
-    let res = await this.initFile()
-    if (res) return
-    const filename = `${this.rootPath}/.vscode/${element.id}.json`
-    await writeFile(filename, 'hello,zx')
+    if (!this.wsDir) await this.initDir()
+    let { key, value, type } = await getValueFrUri(element.id + `.json`)
+    const filename = path.join(this.wsDir, element.id) + `.json`
+    await writeFile(filename, this.genContent(key, value, type))
       .then(() => {
         vscode.workspace.openTextDocument(filename)
           .then(doc => vscode.window.showTextDocument(doc))
       })
       .catch(err => {
+        showMsg('生成临时文件异常' + err.message, 'error')
         console.error(err)
       })
   }
+  genContent(key, value, type) {
+    try {
+      value = JSON.parse(value)
+    } catch (e) { }
+    switch (type) {
+      case 'set':
 
-  initSaveFile() {
+        break;
+
+      case 'string':
+      default:
+
+        break;
+    }
+
+    return JSON.stringify({ key, type, value }, null, 2)
+  }
+  initSaveEvent() {
     vscode.workspace.onDidSaveTextDocument(async e => {
       console.log('onDidSaveTextDocument:', e)
-      let res = path.parse(e.uri.path)
+      let file = path.parse(e.uri._fsPath)
       // e.uri.path.replace(`${this.rootPath}/.vscode/`, '')
-      console.log(res)
-      if (path.parse(res.dir).base !== '.vscode') return
+      console.log(file)
+      if (path.parse(file.dir).base !== '.zx-redis') return
 
-      path.basename(path.parse(e.uri.path))
+      let content = await readFile(e.uri._fsPath, 'utf8')
+      if (!content) return
+      try {
+        let { key, type, value } = JSON.parse(content) || {}
+        if (!key || !type) return showMsg('key, type 不能为空')
+
+        let res = await setValueFrUri(file.base, value)
+        if (res) return showMsg(res)
+
+      } catch (e) { }
+
     })
   }
 

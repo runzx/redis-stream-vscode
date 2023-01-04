@@ -126,17 +126,21 @@ class Pty {
     }
 
     const inputToken = lexer.analyze(this.input)
-    const [command, args] = inputToken
+    let [command, args] = inputToken
     // 保存历史记录
     this.appendToHistory(command + ' ' + args.join(' '))
     // console.log('command: %s, args: %s', command, args)
-    let result = await this.client[command.toLowerCase()]?.(...args)
+    command = command.toLowerCase()
+    let result
+    if (!this.client[command]) result = 'not command: 没有此命令'
+    else result = await this.client[command](...args)
     if (command === 'select') {
       this.dbIndex = args[0]
       this.sysTag()
     }
     this.w('\r\n')
     if (Array.isArray(result)) result = result.join('\n\r')
+    else result += ''
     this.w(result)
     this.w('\r\n')
   }

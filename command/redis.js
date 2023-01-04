@@ -3,12 +3,14 @@ const { RedisType, redisOpt, SHOW_MORE_COUNT } = require('../config')
 const IORedis = require('ioredis')
 const { createLogger } = require('../lib/logging')
 const { Deferred } = require('../lib/util')
+const { access } = require('fs')
 
 const log = createLogger('redis init')
 const redisList = new Map() // redisModel 
 
 
 class RedisModel {
+  cursor = '0'
   static activeClient = {}
   redisBase
 
@@ -17,7 +19,6 @@ class RedisModel {
     this.db = db
     this.client = client
     this.redisBase = new RedisBase({ client, db })
-    this.cursor = 0
     this.scanMore = true
     this.categoryList = {} //{stream:[],zet:[]}
     this.keysLen = 0
@@ -33,7 +34,10 @@ class RedisModel {
   }
 
   async scanKeys(cursor = this.cursor, count = 20, scanMore = this.scanMore) {
-    if (scanMore === '0') return [this.categoryList, this.keysLen]
+    if (scanMore === '0') {
+      this.categoryList = []
+      this.keysLen = 0
+    }
 
     let [cursorNext, keys] = await this.client.scan(cursor, 'count', count)
     const categoryList = this.categoryList
@@ -67,10 +71,11 @@ class RedisModel {
         content = await this.client.get(key)
         break
       case RedisType.hash:
-        const hall = await this.client.hgetall(key)
-        content = Object.keys(hall).map(key => {
-          return { key, value: hall[key] }
-        })
+        // const hall = await this.client.hgetall(key)
+        // content = Object.keys(hall).map(key => {
+        //   return { key, value: hall[key] }
+        // })
+        content = await this.client.hgetall(key)
         break
       case RedisType.list:
         content = await this.client.lrange
@@ -321,4 +326,93 @@ exports.getDbs = async function (client) {
     // return { db: +db[1], keys: +db[2] }
   }, {})
   return dbs
+}
+// 返回错误信息, success 为 'OK'
+exports.setValueFrUri = async function (path, value) {
+  let [name, db, type, key, extension, consumer] = path.split('.')
+  const client = RedisModel.getRedisModel(`${name}:${db}`).client
+  if (!client) return `没有打开相应的 redis ${name}:${db} 连接`
+  let result, res // = await redisModel.getKey(key)
+  try {
+    switch (type) {
+      case RedisType.string:  // 'string'
+        result = await client.getKey(key)
+        if (typeof value === 'object') value = JSON.stringify(value)
+        if (result === value) return 'value 没有变化'
+        result = await redisModel.client.set(key, value)
+        break
+      case RedisType.hash:  // 类似 Map 
+        const hall = await client.hgetall(key)
+        res = []
+        Object.keys(hall).filter(key => value[key] !== hall[key])
+          .forEach(i => res.push(i, value[i]))
+        if (res.length > 0) result = await client.hmset(key, res)
+        break
+      case RedisType.list:
+        // let len = await client.llen(key)
+        res = await client.ltrim(key, 1, 0)
+        result = await client.rpush(key, value)
+        break
+      case RedisType.set:
+        content = await client.smembers(key)
+        break
+      case RedisType.zset:
+        content = await client.zrange
+          (key, 0, await client.zcard(key))
+        break
+      case RedisType.stream:
+
+      case 's-group':
+
+      case 's-pending':
+        result = content.get([name, db, type, key, extension].join('.')) || '没有连接上 redis 服务'
+        result = fmt(result, 'streamK')
+        break;
+      case 's-consumer':
+        result = content.get([name, db, type, key, extension, consumer].join('.')) || '没有连接上 redis 服务'
+
+        result = fmt(result, 'streamK')
+        break;
+
+      case 'stream':
+      case 'search':
+      default:   // string, set, ...
+        value = await RedisModel.getRedisModel(`${name}:${db}`).getKey(key)
+        result = fmt(value, key)
+        break;
+    }
+  } catch (err) {
+    console.error(err)
+    result = err.message
+  }
+
+  return result
+}
+
+// path: 'pve.db4.s-id.siteNotice.1671810120023-0.json'
+exports.getValueFrUri = async function (path) {
+  let [name, db, type, key, extension, consumer] = path.split('.')
+  const redisModel = await RedisModel.getRedisModel(`${name}:${db}`)
+  if (!redisModel) return `没有打开相应的 redis ${name}:${db} 连接`
+  let value
+  switch (type) {
+    case 's-id':  // stream-id, extension -> group
+      value = await redisModel.getInfoById(extension, key)
+      break;
+    case 's-consumer':
+      break;
+    case 'string':
+    case 'RedisType.hash':
+    case 'RedisType.list':
+    case 'RedisType.set':
+    case 'RedisType.zset':
+    case 'stream':
+    case 'search':
+      value = await redisModel.getKey(key)
+      break;
+    default:
+      // value = undefined
+      break;
+  }
+  return { type, value, key }
 }

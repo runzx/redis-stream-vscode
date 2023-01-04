@@ -159,6 +159,7 @@ class RedisTree extends TreeExplorer {
     })
 
     this.register('redis-stream.key.status', async (opt) => {
+      if (opt.redisDataType === 'stream') return this.doc.showDoc(opt.id)
       this.openResource(opt)
     })
   }
