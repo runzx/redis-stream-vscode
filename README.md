@@ -4,13 +4,14 @@ Welcome to the redis-stream extension for vscode!
 
 ## Features
 
-- 2022 年升级可同时多个 redis connections
-- MQ by redis stream, can delayQueue: [redis-stream-queue](https://github.com/runzx/redis-stream-queue) . use: `npm i redis-stream-queue`
-- 延时队列 采用双 stream 队列保证订阅消息(`__keyevent@5__:expired`)不丢失
-- easy use GUI to access Redis stream data.
-- test data for MQ on redis stream
-- key use SCAN, stream use XREVRARNGE.
-- terminal, historys
+* json file  to edit redis value (通过 json 格式文件可修改 redis key 的 value)
+* 2022 年升级可同时管理多个 redis server.
+* MQ by redis stream, can delayQueue: [redis-stream-queue](https://github.com/runzx/redis-stream-queue) . use: `npm i redis-stream-queue`
+* 延时队列 采用双 stream 队列保证订阅消息(`__keyevent@5__:expired`)不丢失
+* easy use GUI to access Redis stream data.
+* test data for MQ on redis stream
+* key use SCAN, stream use XREVRARNGE.
+* terminal, historys
 
 ## Extension Settings
 
