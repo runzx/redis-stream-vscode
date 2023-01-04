@@ -377,10 +377,20 @@ exports.setValueFrUri = async function (path, value) {
         result = await client.sadd(key, value)
         break
       case RedisType.zset:  // 有序集合 member score, 按score排正序
-        res = await client.del(key)
-        result = await client.zadd(key, value)
+        // res = await client.del(key)
+        res = []
+        value.forEach(i => {
+          let [t] = Object.entries(i)
+          t = t.reverse()
+          res.push(...t)
+        })
+        // value.forEach(i => res.push(Object.entries(i)))
+        //  [1,2].reverse()
+        result = await client.zadd(key, res)
         // content = await client.zrange
         //   (key, 0, await client.zcard(key))
+        if (result === 0) result = '修改成功'
+        else result = `增加${result}个新元素`
         break
       case RedisType.stream:
       case 'search':
@@ -419,7 +429,6 @@ exports.getValueFrUri = async function (path) {
 
       let { total, items, cursorNext, count } = value
       return { key, type, value: items, total, count, cursorNext }
-      break;
     default:
       // value = undefined
       break;
