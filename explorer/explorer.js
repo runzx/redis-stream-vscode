@@ -7,9 +7,9 @@ const { isEmpty, } = require('../lib/util')
 const { createLogger } = require('../lib/logging')
 const { showMsg } = require('../lib/show-message')
 // const { writeFile } = require('fs/promises')
-const { getValueFrUri } = require('../editor/v-doc')
+// const { getValueFrUri } = require('../editor/v-doc')
 const { readFile } = require('fs/promises')
-const { setValueFrUri } = require('../command/redis')
+const { setValueFrUri, getValueFrUri } = require('../command/redis')
 
 const log = createLogger('explorer')
 const { TreeItemCollapsibleState, EventEmitter, TreeItem, } = vscode
@@ -73,9 +73,10 @@ class TreeExplorer {
   }
   async openResource(element) {
     if (!this.wsDir) await this.initDir()
-    let { key, value, type } = await getValueFrUri(element.id + `.json`)
+
     const filename = path.join(this.wsDir, element.id) + `.json`
-    await writeFile(filename, this.genContent(key, value, type))
+    const content = await this.genContent(path.basename(filename))
+    await writeFile(filename, content)
       .then(() => {
         vscode.workspace.openTextDocument(filename)
           .then(doc => vscode.window.showTextDocument(doc))
@@ -85,22 +86,13 @@ class TreeExplorer {
         console.error(err)
       })
   }
-  genContent(key, value, type) {
+  async genContent(filePath) {
+    let res = await getValueFrUri(filePath)
     try {
-      value = JSON.parse(value)
+      if (res.type === 'string') res.value = JSON.parse(res.value)
     } catch (e) { }
-    switch (type) {
-      case 'set':
 
-        break;
-
-      case 'string':
-      default:
-
-        break;
-    }
-
-    return JSON.stringify({ key, type, value }, null, 2)
+    return JSON.stringify(res, null, 2)
   }
   initSaveEvent() {
     vscode.workspace.onDidSaveTextDocument(async e => {

@@ -8,6 +8,14 @@ const { access } = require('fs')
 const log = createLogger('redis init')
 const redisList = new Map() // redisModel 
 
+function arr2ArrObj(arr = [], number) {
+  const info = []
+  while (arr.length) info.push({ [arr.shift()]: number ? +arr.shift() : arr.shift() })
+  // {
+  //   info[arr.shift()] = number ? +arr.shift() : arr.shift()
+  // }
+  return info
+}
 
 class RedisModel {
   cursor = '0'
@@ -85,8 +93,12 @@ class RedisModel {
         content = await this.client.smembers(key)
         break
       case RedisType.zset:
-        content = await this.client.zrange
-          (key, 0, await this.client.zcard(key))
+        // zrange 只返回 [v1,v2,...], 没有score1...
+        // content = await this.client.zrange
+        //   (key, 0, await this.client.zcard(key))
+        let total = await this.client.zcard(key)
+        let [cursorNext, items] = await this.client.zscan(key, 0, 'COUNT', 100)
+        content = { total, items: arr2ArrObj(items, 1), cursorNext, count: 100 }
         break
       case RedisType.stream:
         const stream = new RedisStream({ ...this.opt, client: this.client, stream: key })
@@ -343,49 +355,44 @@ exports.setValueFrUri = async function (path, value) {
         break
       case RedisType.hash:  // 类似 Map 
         const hall = await client.hgetall(key)
+        let hallKeys = Object.keys(hall)
+        // 删除 field
+        res = await client.hdel(key, hallKeys.filter(i => value[i] === undefined))
         res = []
-        Object.keys(hall).filter(key => value[key] !== hall[key])
+
+        Object.keys(value)
+          .filter(i => value[i] !== hall[i])
           .forEach(i => res.push(i, value[i]))
         if (res.length > 0) result = await client.hmset(key, res)
         break
       case RedisType.list:
         // let len = await client.llen(key)
-        res = await client.ltrim(key, 1, 0)
+        res = await client.ltrim(key, 1, 0) // start > stop all rm
+        // value: []
         result = await client.rpush(key, value)
         break
       case RedisType.set:
-        content = await client.smembers(key)
+        // res = await client.smembers(key)
+        res = await client.del(key)
+        result = await client.sadd(key, value)
         break
-      case RedisType.zset:
-        content = await client.zrange
-          (key, 0, await client.zcard(key))
+      case RedisType.zset:  // 有序集合 member score, 按score排正序
+        res = await client.del(key)
+        result = await client.zadd(key, value)
+        // content = await client.zrange
+        //   (key, 0, await client.zcard(key))
         break
       case RedisType.stream:
-
-      case 's-group':
-
-      case 's-pending':
-        result = content.get([name, db, type, key, extension].join('.')) || '没有连接上 redis 服务'
-        result = fmt(result, 'streamK')
-        break;
-      case 's-consumer':
-        result = content.get([name, db, type, key, extension, consumer].join('.')) || '没有连接上 redis 服务'
-
-        result = fmt(result, 'streamK')
-        break;
-
-      case 'stream':
       case 'search':
-      default:   // string, set, ...
-        value = await RedisModel.getRedisModel(`${name}:${db}`).getKey(key)
-        result = fmt(value, key)
+      default:   // 
+        // value = await RedisModel.getRedisModel(`${name}:${db}`).getKey(key)
+        // result = fmt(value, key)
         break;
     }
   } catch (err) {
     console.error(err)
     result = err.message
   }
-
   return result
 }
 
@@ -399,20 +406,23 @@ exports.getValueFrUri = async function (path) {
     case 's-id':  // stream-id, extension -> group
       value = await redisModel.getInfoById(extension, key)
       break;
-    case 's-consumer':
-      break;
+    case 'zset':
+    case RedisType.zset:
     case 'string':
-    case 'RedisType.hash':
-    case 'RedisType.list':
-    case 'RedisType.set':
-    case 'RedisType.zset':
+    case RedisType.hash:
+    case RedisType.list:
+    case RedisType.set:
     case 'stream':
     case 'search':
       value = await redisModel.getKey(key)
+      if (type !== 'zset') break
+
+      let { total, items, cursorNext, count } = value
+      return { key, type, value: items, total, count, cursorNext }
       break;
     default:
       // value = undefined
       break;
   }
-  return { type, value, key }
+  return { key, type, value, }
 }
