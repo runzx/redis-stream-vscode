@@ -167,7 +167,7 @@ class TreeDataProvider {
   }
 
   refresh(item) {
-    log.info('TreeDataProvider refresh', item.id)
+    log.info('TreeDataProvider refresh', item?.id)
     this._onDidChangeTreeData.fire(item)
   }
 

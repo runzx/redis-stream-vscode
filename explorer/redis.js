@@ -6,6 +6,8 @@ const { createLogger } = require('../lib/logging')
 const Terminal = require('../terminal')
 const { RedisModel } = require('../command/redis')
 const { initVdoc, cacheSetVdoc } = require('../editor/v-doc')
+const { showModal } = require('../lib/show-message')
+const { rmArrItem } = require('../lib/util')
 
 const log = createLogger('register redis')
 
@@ -98,9 +100,13 @@ class RedisTree extends TreeExplorer {
     this.register('redis-stream.connection.refresh', (opt) => {
       // console.log('connection.refresh', opt)
       RedisModel.closeAll(opt.name)
-      opt.opt.client.disconnect()
+      opt.opt.client?.disconnect()
       opt.opt.client = null
-      this.refresh()
+      let conf = this.cacheGet(Constant.GLOBALSTATE_CONFIG_KEY)
+      let item = rmArrItem(conf, 'name', opt.name)
+      conf.unshift(item)
+      this.cacheSet(Constant.GLOBALSTATE_CONFIG_KEY, conf)
+      this.refresh()  // 不带参数，刷新所有 treeView; 把刷新的置顶
     })
 
     this.register('redis-stream.connection.status', async (opt) => {
@@ -115,6 +121,19 @@ class RedisTree extends TreeExplorer {
       const { host, port, password, db, name, id } = opt.opt
       log.info('terminal', opt.opt)
       terminal.start({ host, port, password, db, name, id })
+    })
+
+    this.register('redis-stream.connection.trash', async (opt) => {
+      // console.log('connection.refresh', opt)
+      let action = await showModal('请你确认要删除 redis server?', 'cancel (取消)', 'delete (删除)')
+      RedisModel.closeAll(opt.name)
+      opt.opt.client?.disconnect()
+      opt.opt.client = null
+
+      let conf = this.cacheGet(Constant.GLOBALSTATE_CONFIG_KEY)
+      rmArrItem(conf, 'name', opt.name)
+      this.cacheSet(Constant.GLOBALSTATE_CONFIG_KEY, conf)
+      this.refresh()
     })
 
     this.register('redis-stream.db.status', () => {

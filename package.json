@@ -41,6 +41,11 @@
         "title": "add new Redis"
       },
       {
+        "command": "redis-stream.connection.terminal",
+        "title": "terminal",
+        "icon": "image/terminal.png"
+      },
+      {
         "command": "redis-stream.connection.refresh",
         "title": "refresh redis",
         "icon": "image/change.png"
@@ -49,6 +54,11 @@
         "command": "redis-stream.connection.status",
         "title": "server info",
         "icon": "image/status.png"
+      },
+      {
+        "command": "redis-stream.connection.trash",
+        "title": "delete redis server",
+        "icon": "$(trash)"
       },
       {
         "command": "redis-stream.key.value.refresh",
@@ -69,11 +79,6 @@
         "command": "redis-stream.db.refresh",
         "title": "db refresh",
         "icon": "image/refresh.png"
-      },
-      {
-        "command": "redis-stream.connection.terminal",
-        "title": "terminal",
-        "icon": "image/terminal.png"
       }
     ],
     "viewsContainers": {
@@ -102,6 +107,11 @@
         }
       ],
       "view/item/context": [
+        {
+          "command": "redis-stream.connection.trash",
+          "when": "view == redisTree && viewItem == connection",
+          "group": "inline@3"
+        },
         {
           "command": "redis-stream.connection.status",
           "when": "view == redisTree && viewItem == connection",
