@@ -3,7 +3,6 @@ const { RedisType, redisOpt, SHOW_MORE_COUNT } = require('../config')
 const IORedis = require('ioredis')
 const { createLogger } = require('../lib/logging')
 const { Deferred } = require('../lib/util')
-const { access } = require('fs')
 
 const log = createLogger('redis init')
 const redisList = new Map() // redisModel 
@@ -356,14 +355,16 @@ exports.setValueFrUri = async function (path, value) {
       case RedisType.hash:  // 类似 Map 
         const hall = await client.hgetall(key)
         let hallKeys = Object.keys(hall)
+        let delKeys = hallKeys.filter(i => value[i] === undefined)
         // 删除 field
-        res = await client.hdel(key, hallKeys.filter(i => value[i] === undefined))
+        if (delKeys.length > 0) res = await client.hdel(key, delKeys)
+        let msg = res > 0 ? `, 删除${res}个元素` : ''
         res = []
-
         Object.keys(value)
           .filter(i => value[i] !== hall[i])
           .forEach(i => res.push(i, value[i]))
         if (res.length > 0) result = await client.hmset(key, res)
+        result += msg
         break
       case RedisType.list:
         // let len = await client.llen(key)
