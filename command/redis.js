@@ -379,13 +379,13 @@ exports.setValueFrUri = async function (path, value) {
       case RedisType.zset:  // 有序集合 member score, 按score排正序
         // res = await client.del(key)
         res = []
-        value.forEach(i => {
-          let [t] = Object.entries(i)
-          t = t.reverse()
-          res.push(...t)
-        })
-        // value.forEach(i => res.push(Object.entries(i)))
-        //  [1,2].reverse()
+        // value.forEach(i => {
+        //   let [t] = Object.entries(i)
+        //   t = t.reverse()
+        //   res.push(...t)
+        // })
+        value.forEach(i => res.push(...Object.entries(i)[0].reverse()))
+
         result = await client.zadd(key, res)
         // content = await client.zrange
         //   (key, 0, await client.zcard(key))
