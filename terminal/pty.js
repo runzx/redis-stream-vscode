@@ -132,8 +132,14 @@ class Pty {
     // console.log('command: %s, args: %s', command, args)
     command = command.toLowerCase()
     let result
-    if (!this.client[command]) result = 'not command: 没有此命令'
-    else result = await this.client[command](...args)
+    try {
+      if (!this.client[command]) result = 'not this command.(没有此命令)'
+      else result = await this.client[command](...args)
+    } catch (err) {
+      console.error(err)
+      result = err.message
+    }
+
     if (command === 'select') {
       this.dbIndex = args[0]
       this.sysTag()

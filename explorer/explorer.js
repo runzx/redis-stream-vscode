@@ -50,7 +50,7 @@ class TreeExplorer {
 
   async initDir(dir = '.zx-redis') {
     if (!vscode.workspace.workspaceFolders) {
-      showMsg('请先打开一个工作空间', 'error')
+      showMsg('Pls Open Folder.(请先打开一个工作空间)', 'error')
       return true
     }
     const wsFolder = vscode.workspace.workspaceFolders.find(f => f.uri.scheme === 'file')
@@ -72,7 +72,7 @@ class TreeExplorer {
       })
   }
   async openResource(element) {
-    if (!this.wsDir) await this.initDir()
+    if (!this.wsDir && await this.initDir()) return
 
     const filename = path.join(this.wsDir, element.id) + `.json`
     const content = await this.genContent(path.basename(filename))
