@@ -19,7 +19,7 @@ class Terminal {
 
   create(redisItem) {
     const terminal = window.createTerminal({
-      name: redisItem.id,
+      name: 'redis-' + redisItem.id,
       pty: new Pty(redisItem,
         () => this.close(redisItem.id),
         this.context)

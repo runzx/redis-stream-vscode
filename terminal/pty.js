@@ -14,7 +14,7 @@ class Pty {
   input = []
   historyIndex = 0
   histories
-  tag = '💻 >'
+  tag = '💻 > '
 
   constructor(redisItem, fn, context) {
     this.redisItem = redisItem
@@ -32,7 +32,7 @@ class Pty {
     })
   }
   sysTag() {
-    this.tag = `💻${this.name}:${this.dbIndex}>`
+    this.tag = `💻 ${this.name}:${this.dbIndex} > `
   }
   w(str = this.tag) {
     this.writeEmitter.fire(str)
