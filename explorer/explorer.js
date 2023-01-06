@@ -3,7 +3,7 @@ const { access, mkdir, unlink, writeFile } = require('node:fs/promises')
 const path = require('path')
 const vscode = require("vscode")
 const { NodeType, RedisType } = require("../config")
-const { isEmpty, atob, btoa } = require('../lib/util')
+const { isEmpty, md5 } = require('../lib/util')
 const { createLogger } = require('../lib/logging')
 const { showMsg } = require('../lib/show-message')
 // const { writeFile } = require('fs/promises')
@@ -73,10 +73,10 @@ class TreeExplorer {
   }
   async openResource(element) {
     if (!this.wsDir && await this.initDir()) return
-    let file = element.id
+    let name = element.id
     // 文件名中允许使用空格，但不允许使用 < > / \ | : " * ? 
-    if (/[<>/|:"*?'$#,@&+;!~()\\]/.test(file)) file = `BASE64-${btoa(file)}`
-    const filename = path.join(this.wsDir, file) + `.json`
+    if (/[<>/|:"*?'$#,@&+;!~()\\]/.test(name)) name = md5(name)
+    const filename = path.join(this.wsDir, name) + `.json`
     const content = await this.genContent(element.id)
     await writeFile(filename, content)
       .then(() => {
@@ -88,12 +88,12 @@ class TreeExplorer {
         console.error(err)
       })
   }
-  async genContent(filePath) {
-    let res = await getValueFrUri(filePath)
+  async genContent(id) {
+    let res = await getValueFrUri(id)
     try {
       if (res.type === 'string') res.value = JSON.parse(res.value)
     } catch (e) { }
-
+    res.id = id
     return JSON.stringify(res, null, 2)
   }
   initSaveEvent() {
@@ -101,20 +101,15 @@ class TreeExplorer {
       console.log('onDidSaveTextDocument:', e)
       let file = path.parse(e.uri._fsPath)
       // e.uri.path.replace(`${this.rootPath}/.vscode/`, '')
-      console.log(file)
+      // console.log(file)
       if (path.parse(file.dir).base !== '.zx-redis') return
 
       let content = await readFile(e.uri._fsPath, 'utf8')
       if (!content) return
       try {
-        let { key, type, value } = JSON.parse(content) || {}
+        let { key, type, value, id } = JSON.parse(content) || {}
         if (!key || !type) return showMsg('key, type 不能为空')
-        let id = file.name
-        if (id.startsWith('BASE64-')) {
-          let t = id.match(/BASE64-(.+)/)
-          if (t) id = atob(t[1])
-        }
-        let res = await setValueFrUri(id, value)
+        let res = await setValueFrUri(id || file.name, value)
         if (res) return showMsg(res)
 
       } catch (e) { }
