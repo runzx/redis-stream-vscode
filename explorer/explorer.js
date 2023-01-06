@@ -3,7 +3,7 @@ const { access, mkdir, unlink, writeFile } = require('node:fs/promises')
 const path = require('path')
 const vscode = require("vscode")
 const { NodeType, RedisType } = require("../config")
-const { isEmpty, } = require('../lib/util')
+const { isEmpty, atob, btoa } = require('../lib/util')
 const { createLogger } = require('../lib/logging')
 const { showMsg } = require('../lib/show-message')
 // const { writeFile } = require('fs/promises')
@@ -73,9 +73,11 @@ class TreeExplorer {
   }
   async openResource(element) {
     if (!this.wsDir && await this.initDir()) return
-
-    const filename = path.join(this.wsDir, element.id) + `.json`
-    const content = await this.genContent(path.basename(filename))
+    let file = element.id
+    // 文件名中允许使用空格，但不允许使用 < > / \ | : " * ? 
+    if (/[<>/|:"*?'$#,@&+;!~()\\]/.test(file)) file = `BASE64-${btoa(file)}`
+    const filename = path.join(this.wsDir, file) + `.json`
+    const content = await this.genContent(element.id)
     await writeFile(filename, content)
       .then(() => {
         vscode.workspace.openTextDocument(filename)
@@ -107,8 +109,12 @@ class TreeExplorer {
       try {
         let { key, type, value } = JSON.parse(content) || {}
         if (!key || !type) return showMsg('key, type 不能为空')
-
-        let res = await setValueFrUri(file.base, value)
+        let id = file.name
+        if (id.startsWith('BASE64-')) {
+          let t = id.match(/BASE64-(.+)/)
+          if (t) id = atob(t[1])
+        }
+        let res = await setValueFrUri(id, value)
         if (res) return showMsg(res)
 
       } catch (e) { }

@@ -347,7 +347,7 @@ exports.setValueFrUri = async function (path, value) {
   try {
     switch (type) {
       case RedisType.string:  // 'string'
-        result = await client.getKey(key)
+        result = await client.get(key)
         if (typeof value === 'object') value = JSON.stringify(value)
         if (result === value) return 'value 没有变化'
         result = await redisModel.client.set(key, value)
