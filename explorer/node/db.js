@@ -90,7 +90,7 @@ class DbTreeItem extends TreeDataItem {
 
     let { redisModel, } = this.opt
     const [keysCategory, scanMore] = await redisModel.scanKeys()
-    const [keysLen] = this.opt.description.match(/\d+/) || []
+    const [keysLen] = !scanMore ? 0 : this.opt.description.match(/\d+/) || []
 
     const categroys = Object.keys(keysCategory).map(label => {
       return RedisDateTypes.init({

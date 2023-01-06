@@ -78,6 +78,7 @@ class TreeExplorer {
     if (/[<>/|:"*?'$#,@&+;!~()\\]/.test(name)) name = md5(name)
     const filename = path.join(this.wsDir, name) + `.json`
     const content = await this.genContent(element.id)
+    if (content === null) return this.refresh()
     await writeFile(filename, content)
       .then(() => {
         vscode.workspace.openTextDocument(filename)
@@ -90,6 +91,7 @@ class TreeExplorer {
   }
   async genContent(id) {
     let res = await getValueFrUri(id)
+    if (!res.value) return null
     try {
       if (res.type === 'string') res.value = JSON.parse(res.value)
     } catch (e) { }

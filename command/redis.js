@@ -350,7 +350,10 @@ exports.setValueFrUri = async function (path, value) {
         result = await client.get(key)
         if (typeof value === 'object') value = JSON.stringify(value)
         if (result === value) return 'value 没有变化'
-        result = await redisModel.client.set(key, value)
+        let ttl = await client.ttl(key)
+        if (ttl < 0)
+          result = await client.set(key, value)
+        else result = await client.setex(key, ttl, value)
         break
       case RedisType.hash:  // 类似 Map 
         const hall = await client.hgetall(key)
